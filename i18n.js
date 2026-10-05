@@ -3,7 +3,7 @@
 window.LAKAYMWEN_TEXT = {
 en: {
   code_if_any:"Code (only if your email shows one)", verify_click_link:"Open the email we sent you and click “Confirm email address”. If it shows a 6-digit code, type it here.", reset_click_link:"Open the email we sent you and click the link in it to choose your new password.", reset_link_text:"Choose your new password.",
-  map_tip_towns:n=>n===1?"1 town":`${n} towns`, map_tip_members:n=>n===1?"1 member":`${n} members`, map_tip_hint:"Click to see the towns",
+  map_tip_towns:n=>n===1?"1 town":`${n} towns`, map_tip_members:n=>n===1?"1 member":`${n} members`, map_tip_hint:"Click to register",
   rel_grandchild:"Grandchild",
   rel_niece:"Niece",
   rel_nephew:"Nephew",
@@ -164,7 +164,7 @@ en: {
   stat_towns:"towns in Haiti", stat_free:"free to search", stat_lang:"languages: Kreyòl & English",
   post_e:"Post a notice", post_h:"Looking for someone? Let them find you.", post_p:"Post a free notice. Anyone who knows them can message you privately, and you can share it on WhatsApp in one tap.",
   town_filter:"Find your town…", none_town:"No town matches that name.",
-  nav_haiti:"Haiti", haiti_e:"Lakaymwen · since 2004", haiti_h:"Haiti Facts", map_hint:"Point to your department, then click it to choose your town.",
+  nav_haiti:"Haiti", haiti_e:"Lakaymwen · since 2004", haiti_h:"Haiti Facts", map_hint:"Point to your department, then click to register.",
   dept_cap:c=>`Capital: ${c}`, dept_pick:"Pick your town to register or see who's looking for family:",
   q_profile:"View profile", q_board:"Message board", q_search:"Member search", q_inbox:"Messages", q_post:"Post a notice",
   cities_h:"Where were you born in Haiti?", cities_p:"Click on the map to select the city.",
@@ -289,7 +289,7 @@ en: {
 },
 ht: {
   code_if_any:"Kòd (sèlman si imèl ou a gen youn)", verify_click_link:"Louvri imèl nou voye a epi klike sou “Confirm email address”. Si li gen yon kòd 6 chif, ekri l isit la.", reset_click_link:"Louvri imèl nou voye a epi klike sou lyen ki ladan l pou w chwazi nouvo modpas ou.", reset_link_text:"Chwazi nouvo modpas ou.",
-  map_tip_towns:n=>`${n} vil`, map_tip_members:n=>`${n} manm`, map_tip_hint:"Klike pou wè vil yo",
+  map_tip_towns:n=>`${n} vil`, map_tip_members:n=>`${n} manm`, map_tip_hint:"Klike pou enskri",
   rel_grandchild:"Pitit pitit",
   rel_niece:"Nyès",
   rel_nephew:"Neve",
@@ -450,7 +450,7 @@ ht: {
   stat_towns:"vil ann Ayiti", stat_free:"gratis pou chèche", stat_lang:"lang: Kreyòl & Angle",
   post_e:"Poste yon avi", post_h:"W ap chèche yon moun? Kite l jwenn ou.", post_p:"Poste yon avi gratis. Nenpòt moun ki konnen l ka voye yon mesaj prive ba ou, epi ou ka pataje l sou WhatsApp an yon sèl klik.",
   town_filter:"Chèche vil ou…", none_town:"Pa gen vil ki gen non sa a.",
-  nav_haiti:"Ayiti", haiti_e:"Lakaymwen · depi 2004", haiti_h:"Ayiti an bref", map_hint:"Mete sourit la sou depatman ou, epi klike pou chwazi vil ou.",
+  nav_haiti:"Ayiti", haiti_e:"Lakaymwen · depi 2004", haiti_h:"Ayiti an bref", map_hint:"Mete sourit la sou depatman ou, epi klike pou enskri.",
   dept_cap:c=>`Chèflye: ${c}`, dept_pick:"Chwazi vil ou pou enskri oswa pou wè kiyès k ap chèche fanmi:",
   q_profile:"Wè pwofil", q_board:"Tablo mesaj", q_search:"Chèche manm", q_inbox:"Mesaj", q_post:"Poste yon avi",
   cities_h:"Ki kote w fèt ann Ayiti?", cities_p:"Klike sou kat la pou chwazi vil la.",
@@ -575,7 +575,7 @@ ht: {
 },
 fr: {
   code_if_any:"Code (seulement si votre e-mail en contient un)", verify_click_link:"Ouvrez l'e-mail que nous vous avons envoyé et cliquez sur « Confirm email address ». S'il contient un code à 6 chiffres, saisissez-le ici.", reset_click_link:"Ouvrez l'e-mail que nous vous avons envoyé et cliquez sur le lien pour choisir votre nouveau mot de passe.", reset_link_text:"Choisissez votre nouveau mot de passe.",
-  map_tip_towns:n=>n===1?"1 ville":`${n} villes`, map_tip_members:n=>n===1?"1 membre":`${n} membres`, map_tip_hint:"Cliquez pour voir les villes",
+  map_tip_towns:n=>n===1?"1 ville":`${n} villes`, map_tip_members:n=>n===1?"1 membre":`${n} membres`, map_tip_hint:"Cliquez pour vous inscrire",
   rel_grandchild:"Petit-enfant",
   rel_niece:"Nièce",
   rel_nephew:"Neveu",
@@ -736,7 +736,7 @@ fr: {
   stat_towns:"villes en Haïti", stat_free:"recherche gratuite", stat_lang:"langues : kreyòl et anglais",
   post_e:"Publier un avis", post_h:"Vous cherchez quelqu'un ? Laissez-le vous trouver.", post_p:"Publiez un avis gratuit. Toute personne qui la connaît peut vous écrire en privé, et vous pouvez le partager sur WhatsApp d'un simple geste.",
   town_filter:"Trouvez votre ville…", none_town:"Aucune ville ne correspond à ce nom.",
-  nav_haiti:"Haïti", haiti_e:"Lakaymwen · depuis 2004", haiti_h:"Haïti en bref", map_hint:"Pointez votre département, puis cliquez pour choisir votre ville.",
+  nav_haiti:"Haïti", haiti_e:"Lakaymwen · depuis 2004", haiti_h:"Haïti en bref", map_hint:"Pointez votre département, puis cliquez pour vous inscrire.",
   dept_cap:c=>`Chef-lieu : ${c}`, dept_pick:"Choisissez votre ville pour vous inscrire ou voir qui cherche sa famille :",
   q_profile:"Voir le profil", q_board:"Tableau des messages", q_search:"Recherche de membres", q_inbox:"Messages", q_post:"Publier un avis",
   cities_h:"Où êtes-vous né en Haïti ?", cities_p:"Cliquez sur la carte pour choisir la ville.",

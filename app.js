@@ -296,10 +296,55 @@
     $("dept-title").textContent = d.name;
     $("dept-cap").textContent = L().dept_cap(d.capital);
     $("dept-towns").replaceChildren(...d.towns.map(t => el("li", {},
-      el("button", { type: "button", onclick: () => { $("dlg-dept").close(); openTown(t); } }, t,
+      el("button", { type: "button", onclick: () => { $("dlg-dept").close(); me ? openTown(t) : openAuth(t); } }, t,
         townCounts[t] ? el("span", { class: "count", text: String(townCounts[t]) }) : null))));
     openDlg("dlg-dept");
   }
+  /* ---------- The Haiti map: departments light up under the mouse ---------- */
+  (function mapSetup() {
+    const svg = $("map-svg"), box = $("map-box"), tip = $("map-tip");
+    if (!svg) return;
+    const byId = Object.fromEntries(DEPTS.map(d => [d.id, d]));
+    const groups = [...svg.querySelectorAll(".dept")];
+    const label = id => svg.querySelector(`.map-labels text[data-dept="${id}"]`);
+    let current = null;
+    function show(g, ev) {
+      const d = byId[g.dataset.dept]; if (!d) return;
+      if (current !== g) {
+        if (current) { current.classList.remove("on"); const l0 = label(current.dataset.dept); if (l0) l0.classList.remove("on"); }
+        current = g; g.classList.add("on");
+        if (ev) g.parentNode.appendChild(g);   // mouse: bring to the front so its outline shows (not on keyboard focus, it would drop focus)
+        const l = label(d.id); if (l) l.classList.add("on");
+        svg.classList.add("hovering");
+        const members = d.towns.reduce((n, t) => n + (townCounts[t] || 0), 0);
+        $("map-tip-name").textContent = d.name;
+        $("map-tip-info").textContent = L().map_tip_towns(d.towns.length) + (members ? " · " + L().map_tip_members(members) : "");
+        $("map-tip-hint").textContent = L().map_tip_hint;
+        tip.hidden = false;
+      }
+      const r = box.getBoundingClientRect();
+      let x, y;
+      if (ev && ev.clientX != null) { x = ev.clientX - r.left; y = ev.clientY - r.top; }
+      else { const b = g.getBoundingClientRect(); x = b.left + b.width / 2 - r.left; y = b.top + b.height / 2 - r.top; }
+      const w = tip.offsetWidth, h = tip.offsetHeight;
+      tip.style.left = Math.max(8, Math.min(r.width - w - 8, x + 14)) + "px";
+      tip.style.top = Math.max(8, Math.min(r.height - h - 8, y - h - 12 < 8 ? y + 18 : y - h - 12)) + "px";
+    }
+    function hide() {
+      if (current) { current.classList.remove("on"); const l = label(current.dataset.dept); if (l) l.classList.remove("on"); }
+      current = null; svg.classList.remove("hovering"); tip.hidden = true;
+    }
+    groups.forEach(g => {
+      g.addEventListener("pointermove", ev => { if (ev.pointerType !== "touch") show(g, ev); });
+      g.addEventListener("focus", () => show(g));
+      g.addEventListener("blur", hide);
+      g.addEventListener("click", ev => { ev.preventDefault(); ev.stopPropagation(); hide(); const d = byId[g.dataset.dept]; if (d) openDept(d); });
+      g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); ev.stopPropagation(); hide(); const d = byId[g.dataset.dept]; if (d) openDept(d); } });
+    });
+    svg.addEventListener("pointerleave", hide);
+    // clicking the sea (not a department) opens the full town list, like before
+    svg.addEventListener("click", () => go("#register"));
+  })();
   async function loadTownCounts() {
     townCounts = {};
     if (sb) {

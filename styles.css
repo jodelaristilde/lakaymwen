@@ -851,3 +851,65 @@ body.register-mode .side-col,.side-col{display:grid;gap:16px;align-content:start
   .sponsors-h{grid-column:1/-1}
   .sponsor{display:flex;align-items:center;justify-content:center;min-height:86px}
 }
+
+/* ---------- No top header: language in the banner, ☰ floats on phones ---------- */
+.acct-hidden{display:none!important}
+.hb-lang{position:absolute;right:16px;bottom:12px;z-index:2;background:transparent;border:0;box-shadow:none}
+.hb-lang button{background:transparent;color:#fff;border-color:transparent}
+.hb-lang button .lang-code{color:#fff}
+.hb-lang button[aria-pressed="true"]{background:rgba(255,255,255,.18);color:#fff;box-shadow:none}
+.hb-lang button:hover{background:rgba(255,255,255,.12)}
+.hb-logo{display:inline-block}
+.hb-logo:focus-visible{outline:3px solid #fff;outline-offset:4px;border-radius:8px}
+body.register-mode .side-col,.side-col{top:16px}
+.portal-grid,body.register-mode .portal-grid{grid-template-columns:230px minmax(0,1fr) minmax(250px,300px)}
+@media (max-width:1100px){.portal-grid,body.register-mode .portal-grid{grid-template-columns:210px minmax(0,1fr)}}
+.sponsors{gap:12px}
+.sponsor{padding:10px;border-radius:14px}
+.sponsor.dark{padding:6px}
+@media (max-width:760px){
+  .portal-grid,body.register-mode .portal-grid{grid-template-columns:1fr}
+  .menu-btn{position:fixed;top:12px;right:12px;z-index:45;background:var(--bg);box-shadow:0 4px 14px rgba(7,19,48,.18)}
+  body.menu-open .side-menu,body.menu-open.register-mode .side-menu{top:62px}
+  .sponsors{grid-template-columns:1fr;max-width:420px;width:100%;margin:0 auto}
+  .sponsor{min-height:0}
+  .sponsor img{max-height:150px;object-fit:contain}
+  .hb-lang{right:10px;bottom:8px}
+  .hb-text{padding-right:60px}
+}
+
+/* ---------- Banner: light morning mist on the left so the green logo reads without an outline ---------- */
+.hb-art rect[fill="url(#hb-fade)"]{display:none}
+.hero-banner::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(255,255,255,.93) 0%,rgba(255,255,255,.82) 34%,rgba(255,255,255,.35) 52%,rgba(255,255,255,0) 66%)}
+.hb-kicker{color:#a1460a;text-shadow:none}
+.hb-sub{color:#0b1530;text-shadow:none;font-weight:500}
+.hb-logo{filter:none}
+@media (max-width:760px){
+  .hero-banner::before{background:linear-gradient(90deg,rgba(255,255,255,.94) 0%,rgba(255,255,255,.86) 62%,rgba(255,255,255,.45) 82%,rgba(255,255,255,.15) 100%)}
+}
+.hb-lang button{text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.hb-text{position:relative;z-index:1}
+/* languages sit low, on the sea, clear of the houses */
+.hb-lang{bottom:3px;right:12px}
+.hb-lang button{padding:4px 9px}
+@media (max-width:760px){.hb-lang{bottom:2px;right:8px}}
+/* languages up in the sky, larger and easier to read */
+@media (min-width:761px){
+  .hb-lang{top:16px;bottom:auto;left:55%;right:auto;padding:4px;gap:4px;background:rgba(7,19,48,.38);border-radius:999px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 4px 16px rgba(7,19,48,.25)}
+  .hb-lang button{font-size:1rem;font-weight:800;padding:7px 14px;gap:8px;letter-spacing:.02em}
+  .hb-lang .flag{width:28px;height:19px;border-radius:4px}
+  .hb-lang button[aria-pressed="true"]{background:rgba(255,255,255,.95);color:#0b1530;text-shadow:none}
+  .hb-lang button[aria-pressed="true"] .lang-code{color:#0b1530}
+  .hb-lang button[aria-pressed="false"] .flag{opacity:1}
+}
+@media (max-width:760px){
+  .hb-lang{background:rgba(7,19,48,.38);border-radius:999px;padding:3px}
+  .hb-lang .flag{width:24px;height:16px}
+  .hb-lang button[aria-pressed="true"]{background:rgba(255,255,255,.95)}
+}
+/* logo word + tagline as normal-weight text */
+.hb-logo{text-decoration:none}
+.hb-logo img{height:clamp(40px,4.6vw,60px)}
+.hb-tag{display:block;margin-top:2px;font-family:var(--body);font-weight:500;font-size:clamp(.95rem,1.55vw,1.3rem);letter-spacing:.01em;color:#e8740a;line-height:1.15}
+@media (max-width:760px){.hb-logo img{width:min(220px,100%);height:auto}.hb-tag{font-size:1rem}}

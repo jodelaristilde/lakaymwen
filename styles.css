@@ -798,3 +798,20 @@ body.logged-in:not(.search-mode) #search-page .back-home{display:none}
 .map-tip small{color:#ffc94d;font-weight:700}
 @media (prefers-reduced-motion:reduce){.map-svg .dept path,.map-svg .map-labels text{transition:none}}
 a.map-cta,a.map-cta:hover{text-decoration:none;color:#fff}
+
+/* ---------- Phone: ☰ menu button and drop-down menu ---------- */
+.menu-btn,.side-menu .phone-only{display:none}
+@media (max-width:760px){
+  .menu-btn{display:inline-flex;flex-direction:column;justify-content:center;gap:4px;width:42px;height:42px;padding:0 10px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);cursor:pointer;flex:0 0 auto}
+  .menu-btn span{display:block;height:2.5px;border-radius:2px;background:var(--ink,#0b1530);transition:transform .2s,opacity .2s}
+  body.menu-open .menu-btn span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+  body.menu-open .menu-btn span:nth-child(2){opacity:0}
+  body.menu-open .menu-btn span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+  .side-menu,body.register-mode .side-menu{display:none}
+  body.menu-open .side-menu,body.menu-open.register-mode .side-menu{display:grid;position:fixed;top:64px;left:12px;right:12px;z-index:40;gap:6px;padding:12px;max-height:calc(100vh - 80px);overflow:auto;background:var(--card,#fff);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 40px rgba(7,19,48,.25)}
+  body.menu-open .side-menu a,body.menu-open .side-menu button{padding:13px 16px;font-size:1rem}
+  body.menu-open .side-menu .phone-only{display:block}
+  body.logged-in.menu-open .side-menu .out-only,body:not(.logged-in).menu-open .side-menu .in-only{display:none}
+  .menu-shade{position:fixed;inset:0;z-index:35;background:rgba(7,19,48,.35)}
+  #btn-mine,#btn-signout{display:none}
+}

@@ -1,8 +1,8 @@
 // Lakaymwen offline helper: keeps the site's own files on the phone so it opens
 // fast on slow connections. Member data always comes fresh from the internet.
-const CACHE = "lakaymwen-v3";
+const CACHE = "lakaymwen-v4";
 const SHELL = ["/", "/index.html", "/styles.css", "/app.js", "/i18n.js", "/towns.js", "/depts.js", "/geo.js", "/config.js",
-  "/haiti-map.svg", "/manifest.webmanifest", "/icon-192.png", "/logo-word.png", "/logo-full.png", "/logo-banner.png"];
+  "/haiti-map.svg", "/manifest.webmanifest", "/icon-192.png", "/logo-word.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

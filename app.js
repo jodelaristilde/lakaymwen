@@ -551,6 +551,11 @@
   $("verify-form").addEventListener("submit", async e => {
     e.preventDefault();
     const token = $("v-code").value.replace(/\D/g, "");
+    if (!token) {   // most emails carry a link instead of a code
+      const { data: s0 } = await sb.auth.getSession();
+      if (s0 && s0.session) { finishRegistration(s0.session.user); return; }
+      say("join-msg", L().verify_click_link, true); return;
+    }
     if (token.length !== 6) { say("join-msg", L().bad_code, true); $("v-code").focus(); return; }
     const btn = e.submitter; if (btn) btn.disabled = true;
     registering = true;
@@ -589,8 +594,19 @@
   }
 
   /* ---------- Forgot password: code by email, then a new password ---------- */
-  let forgotEmail = "";
+  var forgotEmail = "", recoveryMode = false;
+  $("dlg-forgot").addEventListener("close", () => { recoveryMode = false; });
+  // The reset email's link brings the member back here already signed in: just ask for the new password
+  function openRecovery() {
+    recoveryMode = true;
+    $("forgot-form").hidden = true; $("reset-form").hidden = false; say("forgot-msg", "");
+    $("f-code-wrap").hidden = true;
+    $("reset-text").textContent = L().reset_link_text;
+    if (!$("dlg-forgot").open) openDlg("dlg-forgot");
+    setTimeout(() => $("f-pass").focus(), 60);
+  }
   function openForgot() {
+    recoveryMode = false; $("f-code-wrap").hidden = false;
     $("forgot-form").hidden = false; $("reset-form").hidden = true; say("forgot-msg", "");
     $("f-email").value = ($("l-email").value || $("side-email").value || "").trim();
     if ($("dlg-auth").open) $("dlg-auth").close();
@@ -614,15 +630,19 @@
   $("reset-form").addEventListener("submit", async e => {
     e.preventDefault();
     const token = $("f-code").value.replace(/\D/g, "");
-    if (token.length !== 6) { say("forgot-msg", L().bad_code, true); return; }
+    if (!recoveryMode && !token) { say("forgot-msg", L().reset_click_link, true); return; }
+    if (!recoveryMode && token.length !== 6) { say("forgot-msg", L().bad_code, true); return; }
     if ($("f-pass").value.length < 6) { say("forgot-msg", L().pass_short, true); return; }
     if ($("f-pass").value !== $("f-pass2").value) { say("forgot-msg", L().pass_mismatch, true); return; }
     const btn = e.submitter; if (btn) btn.disabled = true;
-    const { data, error } = await sb.auth.verifyOtp({ email: forgotEmail, token, type: "recovery" });
-    if (error || !data.session) { if (btn) btn.disabled = false; say("forgot-msg", L().bad_code, true); return; }
+    if (!recoveryMode) {
+      const { data, error } = await sb.auth.verifyOtp({ email: forgotEmail, token, type: "recovery" });
+      if (error || !data.session) { if (btn) btn.disabled = false; say("forgot-msg", L().bad_code, true); return; }
+    }
     const { error: uErr } = await sb.auth.updateUser({ password: $("f-pass").value });
     if (btn) btn.disabled = false;
     if (uErr) { say("forgot-msg", L().err + " (" + uErr.message + ")", true); return; }
+    recoveryMode = false;
     $("reset-form").hidden = true; say("forgot-msg", L().pass_changed);
     setTimeout(() => $("dlg-forgot").close(), 1400);
   });
@@ -1617,7 +1637,7 @@
   let currentMember = null;
   let curHash = location.hash || "#home";
   function go(h) {
-    document.querySelectorAll("dialog[open]").forEach(d => d.close());
+    document.querySelectorAll("dialog[open]").forEach(d => { if (!(recoveryMode && d.id === "dlg-forgot")) d.close(); });
     if (h !== curHash) {
       curHash = h;
       try { history.pushState(null, "", h); } catch (e) {}
@@ -1815,8 +1835,9 @@
   fillTownSelects();
   applyLang();
   if (sb) {
-    sb.auth.onAuthStateChange((_ev, session) => {
+    sb.auth.onAuthStateChange((ev, session) => {
       me = session ? session.user : null;
+      if (ev === "PASSWORD_RECOVERY") setTimeout(openRecovery, 0);
       setTimeout(afterAuth, 0); // run Supabase calls outside the auth callback
     });
     loadRecent(); loadTownCounts(); openSharedNotice();

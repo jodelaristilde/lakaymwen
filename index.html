@@ -16,16 +16,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20261005c">
 </head>
 <body>
 
 <header class="nav">
   <div class="wrap nav-row">
-    <a class="brand" href="#home" aria-label="Lakaymwen home">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#071330"/><path d="M32 13 51 29v22H13V29z" fill="#fff"/><path d="M13 29h38v11H13z" fill="#1f3fd1"/><path d="M13 40h38v11H13z" fill="#e8193c"/></svg>
-      <span>Lakaymwen</span>
-    </a>
+    <a class="brand" href="#home" aria-label="Lakaymwen.co home"><img class="brand-logo" src="logo-word.png?v=4" alt="Lakaymwen.co" width="600" height="94"></a>
     <nav class="links" aria-label="Main">
       <a href="#about" data-t="nav_about"></a>
     </nav>
@@ -86,12 +83,13 @@
         </svg>
         <div class="hb-text">
           <p class="hb-kicker" data-t="since"></p>
-          <p class="hb-title">Kote zanmi ak fanmi reyini</p>
+          <h1 class="hb-title"><span class="hb-logo"><img src="logo-banner.png?v=4" alt="Lakaymwen.co: Kote zanmi ak fanmi reyini" width="1000" height="235"></span></h1>
           <p class="hb-sub" data-t="banner_sub"></p>
         </div>
       </div>
     </div>
     <div class="wrap portal-grid">
+      <div class="side-col">
       <nav class="side-menu" id="side-menu" aria-label="Member menu">
         <a href="#home" data-t="nav_home"></a>
         <button type="button" class="out-only" data-forgot-menu data-t="forgot"></button>
@@ -108,6 +106,14 @@
         <a href="#about" class="phone-only" data-t="nav_about"></a>
         <button type="button" class="phone-only in-only" data-action="signout" data-t="signout"></button>
       </nav>
+      <aside class="sponsors" aria-labelledby="sponsors-h">
+        <h2 class="sponsors-h" id="sponsors-h" data-t="sponsors_h"></h2>
+        <a class="sponsor" href="https://jaeky.us" target="_blank" rel="noopener sponsored"><img src="sponsor-jaeky.png?v=1" alt="Jaeky: Just About Everything, Kindly Yours" width="600" height="265" loading="lazy"></a>
+        <a class="sponsor" href="https://seating4u.com" target="_blank" rel="noopener sponsored"><img src="sponsor-seating4u.png?v=1" alt="Seating4U: We've Got Your Seats" width="900" height="326" loading="lazy"></a>
+        <a class="sponsor dark" href="https://vipservice4u.us" target="_blank" rel="noopener sponsored"><img src="sponsor-vipservice4u.png?v=1" alt="VIP Service4U" width="600" height="344" loading="lazy"></a>
+        <a class="sponsor" href="https://radiogroovefm.com" target="_blank" rel="noopener sponsored"><img src="sponsor-groovefm.png?v=1" alt="Groove FM Radio" width="600" height="269" loading="lazy"></a>
+      </aside>
+      </div>
       <div class="menu-shade" id="menu-shade" hidden></div>
       <div class="portal-main">
 
@@ -288,7 +294,6 @@
 <text x="71.0" y="395.9" data-dept="grand-anse">GRAND ANSE</text>
 </g></svg>
               <div class="map-tip" id="map-tip" hidden><b id="map-tip-name"></b><span id="map-tip-info"></span><small id="map-tip-hint"></small></div>
-              <a class="map-cta" href="#register" data-t="map_cta"></a>
             </div>
             <figcaption data-t="map_hint"></figcaption>
           </figure>
@@ -366,7 +371,7 @@
 
 <footer id="contact">
   <div class="wrap foot-row">
-    <a class="brand light" href="#home"><span>Lakaymwen</span></a>
+    <a class="brand light" href="#home"><span>Lakaymwen.co</span></a>
     <span><span data-t="contact_us"></span> <span id="contact-email"></span></span>
     <a href="#privacy" class="foot-link" data-t="privacy_h"></a>
     <span>© 2004–<span id="year"></span></span>
@@ -559,12 +564,21 @@
   </div>
 </dialog>
 
+<script>
+window.addEventListener("error", function (e) {
+  if (!e.message || document.getElementById("js-error")) return;
+  var d = document.createElement("div"); d.id = "js-error";
+  d.style.cssText = "position:fixed;left:8px;right:8px;bottom:8px;z-index:99;background:#7a1414;color:#fff;padding:10px 14px;border-radius:12px;font:14px/1.4 system-ui,sans-serif";
+  d.textContent = "The page didn't load completely. Please refresh. (" + e.message + " · " + (e.filename || "").split("/").pop() + ":" + e.lineno + ")";
+  document.body.appendChild(d);
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
-<script src="config.js"></script>
-<script src="towns.js"></script>
-<script src="depts.js"></script>
-<script src="geo.js"></script>
-<script src="i18n.js"></script>
-<script src="app.js"></script>
+<script src="config.js?v=20261005c"></script>
+<script src="towns.js?v=20261005c"></script>
+<script src="depts.js?v=20261005c"></script>
+<script src="geo.js?v=20261005c"></script>
+<script src="i18n.js?v=20261005c"></script>
+<script src="app.js?v=20261005c"></script>
 </body>
 </html>

@@ -71,6 +71,7 @@
       if (typeof v !== "string") return;
       if (e.hasAttribute("data-html")) e.innerHTML = v; else e.textContent = v;
     });
+    document.querySelectorAll("[data-t-aria]").forEach(e => { const v = L()[e.dataset.tAria]; if (typeof v === "string") e.setAttribute("aria-label", v); });
     document.querySelectorAll("[data-ph]").forEach(e => { const v = L()[e.dataset.ph]; if (typeof v === "string") e.placeholder = v; });
     document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
     if (!sb) { $("setup-banner").textContent = L().setup; $("setup-banner").hidden = false; }
@@ -254,6 +255,17 @@
   }
 
   /* ---------- Portal: quick buttons, sidebar login, featured members, recent list ---------- */
+  /* ---------- Phone: the side menu opens from the ☰ button ---------- */
+  function setMenu(open) {
+    document.body.classList.toggle("menu-open", open);
+    $("menu-btn").setAttribute("aria-expanded", String(open));
+    $("menu-shade").hidden = !open;
+  }
+  $("menu-btn").addEventListener("click", () => setMenu(!document.body.classList.contains("menu-open")));
+  $("menu-shade").addEventListener("click", () => setMenu(false));
+  $("side-menu").addEventListener("click", ev => { if (ev.target.closest("a,button")) setMenu(false); });
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape" && document.body.classList.contains("menu-open")) { setMenu(false); $("menu-btn").focus(); } });
+  window.addEventListener("hashchange", () => setMenu(false));
   let featuredData = null;
   document.querySelectorAll("[data-action]").forEach(b => b.addEventListener("click", () => {
     const a = b.dataset.action;
@@ -262,6 +274,7 @@
     else if (a === "inbox") { me ? openInbox() : openAuth(); }
     else if (a === "search") { go("#search"); setTimeout(() => $("s-name").focus(), 60); }
     else if (a === "login") { openAuth(null, "login"); }
+    else if (a === "signout") { $("btn-signout").click(); }
     else if (a === "tell") {
       const text = L().tell_text + " " + pageUrl();
       wa(text);

@@ -913,3 +913,18 @@ body.register-mode .side-col,.side-col{top:16px}
 .hb-logo img{height:clamp(40px,4.6vw,60px)}
 .hb-tag{display:block;margin-top:2px;font-family:var(--body);font-weight:500;font-size:clamp(.95rem,1.55vw,1.3rem);letter-spacing:.01em;color:#e8740a;line-height:1.15}
 @media (max-width:760px){.hb-logo img{width:min(220px,100%);height:auto}.hb-tag{font-size:1rem}}
+/* banner sentence on one line */
+.hb-text{max-width:none}
+@media (min-width:1001px){.hb-sub{white-space:nowrap}}
+/* slogans under sponsor logos that don't have one built in */
+.sponsor-tag{display:block;margin-top:6px;text-align:center;font-family:Georgia,"Times New Roman",serif;font-variant:small-caps;letter-spacing:.06em;font-size:.86rem;line-height:1.2;color:#1a1a1a}
+.sponsor{text-decoration:none}
+@media (max-width:760px){.sponsor{flex-direction:column}.sponsor-tag{font-size:1rem}}
+/* "Where were you born in Haiti?" flashes like the old Flash site */
+@keyframes lkm-flash{0%,100%{color:var(--ink)}25%{color:#d21034;text-shadow:0 0 14px rgba(210,16,52,.35)}50%{color:var(--ink)}75%{color:#1f3fd1;text-shadow:0 0 14px rgba(31,63,209,.35)}}
+.flash-h{animation:lkm-flash 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.flash-h{animation:none}}
+/* sponsors heading back, Groove FM slogan in its own blue */
+.sponsors-h{font-size:.8rem;color:var(--ink-2);margin:6px 0 0}
+.sponsor-tag.groove{font-family:"Montserrat",var(--body);font-variant:normal;text-transform:uppercase;font-weight:600;letter-spacing:.06em;font-size:.68rem;color:#0a0fb0;white-space:nowrap}
+@media (max-width:760px){.sponsor-tag.groove{font-size:.85rem}}

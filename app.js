@@ -5,6 +5,9 @@
   const TEXT = window.LAKAYMWEN_TEXT;
   const $ = id => document.getElementById(id);
 
+  // tolerate stray spaces or a trailing slash pasted with the keys
+  if (typeof C.SUPABASE_URL === "string") C.SUPABASE_URL = C.SUPABASE_URL.trim().replace(/\/+$/, "");
+  if (typeof C.SUPABASE_ANON_KEY === "string") C.SUPABASE_ANON_KEY = C.SUPABASE_ANON_KEY.trim();
   const configured = typeof C.SUPABASE_URL === "string" && C.SUPABASE_URL.startsWith("https://") &&
     typeof C.SUPABASE_ANON_KEY === "string" && !C.SUPABASE_ANON_KEY.includes("PASTE");
   const sb = configured && window.supabase ? window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY) : null;

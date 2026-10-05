@@ -15,8 +15,8 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23071330'/%3E%3Cpath d='M32 13 51 29v22H13V29z' fill='%23fff'/%3E%3Cpath d='M13 29h38v11H13z' fill='%231f3fd1'/%3E%3Cpath d='M13 40h38v11H13z' fill='%23e8193c'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261005g">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Montserrat:wght@500;600&display=swap">
+<link rel="stylesheet" href="styles.css?v=20261005j">
 </head>
 <body>
 
@@ -78,7 +78,6 @@
         <div class="hb-text">
           <p class="hb-kicker" data-t="since"></p>
           <h1 class="hb-title"><a class="hb-logo" href="#home"><img src="logo-word.png?v=5" alt="Lakaymwen.co" width="600" height="99"><span class="hb-tag">Kote Zanmi Ak Fanmi Reyini</span></a></h1>
-          <p class="hb-sub" data-t="banner_sub"></p>
         </div>
       </div>
     </div>
@@ -100,11 +99,12 @@
         <a href="#about" data-t="nav_about"></a>
         <button type="button" class="in-only" data-action="signout" data-t="signout"></button>
       </nav>
-      <aside class="sponsors" data-t-aria="sponsors_h">
+      <aside class="sponsors" aria-labelledby="sponsors-h">
+        <h2 class="sponsors-h" id="sponsors-h" data-t="sponsors_h"></h2>
         <a class="sponsor" href="https://jaeky.us/place-new-order" target="_blank" rel="noopener sponsored"><img src="sponsor-jaeky.png?v=2" alt="Jaeky Got You: Just About Everything, Kindly Yours" width="700" height="363" loading="lazy"></a>
         <a class="sponsor" href="https://seating4u.com" target="_blank" rel="noopener sponsored"><img src="sponsor-seating4u.png?v=1" alt="Seating4U: We've Got Your Seats" width="900" height="326" loading="lazy"></a>
-        <a class="sponsor" href="https://vipservice4u.us" target="_blank" rel="noopener sponsored"><img src="sponsor-vipservice4u.png?v=2" alt="VIP Service4U" width="700" height="392" loading="lazy"></a>
-        <a class="sponsor" href="https://radiogroovefm.com" target="_blank" rel="noopener sponsored"><img src="sponsor-groovefm.png?v=1" alt="Groove FM Radio" width="600" height="269" loading="lazy"></a>
+        <a class="sponsor" href="https://vipservice4u.us" target="_blank" rel="noopener sponsored"><img src="sponsor-vipservice4u.png?v=2" alt="VIP Service4U" width="700" height="392" loading="lazy"><span class="sponsor-tag">Where Every Guest Is a VIP</span></a>
+        <a class="sponsor" href="https://radiogroovefm.com" target="_blank" rel="noopener sponsored"><img src="sponsor-groovefm.png?v=1" alt="Groove FM Radio" width="600" height="269" loading="lazy"><span class="sponsor-tag groove">Feel the Groove, Anywhere</span></a>
       </aside>
       </div>
       <div class="menu-shade" id="menu-shade" hidden></div>
@@ -257,7 +257,7 @@
 
 
         <div class="box" id="haiti">
-          <div class="box-head"><h2 data-t="cities_h"></h2></div>
+          <div class="box-head"><h2 class="flash-h" data-t="cities_h"></h2></div>
           <p class="box-text" data-t="cities_p"></p>
           <figure class="map">
             <div class="map-box map-link" id="map-box">
@@ -567,11 +567,11 @@ window.addEventListener("error", function (e) {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
-<script src="config.js?v=20261005g"></script>
-<script src="towns.js?v=20261005g"></script>
-<script src="depts.js?v=20261005g"></script>
-<script src="geo.js?v=20261005g"></script>
-<script src="i18n.js?v=20261005g"></script>
-<script src="app.js?v=20261005g"></script>
+<script src="config.js?v=20261005j"></script>
+<script src="towns.js?v=20261005j"></script>
+<script src="depts.js?v=20261005j"></script>
+<script src="geo.js?v=20261005j"></script>
+<script src="i18n.js?v=20261005j"></script>
+<script src="app.js?v=20261005j"></script>
 </body>
 </html>

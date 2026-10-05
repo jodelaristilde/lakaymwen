@@ -782,3 +782,19 @@ body:not(.logged-in) .side-menu .in-only{display:none}
 body.logged-in:not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) #haiti{display:none}
 body.logged-in:not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) #search-page.search-page{display:block}
 body.logged-in:not(.search-mode) #search-page .back-home{display:none}
+
+/* Interactive Haiti map */
+.map-svg{display:block;width:100%;height:auto;cursor:pointer;background:#fff}
+.map-svg .dept{cursor:pointer;outline:none}
+.map-svg .dept path{transition:opacity .18s,filter .18s}
+.map-svg.hovering .dept:not(.on) path{opacity:.5}
+.map-svg .dept.on path{filter:saturate(1.6) brightness(1.03) drop-shadow(0 3px 6px rgba(7,19,48,.35));stroke:#0b1530;stroke-width:2.6}
+.map-svg .dept:focus-visible path{stroke:#1f3fd1;stroke-width:3}
+.map-svg .map-labels text{transition:fill .18s}
+.map-svg .map-labels text.on{fill:#c40f2e;font-size:14px}
+.map-link:hover img{transform:none}
+.map-tip{position:absolute;z-index:3;pointer-events:none;display:grid;gap:1px;padding:8px 12px;border-radius:12px;background:#0b1530;color:#fff;box-shadow:0 10px 26px rgba(7,19,48,.3);font-size:.85rem;white-space:nowrap}
+.map-tip b{font-size:1rem}
+.map-tip small{color:#ffc94d;font-weight:700}
+@media (prefers-reduced-motion:reduce){.map-svg .dept path,.map-svg .map-labels text{transition:none}}
+a.map-cta,a.map-cta:hover{text-decoration:none;color:#fff}

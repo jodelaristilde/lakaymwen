@@ -16,22 +16,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261005c">
+<link rel="stylesheet" href="styles.css?v=20261005g">
 </head>
 <body>
 
-<header class="nav">
-  <div class="wrap nav-row">
-    <a class="brand" href="#home" aria-label="Lakaymwen.co home"><img class="brand-logo" src="logo-word.png?v=4" alt="Lakaymwen.co" width="600" height="94"></a>
-    <nav class="links" aria-label="Main">
-      <a href="#about" data-t="nav_about"></a>
-    </nav>
-    <div class="nav-right">
-      <div class="lang" role="group" aria-label="Language">
-        <button type="button" data-lang="ht" aria-pressed="false" aria-label="Kreyòl" title="Kreyòl"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="10" fill="#00209f"/><rect y="10" width="30" height="10" fill="#d21034"/><rect x="11" y="6.5" width="8" height="7" fill="#fff"/><path d="M15 7.6v4.8M13 12h4" stroke="#016a16" stroke-width="1.1"/></svg><span class="lang-code">KR</span></button>
-        <button type="button" data-lang="fr" aria-pressed="false" aria-label="Français" title="Français"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="10" height="20" fill="#002395"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#ed2939"/></svg><span class="lang-code">FR</span></button>
-        <button type="button" data-lang="en" aria-pressed="true" aria-label="English" title="English"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><g fill="#b22234"><rect width="30" height="1.54"/><rect y="3.08" width="30" height="1.54"/><rect y="6.15" width="30" height="1.54"/><rect y="9.23" width="30" height="1.54"/><rect y="12.3" width="30" height="1.54"/><rect y="15.4" width="30" height="1.54"/><rect y="18.46" width="30" height="1.54"/></g><rect width="13" height="10.77" fill="#3c3b6e"/><g fill="#fff"><circle cx="2.2" cy="2" r=".55"/><circle cx="5.4" cy="2" r=".55"/><circle cx="8.6" cy="2" r=".55"/><circle cx="11" cy="2" r=".55"/><circle cx="3.8" cy="4.2" r=".55"/><circle cx="7" cy="4.2" r=".55"/><circle cx="10.2" cy="4.2" r=".55"/><circle cx="2.2" cy="6.4" r=".55"/><circle cx="5.4" cy="6.4" r=".55"/><circle cx="8.6" cy="6.4" r=".55"/><circle cx="11" cy="6.4" r=".55"/><circle cx="3.8" cy="8.6" r=".55"/><circle cx="7" cy="8.6" r=".55"/><circle cx="10.2" cy="8.6" r=".55"/></g></svg><span class="lang-code">EN</span></button>
-      </div>
+<!-- Account buttons kept for the site logic; the left menu and login box are what members use -->
+<div class="acct-hidden" hidden>
       <div class="account" id="acct-out">
         <button class="btn ghost" type="button" id="btn-signin" data-t="signin"></button>
         <a class="btn dark" href="#register" data-t="register"></a>
@@ -41,10 +31,9 @@
         <button class="btn ghost" type="button" id="btn-mine" data-t="my_account"></button>
         <button class="linkbtn" type="button" id="btn-signout" data-t="signout"></button>
       </div>
-      <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="side-menu" data-t-aria="menu"><span></span><span></span><span></span></button>
-    </div>
-  </div>
-</header>
+</div>
+<button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="side-menu" data-t-aria="menu"><span></span><span></span><span></span></button>
+
 
 <main>
   <div class="setup" id="setup-banner" hidden></div>
@@ -81,9 +70,14 @@
           </g>
           <rect width="1200" height="180" fill="url(#hb-fade)"/>
         </svg>
+        <div class="lang hb-lang" role="group" aria-label="Language">
+        <button type="button" data-lang="ht" aria-pressed="false" aria-label="Kreyòl" title="Kreyòl"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="10" fill="#00209f"/><rect y="10" width="30" height="10" fill="#d21034"/><rect x="11" y="6.5" width="8" height="7" fill="#fff"/><path d="M15 7.6v4.8M13 12h4" stroke="#016a16" stroke-width="1.1"/></svg><span class="lang-code">KR</span></button>
+        <button type="button" data-lang="fr" aria-pressed="false" aria-label="Français" title="Français"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="10" height="20" fill="#002395"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#ed2939"/></svg><span class="lang-code">FR</span></button>
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English" title="English"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><g fill="#b22234"><rect width="30" height="1.54"/><rect y="3.08" width="30" height="1.54"/><rect y="6.15" width="30" height="1.54"/><rect y="9.23" width="30" height="1.54"/><rect y="12.3" width="30" height="1.54"/><rect y="15.4" width="30" height="1.54"/><rect y="18.46" width="30" height="1.54"/></g><rect width="13" height="10.77" fill="#3c3b6e"/><g fill="#fff"><circle cx="2.2" cy="2" r=".55"/><circle cx="5.4" cy="2" r=".55"/><circle cx="8.6" cy="2" r=".55"/><circle cx="11" cy="2" r=".55"/><circle cx="3.8" cy="4.2" r=".55"/><circle cx="7" cy="4.2" r=".55"/><circle cx="10.2" cy="4.2" r=".55"/><circle cx="2.2" cy="6.4" r=".55"/><circle cx="5.4" cy="6.4" r=".55"/><circle cx="8.6" cy="6.4" r=".55"/><circle cx="11" cy="6.4" r=".55"/><circle cx="3.8" cy="8.6" r=".55"/><circle cx="7" cy="8.6" r=".55"/><circle cx="10.2" cy="8.6" r=".55"/></g></svg><span class="lang-code">EN</span></button>
+      </div>
         <div class="hb-text">
           <p class="hb-kicker" data-t="since"></p>
-          <h1 class="hb-title"><span class="hb-logo"><img src="logo-banner.png?v=4" alt="Lakaymwen.co: Kote zanmi ak fanmi reyini" width="1000" height="235"></span></h1>
+          <h1 class="hb-title"><a class="hb-logo" href="#home"><img src="logo-word.png?v=5" alt="Lakaymwen.co" width="600" height="99"><span class="hb-tag">Kote Zanmi Ak Fanmi Reyini</span></a></h1>
           <p class="hb-sub" data-t="banner_sub"></p>
         </div>
       </div>
@@ -100,17 +94,16 @@
         <a href="#schools" class="in-only" data-t="nav_schools"></a>
         <a href="#photos" class="in-only"><span data-t="nav_photos"></span><span class="menu-badge" id="photos-badge" hidden></span></a>
         <a href="#alerts" class="alerts-link in-only"><span data-t="nav_alerts"></span><span class="menu-badge" id="alerts-badge" hidden></span></a>
-        <button type="button" class="in-only" data-action="inbox" data-t="messages"></button>
+        <button type="button" class="in-only" data-action="inbox"><span data-t="messages"></span><span class="menu-badge" id="unread-side" hidden></span></button>
         <button type="button" data-action="tell" data-t="tell_friend"></button>
         <a href="#admin" class="admin-only" data-t="admin_h"></a>
-        <a href="#about" class="phone-only" data-t="nav_about"></a>
-        <button type="button" class="phone-only in-only" data-action="signout" data-t="signout"></button>
+        <a href="#about" data-t="nav_about"></a>
+        <button type="button" class="in-only" data-action="signout" data-t="signout"></button>
       </nav>
-      <aside class="sponsors" aria-labelledby="sponsors-h">
-        <h2 class="sponsors-h" id="sponsors-h" data-t="sponsors_h"></h2>
-        <a class="sponsor" href="https://jaeky.us" target="_blank" rel="noopener sponsored"><img src="sponsor-jaeky.png?v=1" alt="Jaeky: Just About Everything, Kindly Yours" width="600" height="265" loading="lazy"></a>
+      <aside class="sponsors" data-t-aria="sponsors_h">
+        <a class="sponsor" href="https://jaeky.us/place-new-order" target="_blank" rel="noopener sponsored"><img src="sponsor-jaeky.png?v=2" alt="Jaeky Got You: Just About Everything, Kindly Yours" width="700" height="363" loading="lazy"></a>
         <a class="sponsor" href="https://seating4u.com" target="_blank" rel="noopener sponsored"><img src="sponsor-seating4u.png?v=1" alt="Seating4U: We've Got Your Seats" width="900" height="326" loading="lazy"></a>
-        <a class="sponsor dark" href="https://vipservice4u.us" target="_blank" rel="noopener sponsored"><img src="sponsor-vipservice4u.png?v=1" alt="VIP Service4U" width="600" height="344" loading="lazy"></a>
+        <a class="sponsor" href="https://vipservice4u.us" target="_blank" rel="noopener sponsored"><img src="sponsor-vipservice4u.png?v=2" alt="VIP Service4U" width="700" height="392" loading="lazy"></a>
         <a class="sponsor" href="https://radiogroovefm.com" target="_blank" rel="noopener sponsored"><img src="sponsor-groovefm.png?v=1" alt="Groove FM Radio" width="600" height="269" loading="lazy"></a>
       </aside>
       </div>
@@ -574,11 +567,11 @@ window.addEventListener("error", function (e) {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
-<script src="config.js?v=20261005c"></script>
-<script src="towns.js?v=20261005c"></script>
-<script src="depts.js?v=20261005c"></script>
-<script src="geo.js?v=20261005c"></script>
-<script src="i18n.js?v=20261005c"></script>
-<script src="app.js?v=20261005c"></script>
+<script src="config.js?v=20261005g"></script>
+<script src="towns.js?v=20261005g"></script>
+<script src="depts.js?v=20261005g"></script>
+<script src="geo.js?v=20261005g"></script>
+<script src="i18n.js?v=20261005g"></script>
+<script src="app.js?v=20261005g"></script>
 </body>
 </html>

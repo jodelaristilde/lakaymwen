@@ -44,6 +44,7 @@
         <button class="btn ghost" type="button" id="btn-mine" data-t="my_account"></button>
         <button class="linkbtn" type="button" id="btn-signout" data-t="signout"></button>
       </div>
+      <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="side-menu" data-t-aria="menu"><span></span><span></span><span></span></button>
     </div>
   </div>
 </header>
@@ -91,7 +92,7 @@
       </div>
     </div>
     <div class="wrap portal-grid">
-      <nav class="side-menu" aria-label="Member menu">
+      <nav class="side-menu" id="side-menu" aria-label="Member menu">
         <a href="#home" data-t="nav_home"></a>
         <button type="button" class="out-only" data-forgot-menu data-t="forgot"></button>
         <a href="#register" class="out-only" data-t="register"></a>
@@ -104,7 +105,10 @@
         <button type="button" class="in-only" data-action="inbox" data-t="messages"></button>
         <button type="button" data-action="tell" data-t="tell_friend"></button>
         <a href="#admin" class="admin-only" data-t="admin_h"></a>
+        <a href="#about" class="phone-only" data-t="nav_about"></a>
+        <button type="button" class="phone-only in-only" data-action="signout" data-t="signout"></button>
       </nav>
+      <div class="menu-shade" id="menu-shade" hidden></div>
       <div class="portal-main">
 
         <div class="box search-page" id="search-page">

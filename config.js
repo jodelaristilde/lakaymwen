@@ -1,8 +1,6 @@
-// ============================================================
-// Your Supabase keys go here (see LAUNCH-GUIDE.md, step 3).
+// Your Supabase keys (see LAUNCH-GUIDE.md, step 3).
 // Both values are safe to be public: the privacy rules in
 // supabase-setup.sql protect the data.
-// ============================================================
 window.LAKAYMWEN_CONFIG = {
   SUPABASE_URL: "PASTE-YOUR-PROJECT-URL-HERE",
   SUPABASE_ANON_KEY: "PASTE-YOUR-ANON-PUBLIC-KEY-HERE",

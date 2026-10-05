@@ -522,7 +522,7 @@ body.search-mode #home.portal{padding-block:16px 28px}
 #search-page #results .h3{margin:0 0 10px}
 
 /* ---------- Slim Haiti banner on every page ---------- */
-.hero-banner{position:relative;height:clamp(118px,13vw,160px);border-radius:22px;overflow:hidden;margin-bottom:20px;box-shadow:0 14px 40px rgba(7,19,48,.16);isolation:isolate}
+.hero-banner{position:relative;height:clamp(170px,16vw,200px);border-radius:22px;overflow:hidden;margin-bottom:20px;box-shadow:0 14px 40px rgba(7,19,48,.16);isolation:isolate}
 .hb-art{position:absolute;inset:0;width:100%;height:100%;z-index:-1;display:block}
 .hb-text{height:100%;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:0 clamp(18px,3.5vw,40px);color:#fff;max-width:min(640px,78%)}
 .hb-kicker{margin:0;font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
@@ -814,4 +814,40 @@ a.map-cta,a.map-cta:hover{text-decoration:none;color:#fff}
   body.logged-in.menu-open .side-menu .out-only,body:not(.logged-in).menu-open .side-menu .in-only{display:none}
   .menu-shade{position:fixed;inset:0;z-index:35;background:rgba(7,19,48,.35)}
   #btn-mine,#btn-signout{display:none}
+}
+
+/* ---------- Logo: top-left corner and inside the banner ---------- */
+.brand-logo{display:block;height:38px;width:auto}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .nav .brand-logo{background:#fff;border-radius:10px;padding:4px 8px;box-sizing:content-box;height:30px}}
+.hb-title{margin:6px 0 4px}
+.hb-logo{display:inline-block;filter:drop-shadow(0 4px 14px rgba(0,0,0,.35))}
+.hb-logo img{display:block;height:clamp(50px,6vw,78px);width:auto;max-width:100%}
+@media (max-width:760px){
+  .nav .brand{flex:0 1 150px;min-width:70px}
+  .nav .brand-logo{height:auto;width:100%;max-width:150px}
+  .nav-right{flex:0 0 auto;gap:6px}
+  #acct-out a.btn.dark{display:none}
+  .hb-logo img{height:auto;width:min(250px,100%)}
+}
+@media (max-width:1100px) and (min-width:761px){.brand-logo{height:30px}}
+@media (max-width:420px){#btn-inbox [data-t="messages"]{font-size:0}#btn-inbox [data-t="messages"]::before{content:"✉";font-size:1.15rem;line-height:1}#btn-inbox{padding:7px 11px}}
+@media (max-width:1000px){.hb-sub{display:none}}
+@media (max-width:640px){.hero-banner{height:150px}}
+
+/* ---------- Left column: menu + title sponsors ---------- */
+.side-col{display:none}
+body.register-mode .side-col,.side-col{display:grid;gap:16px;align-content:start;align-self:start;position:sticky;top:84px;min-width:0}
+.side-col .side-menu,body.register-mode .side-col .side-menu{position:static}
+.sponsors{display:grid;gap:10px;align-content:start}
+.sponsors-h{margin:4px 0 0;font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:center}
+.sponsor{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;transition:transform .15s,box-shadow .15s}
+.sponsor.dark{background:#000;border-color:#000;padding:4px}
+.sponsor:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(7,19,48,.14)}
+.sponsor:focus-visible{outline:3px solid var(--blue,#1f3fd1);outline-offset:2px}
+.sponsor img{display:block;width:100%;height:auto}
+@media (max-width:760px){
+  .side-col,body.register-mode .side-col{position:static;order:9}
+  .sponsors{grid-template-columns:1fr 1fr;padding:4px 0 8px}
+  .sponsors-h{grid-column:1/-1}
+  .sponsor{display:flex;align-items:center;justify-content:center;min-height:86px}
 }

@@ -928,3 +928,10 @@ body.register-mode .side-col,.side-col{top:16px}
 .sponsors-h{font-size:.8rem;color:var(--ink-2);margin:6px 0 0}
 .sponsor-tag.groove{font-family:"Montserrat",var(--body);font-variant:normal;text-transform:uppercase;font-weight:600;letter-spacing:.06em;font-size:.68rem;color:#0a0fb0;white-space:nowrap}
 @media (max-width:760px){.sponsor-tag.groove{font-size:.85rem}}
+/* slogan spans exactly from the L to the end of LAKAYMWEN */
+.hb-logo{display:inline-block;max-width:100%}
+.hb-logo img{display:block}
+svg.hb-tag{display:block;width:82.3%;height:auto;margin-top:3px;overflow:visible}
+svg.hb-tag text{font-family:var(--body);font-weight:500;font-size:34px;fill:#e8740a}
+@media (max-width:760px){.hb-logo{width:min(220px,100%)}.hb-logo img{width:100%}svg.hb-tag{width:82.3%}}
+@media (min-width:761px){.hb-logo{width:calc(clamp(40px,4.6vw,60px) * 600 / 99)}.hb-logo img{width:100%;height:auto}}

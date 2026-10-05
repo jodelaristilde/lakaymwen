@@ -1,0 +1,16 @@
+{
+  "name": "Lakaymwen: find family and friends from Haiti",
+  "short_name": "Lakaymwen",
+  "description": "Find family and old friends from Haiti, at home and across the diaspora. Since 2004.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#071330",
+  "theme_color": "#071330",
+  "lang": "ht",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

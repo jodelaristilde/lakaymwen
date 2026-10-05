@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lakaymwen · Find your family in Haiti</title>
+<meta name="description" content="Lakaymwen helps Haitians everywhere find family and friends, in Haiti and across the diaspora. Free since 2004.">
+<meta property="og:title" content="Lakaymwen · Find your family">
+<meta property="og:description" content="Helping Haitians reconnect with family and friends since 2004. Free to search.">
+<meta name="theme-color" content="#071330">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lakaymwen">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23071330'/%3E%3Cpath d='M32 13 51 29v22H13V29z' fill='%23fff'/%3E%3Cpath d='M13 29h38v11H13z' fill='%231f3fd1'/%3E%3Cpath d='M13 40h38v11H13z' fill='%23e8193c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="#home" aria-label="Lakaymwen home">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#071330"/><path d="M32 13 51 29v22H13V29z" fill="#fff"/><path d="M13 29h38v11H13z" fill="#1f3fd1"/><path d="M13 40h38v11H13z" fill="#e8193c"/></svg>
+      <span>Lakaymwen</span>
+    </a>
+    <nav class="links" aria-label="Main">
+      <a href="#about" data-t="nav_about"></a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="ht" aria-pressed="false" aria-label="Kreyòl" title="Kreyòl"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="10" fill="#00209f"/><rect y="10" width="30" height="10" fill="#d21034"/><rect x="11" y="6.5" width="8" height="7" fill="#fff"/><path d="M15 7.6v4.8M13 12h4" stroke="#016a16" stroke-width="1.1"/></svg><span class="lang-code">KR</span></button>
+        <button type="button" data-lang="fr" aria-pressed="false" aria-label="Français" title="Français"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="10" height="20" fill="#002395"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#ed2939"/></svg><span class="lang-code">FR</span></button>
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English" title="English"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><g fill="#b22234"><rect width="30" height="1.54"/><rect y="3.08" width="30" height="1.54"/><rect y="6.15" width="30" height="1.54"/><rect y="9.23" width="30" height="1.54"/><rect y="12.3" width="30" height="1.54"/><rect y="15.4" width="30" height="1.54"/><rect y="18.46" width="30" height="1.54"/></g><rect width="13" height="10.77" fill="#3c3b6e"/><g fill="#fff"><circle cx="2.2" cy="2" r=".55"/><circle cx="5.4" cy="2" r=".55"/><circle cx="8.6" cy="2" r=".55"/><circle cx="11" cy="2" r=".55"/><circle cx="3.8" cy="4.2" r=".55"/><circle cx="7" cy="4.2" r=".55"/><circle cx="10.2" cy="4.2" r=".55"/><circle cx="2.2" cy="6.4" r=".55"/><circle cx="5.4" cy="6.4" r=".55"/><circle cx="8.6" cy="6.4" r=".55"/><circle cx="11" cy="6.4" r=".55"/><circle cx="3.8" cy="8.6" r=".55"/><circle cx="7" cy="8.6" r=".55"/><circle cx="10.2" cy="8.6" r=".55"/></g></svg><span class="lang-code">EN</span></button>
+      </div>
+      <div class="account" id="acct-out">
+        <button class="btn ghost" type="button" id="btn-signin" data-t="signin"></button>
+        <a class="btn dark" href="#register" data-t="register"></a>
+      </div>
+      <div class="account" id="acct-in" hidden>
+        <button class="btn dark" type="button" id="btn-inbox"><span data-t="messages"></span><span class="badge" id="unread" hidden></span></button>
+        <button class="btn ghost" type="button" id="btn-mine" data-t="my_account"></button>
+        <button class="linkbtn" type="button" id="btn-signout" data-t="signout"></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="setup" id="setup-banner" hidden></div>
+  <section id="home" class="portal">
+    <div class="wrap">
+      <div class="hero-banner">
+        <svg class="hb-art" viewBox="0 0 1200 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="hb-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d2a6b"/><stop offset=".55" stop-color="#3b5bd6"/><stop offset="1" stop-color="#ffb36b"/></linearGradient>
+            <linearGradient id="hb-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1aa6b7"/><stop offset="1" stop-color="#0b5c78"/></linearGradient>
+            <radialGradient id="hb-sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff1b8"/><stop offset=".55" stop-color="#ffcc4d"/><stop offset="1" stop-color="#ffcc4d" stop-opacity="0"/></radialGradient>
+            <linearGradient id="hb-fade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#071330" stop-opacity=".82"/><stop offset=".45" stop-color="#071330" stop-opacity=".35"/><stop offset=".7" stop-color="#071330" stop-opacity="0"/></linearGradient>
+          </defs>
+          <rect width="1200" height="180" fill="url(#hb-sky)"/>
+          <circle cx="900" cy="118" r="70" fill="url(#hb-sun)"/>
+          <circle cx="900" cy="118" r="26" fill="#ffd66b"/>
+          <path d="M0 120 90 82 170 104 260 64 350 100 430 72 520 108 610 70 700 104 790 76 880 110 960 84 1050 108 1130 80 1200 98V180H0Z" fill="#2f7d4f"/>
+          <path d="M0 138 110 108 220 128 330 100 450 132 560 106 680 134 800 110 920 136 1040 112 1200 132V180H0Z" fill="#1f6140"/>
+          <rect y="148" width="1200" height="32" fill="url(#hb-sea)"/>
+          <path d="M0 154q25-5 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0" fill="none" stroke="#9beef3" stroke-width="2" opacity=".55"/>
+          <g transform="translate(1000 108)">
+            <rect x="0" y="16" width="34" height="24" fill="#f2b84b"/><path d="M-4 18 17 2 38 18Z" fill="#e8193c"/><rect x="13" y="26" width="8" height="14" fill="#1f3fd1"/>
+            <rect x="40" y="20" width="30" height="20" fill="#5cc6b5"/><path d="M36 22 55 8 74 22Z" fill="#1f3fd1"/><rect x="51" y="28" width="7" height="12" fill="#fff"/>
+            <rect x="76" y="14" width="34" height="26" fill="#f6e7c8"/><path d="M72 16 93 0 114 16Z" fill="#0f8f86"/><rect x="89" y="24" width="8" height="16" fill="#e8193c"/>
+          </g>
+          <g fill="#0f3d2a">
+            <g transform="translate(960 96)"><rect x="5" y="14" width="3.5" height="40"/><path d="M7 16c-12-7-23-5-27 2 9-5 18-4 27-2zm0 0c12-9 25-7 28 0-11-6-19-4-28 0zm0 0c-5-11-1-19 5-21-5 7-5 14-5 21z"/></g>
+            <g transform="translate(1140 92) scale(.85)"><rect x="5" y="14" width="3.5" height="48"/><path d="M7 16c-12-7-23-5-27 2 9-5 18-4 27-2zm0 0c12-9 25-7 28 0-11-6-19-4-28 0zm0 0c-5-11-1-19 5-21-5 7-5 14-5 21z"/></g>
+          </g>
+          <g transform="translate(1122 40)">
+            <rect x="0" y="0" width="3" height="96" fill="#e8e8e8"/>
+            <rect x="3" y="2" width="40" height="13" fill="#1f3fd1"/><rect x="3" y="15" width="40" height="13" fill="#e8193c"/>
+            <rect x="17" y="10" width="12" height="10" fill="#fff"/>
+          </g>
+          <rect width="1200" height="180" fill="url(#hb-fade)"/>
+        </svg>
+        <div class="hb-text">
+          <p class="hb-kicker" data-t="since"></p>
+          <p class="hb-title">Kote zanmi ak fanmi reyini</p>
+          <p class="hb-sub" data-t="banner_sub"></p>
+        </div>
+      </div>
+    </div>
+    <div class="wrap portal-grid">
+      <nav class="side-menu" aria-label="Member menu">
+        <a href="#home" data-t="nav_home"></a>
+        <button type="button" class="out-only" data-forgot-menu data-t="forgot"></button>
+        <a href="#register" class="out-only" data-t="register"></a>
+        <button type="button" class="in-only" data-action="profile" data-t="q_profile"></button>
+        <button type="button" class="in-only" data-action="tree" data-t="nav_tree"></button>
+        <button type="button" class="in-only" data-action="search" data-t="q_search"></button>
+        <a href="#schools" class="in-only" data-t="nav_schools"></a>
+        <a href="#photos" class="in-only"><span data-t="nav_photos"></span><span class="menu-badge" id="photos-badge" hidden></span></a>
+        <a href="#alerts" class="alerts-link in-only"><span data-t="nav_alerts"></span><span class="menu-badge" id="alerts-badge" hidden></span></a>
+        <button type="button" class="in-only" data-action="inbox" data-t="messages"></button>
+        <button type="button" data-action="tell" data-t="tell_friend"></button>
+        <a href="#admin" class="admin-only" data-t="admin_h"></a>
+      </nav>
+      <div class="portal-main">
+
+        <div class="box search-page" id="search-page">
+          <a class="back-home" href="#home" data-t="back_home"></a>
+          <h2 class="join-h" data-t="q_search"></h2>
+          <p class="lead" data-t="search_p"></p>
+          <form id="search-form" class="searchbar light" role="search" novalidate>
+            <label class="sb-field"><span data-t="f_name"></span><input id="s-name" type="text" autocomplete="off" required minlength="2" placeholder="Marie Joseph"></label>
+            <label class="sb-field"><span data-t="f_town"></span><select id="s-town"><option value="" data-t="any"></option></select></label>
+            <button class="sb-go" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span data-t="b_search"></span></button>
+          </form>
+          <p class="msg" id="search-msg" hidden></p>
+          <div id="results" hidden>
+            <h3 class="h3" id="res-title"></h3>
+            <div class="people" id="res-members"></div>
+          </div>
+        </div>
+        <div class="box page-box" id="privacy">
+          <a class="back-home" href="#home" data-t="back_home"></a>
+          <h2 class="join-h" data-t="privacy_h"></h2>
+          <p class="note" data-t="privacy_updated"></p>
+          <div class="policy" id="privacy-body"></div>
+        </div>
+        <div class="box page-box" id="admin">
+          <a class="back-home" href="#home" data-t="back_home"></a>
+          <h2 class="join-h" data-t="admin_h"></h2>
+          <div id="admin-view"></div>
+        </div>
+        <div class="box page-box" id="alerts-page">
+          <a class="back-home" href="#home" data-t="back_home"></a>
+          <h2 class="join-h" data-t="alerts_h"></h2>
+          <p class="lead" data-t="alerts_p"></p>
+          <div id="alerts-view"></div>
+        </div>
+        <div class="box page-box" id="schools-page">
+          <a class="back-home" href="#home" data-t="back_home"></a>
+          <h2 class="join-h" data-t="schools_h"></h2>
+          <p class="lead" data-t="schools_p"></p>
+          <input id="school-filter" class="page-filter" type="search" autocomplete="off" data-ph="school_filter" aria-label="School">
+          <div id="schools-view"></div>
+        </div>
+        <div class="box page-box" id="place-page">
+          <a class="back-home" id="place-back" href="#schools"></a>
+          <div id="place-view"></div>
+        </div>
+        <div class="box page-box" id="photos-page">
+          <a class="back-home" href="#home" data-t="back_home"></a>
+          <div class="photos-head">
+            <div><h2 class="join-h" data-t="photos_h"></h2><p class="lead" data-t="photos_p"></p></div>
+            <button class="btn red" type="button" id="photo-add-btn" data-t="photo_add"></button>
+          </div>
+          <div class="photo-tools">
+            <div class="tabs" role="tablist">
+              <a href="#photos" data-tab="all" data-t="photos_all"></a>
+              <a href="#photos/me" data-tab="me" data-t="photos_me"></a>
+              <a href="#photos/mine" data-tab="mine" data-t="photos_mine"></a>
+            </div>
+            <select id="photo-town" aria-label="Town"><option value="" data-t="any"></option></select>
+          </div>
+          <div id="photos-view"></div>
+        </div>
+        <div class="box page-box" id="photo-page">
+          <a class="back-home" href="#photos" data-t="photos_back"></a>
+          <div id="photo-view"></div>
+        </div>
+        <div class="box page-box" id="tree-page">
+          <a class="back-home" href="#home" data-t="back_home"></a>
+          <div id="tree-view"></div>
+        </div>
+        <div class="member-box" id="member-page">
+          <a class="back-home" href="#home" data-t="back_home"></a>
+          <div id="member-view"></div>
+        </div>
+        <div class="box join-box" id="join">
+          <a class="back-home" href="#register" data-t="back_towns"></a>
+          <h2 class="join-h" data-t="join_h"></h2>
+          <p class="lead" data-t="join_p"></p>
+          <div class="msg join-loggedin" id="join-loggedin" hidden><span id="join-loggedin-text"></span> <button class="linkbtn" type="button" id="join-logout" data-t="signout"></button></div>
+          <div class="join-town"><span data-t="join_from"></span> <b id="join-town-name"></b> <a href="#register" data-t="change_town"></a></div>
+          <form id="reg-form" novalidate>
+            <h3 class="form-h" data-t="sec_account"></h3>
+            <p class="note req-note" data-t="req_note"></p>
+            <label><span class="req" data-t="username"></span><input id="r-user" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"><small class="note" data-t="user_rule"></small></label>
+            <div class="two">
+              <label><span class="req" data-t="first_name"></span><input id="r-first" type="text" maxlength="40" autocomplete="given-name"></label>
+              <label><span class="req" data-t="last_name"></span><input id="r-last" type="text" maxlength="40" autocomplete="family-name"></label>
+            </div>
+            <label><span class="req" data-t="email"></span><input id="r-email" type="email" maxlength="120" autocomplete="email" autocapitalize="none" spellcheck="false"><small class="note" data-t="email_note"></small></label>
+            <div class="two">
+              <label><span class="req" data-t="password"></span><input id="r-pass" type="password" autocomplete="new-password"></label>
+              <label><span class="req" data-t="password2"></span><input id="r-pass2" type="password" autocomplete="new-password"></label>
+            </div>
+            <select id="r-town" hidden aria-hidden="true" tabindex="-1"><option value=""></option></select>
+
+            <h3 class="form-h" data-t="sec_about"></h3>
+            <label><span data-t="nickname"></span><input id="r-nick" type="text" maxlength="40" placeholder="Ti Djo, Gége…"></label>
+            <label><span data-t="katye"></span><input id="r-katye" type="text" maxlength="80" data-ph="katye_ph" placeholder="Lalue, Bel-Air, Carrefour-Feuilles…"></label>
+            <div class="two">
+              <label><span data-t="cur_country"></span><select id="r-country"><option value="" data-t="pick_country"></option></select></label>
+              <label id="r-state-wrap" hidden><span data-t="cur_state"></span><select id="r-state"><option value="" data-t="pick_state"></option></select></label>
+            </div>
+            <label><span data-t="cur_city"></span><input id="r-lives" type="text" maxlength="60" placeholder="Miami, Boston, Montréal…"></label>
+
+            <h3 class="form-h"><span data-t="schools"></span> <small data-t="optional"></small></h3>
+            <div class="list-rows" id="r-schools"></div>
+            <button class="btn ghost small add-fam" type="button" data-add-school="r" data-t="add_school"></button>
+
+            <label><span data-t="describe"></span><textarea id="r-bio" maxlength="600"></textarea></label>
+
+            <h3 class="form-h"><span data-t="sec_family"></span> <small data-t="optional"></small></h3>
+            <p class="note" data-t="family_note"></p>
+            <div class="family-list" id="r-family"></div>
+            <button class="btn ghost small add-fam" type="button" data-add-family="r" data-t="add_family"></button>
+
+            <label><span data-t="your_photo"></span><input id="r-photo" type="file" accept="image/*"></label>
+            <label class="check"><input id="r-listed" type="checkbox" checked><span data-t="listed"></span></label>
+            <label class="check"><input id="r-founding" type="checkbox"><span data-t="founding_q"></span></label>
+            <label id="r-old-wrap" hidden><span data-t="old_username"></span><input id="r-old" type="text" maxlength="40" placeholder="BETHSAIDA, JODEL…"></label>
+            <label class="check terms"><input id="r-terms" type="checkbox"><span class="req"><span data-t="terms_1"></span> <a href="#privacy" data-t="privacy_link"></a></span></label>
+            <button class="btn red big" type="submit" data-t="create_account"></button>
+          </form>
+          <div id="verify-step" class="verify" hidden>
+            <h3 class="form-h" data-t="verify_h"></h3>
+            <p id="verify-text"></p>
+            <form id="verify-form" novalidate>
+              <label><span data-t="code_label"></span><input id="v-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label>
+              <button class="btn red big" type="submit" data-t="verify_btn"></button>
+            </form>
+            <p class="note"><button class="linkbtn" type="button" id="v-resend" data-t="resend_code"></button> · <button class="linkbtn" type="button" id="v-change" data-t="change_email"></button></p>
+          </div>
+          <p class="msg" id="join-msg" hidden></p>
+          <p class="note"><span data-t="have_account"></span> <button class="linkbtn" type="button" data-action="login" data-t="login_btn"></button></p>
+        </div>
+        <div class="box towns-box" id="towns">
+      <a class="back-home" href="#home" data-t="back_home"></a>
+      <div class="head-row">
+        <div>
+          <p class="eyebrow" data-t="towns_e"></p>
+          <h2 data-t="towns_h"></h2>
+          <p class="lead" data-t="towns_p" data-html></p>
+        </div>
+        <label class="filter"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input id="town-filter" type="search" autocomplete="off"></label>
+      </div>
+      <nav class="az" id="az" aria-label="Letters"></nav>
+      <div class="towns" id="town-list"></div>
+        </div>
+
+
+        <div class="box" id="haiti">
+          <div class="box-head"><h2 data-t="cities_h"></h2></div>
+          <p class="box-text" data-t="cities_p"></p>
+          <figure class="map">
+            <a class="map-box map-link" href="#register">
+              <img src="haiti-map.svg" width="640" height="515" alt="Map of Haiti's 10 departments. Click to register." id="map-img">
+              <span class="map-cta" data-t="map_cta"></span>
+            </a>
+            <figcaption data-t="map_hint"></figcaption>
+          </figure>
+        </div>
+
+        <div class="box" id="pymk-box" hidden>
+          <div class="box-head"><h2 data-t="pymk_h"></h2></div>
+          <p class="box-text" data-t="pymk_p"></p>
+          <div class="pymk" id="pymk"></div>
+        </div>
+        <div class="box">
+          <div class="box-head"><h2 data-t="featured_h"></h2></div>
+          <p class="box-text" data-t="featured_p"></p>
+          <div class="featured" id="featured"></div>
+        </div>
+      </div>
+
+      <aside class="portal-side">
+        <div class="box" id="login-box">
+          <div class="box-head"><h2 data-t="login_h"></h2></div>
+          <div id="side-out">
+            <form id="side-login-form" novalidate>
+              <label><span data-t="email"></span><input id="side-email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false"></label>
+              <label><span data-t="password"></span><input id="side-pass" type="password" required autocomplete="current-password"></label>
+              <button class="btn dark big" type="submit" data-t="login_btn"></button>
+            </form>
+            <p class="msg" id="side-auth-msg" hidden></p>
+            <ul class="side-links">
+              <li><a href="#register" data-t="reg_link"></a></li>
+              <li><button class="linkbtn" type="button" data-forgot data-t="forgot"></button></li>
+            </ul>
+          </div>
+          <div id="side-in" hidden>
+            <p class="welcome" id="side-welcome"></p>
+            <a class="side-alerts" id="side-alerts" href="#alerts" hidden></a>
+            <a class="side-alerts" id="side-tags" href="#photos/me" hidden></a>
+            <a class="side-alerts" id="side-fam" href="#home" hidden></a>
+            <div class="side-btns">
+              <button class="btn dark" type="button" data-action="inbox" data-t="messages"></button>
+              <button class="btn ghost" type="button" data-action="profile" data-t="my_account"></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-head"><h2 data-t="how_h"></h2></div>
+          <ol class="steps side-steps">
+            <li><b data-t="s1_h"></b><span data-t="s1_p"></span></li>
+            <li><b data-t="s2_h"></b><span data-t="s2_p"></span></li>
+            <li><b data-t="s3_h"></b><span data-t="s3_p"></span></li>
+          </ol>
+        </div>
+        <div class="install-box" id="install-box" hidden>
+          <button class="btn dark" type="button" id="install-btn" data-t="install_btn"></button>
+          <p class="note" id="install-ios" hidden data-t="install_ios"></p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="about" class="band dark">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow" data-t="ab_e"></p>
+        <h2 data-t="ab_h"></h2>
+        <p data-t="ab_1"></p><p data-t="ab_2"></p><p data-t="ab_3"></p>
+      </div>
+      <aside class="safe">
+        <h3 data-t="safe_h"></h3>
+        <ul><li data-t="safe_1"></li><li data-t="safe_2"></li><li data-t="safe_3"></li><li data-t="safe_4"></li></ul>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="wrap foot-row">
+    <a class="brand light" href="#home"><span>Lakaymwen</span></a>
+    <span><span data-t="contact_us"></span> <span id="contact-email"></span></span>
+    <a href="#privacy" class="foot-link" data-t="privacy_h"></a>
+    <span>© 2004–<span id="year"></span></span>
+  </div>
+</footer>
+
+<!-- Log in / register -->
+<dialog id="dlg-auth">
+  <div class="dlg-head"><h2 id="auth-title"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <form id="login-form" novalidate>
+      <label><span data-t="email"></span><input id="l-email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false"></label>
+      <label><span data-t="password"></span><input id="l-pass" type="password" required autocomplete="current-password"></label>
+      <button class="btn dark big" type="submit" data-t="login_btn"></button>
+      <button class="linkbtn" type="button" data-forgot data-t="forgot"></button>
+      <p class="note center"><span data-t="new_here"></span> <a href="#register" data-t="reg_pick"></a></p>
+    </form>
+    <p class="msg" id="auth-msg" hidden></p>
+  </div>
+</dialog>
+
+<!-- Profile -->
+<dialog id="dlg-profile">
+  <div class="dlg-head"><h2 data-t="profile_h"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <form id="profile-form" novalidate>
+      <div class="photo-edit">
+        <div id="pr-photo-preview"></div>
+        <div class="photo-btns">
+          <label class="btn ghost small file-btn"><span data-t="choose_photo"></span><input id="pr-photo" type="file" accept="image/*" hidden></label>
+          <button class="linkbtn" type="button" id="pr-photo-remove" data-t="remove_photo"></button>
+          <p class="note" data-t="photo_note"></p>
+        </div>
+      </div>
+      <div class="two">
+        <label><span class="req" data-t="first_name"></span><input id="pr-first" type="text" maxlength="40" autocomplete="given-name"></label>
+        <label><span class="req" data-t="last_name"></span><input id="pr-last" type="text" maxlength="40" autocomplete="family-name"></label>
+      </div>
+      <label><span data-t="nickname"></span><input id="pr-nick" type="text" maxlength="40" placeholder="Ti Djo, Gége…"></label>
+      <label><span data-t="your_town"></span><select id="pr-town"><option value="" data-t="pick_town"></option></select></label>
+      <label><span data-t="katye"></span><input id="pr-katye" type="text" maxlength="80" data-ph="katye_ph" placeholder="Lalue, Bel-Air, Carrefour-Feuilles…"></label>
+      <div class="two">
+        <label><span data-t="cur_country"></span><select id="pr-country"><option value="" data-t="pick_country"></option></select></label>
+        <label id="pr-state-wrap" hidden><span data-t="cur_state"></span><select id="pr-state"><option value="" data-t="pick_state"></option></select></label>
+      </div>
+      <label><span data-t="cur_city"></span><input id="pr-lives" type="text" maxlength="60" placeholder="Miami, Boston, Montréal…"></label>
+
+      <h3 class="form-h"><span data-t="schools"></span> <small data-t="optional"></small></h3>
+      <div class="list-rows" id="pr-schools"></div>
+      <button class="btn ghost small add-fam" type="button" data-add-school="pr" data-t="add_school"></button>
+
+      <label><span data-t="describe"></span><textarea id="pr-bio" maxlength="600"></textarea></label>
+
+      <h3 class="form-h"><span data-t="sec_family"></span> <small data-t="optional"></small></h3>
+      <p class="note" data-t="family_note"></p>
+      <div class="family-list" id="pr-family"></div>
+      <button class="btn ghost small add-fam" type="button" data-add-family="pr" data-t="add_family"></button>
+      <label class="check"><input id="pr-listed" type="checkbox" checked><span data-t="listed"></span></label>
+      <label class="check"><input id="pr-founding" type="checkbox"><span data-t="founding_q"></span></label>
+      <label id="pr-old-wrap" hidden><span data-t="old_username"></span><input id="pr-old" type="text" maxlength="40"></label>
+      <button class="btn dark big" type="submit" data-t="save"></button>
+    </form>
+    <p class="msg" id="profile-msg" hidden></p>
+    <div class="danger">
+      <button class="linkbtn danger-link" type="button" id="del-start" data-t="delete_account"></button>
+      <div id="del-confirm" hidden>
+        <p data-t="delete_warn"></p>
+        <label><span data-t="delete_type"></span><input id="del-word" type="text" autocomplete="off" autocapitalize="characters"></label>
+        <div class="row-btns">
+          <button class="btn red" type="button" id="del-go" data-t="delete_forever"></button>
+          <button class="btn ghost" type="button" id="del-cancel" data-t="cancel"></button>
+        </div>
+        <p class="msg" id="del-msg" hidden></p>
+      </div>
+    </div>
+    <div id="my-notices-wrap" hidden>
+      <h3 class="h3" data-t="my_notices"></h3>
+      <div id="my-notices"></div>
+    </div>
+  </div>
+</dialog>
+
+<!-- Forgot password: email code, then a new password -->
+<dialog id="dlg-forgot">
+  <div class="dlg-head"><h2 data-t="forgot_h"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <form id="forgot-form" novalidate>
+      <p class="note" data-t="forgot_p"></p>
+      <label><span data-t="email"></span><input id="f-email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false"></label>
+      <button class="btn dark big" type="submit" data-t="send_code"></button>
+    </form>
+    <form id="reset-form" novalidate hidden>
+      <p id="reset-text"></p>
+      <label><span data-t="code_label"></span><input id="f-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label>
+      <div class="two">
+        <label><span data-t="new_pass"></span><input id="f-pass" type="password" autocomplete="new-password"></label>
+        <label><span data-t="password2"></span><input id="f-pass2" type="password" autocomplete="new-password"></label>
+      </div>
+      <button class="btn red big" type="submit" data-t="set_pass"></button>
+    </form>
+    <p class="msg" id="forgot-msg" hidden></p>
+  </div>
+</dialog>
+
+<!-- Department -->
+<dialog id="dlg-dept">
+  <div class="dlg-head"><h2 id="dept-title"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <p class="note" id="dept-cap"></p>
+    <p class="dept-pick" data-t="dept_pick"></p>
+    <ul class="chips" id="dept-towns"></ul>
+  </div>
+</dialog>
+
+<!-- Town -->
+<dialog id="dlg-town">
+  <div class="dlg-head"><h2 id="town-title"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <button class="btn red big" type="button" id="town-register"></button>
+    <div id="town-katye" hidden><h3 class="h3" data-t="town_katye_h"></h3><div class="chips" id="town-katye-list"></div></div>
+    <h3 class="h3" data-t="town_members"></h3>
+    <div class="people" id="town-members"></div>
+  </div>
+</dialog>
+
+<!-- Messages -->
+<dialog id="dlg-inbox">
+  <div class="dlg-head"><h2 id="inbox-title"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <button class="linkbtn" type="button" id="inbox-back" data-t="back" hidden></button>
+    <div class="thread-list" id="thread-list"></div>
+    <div id="thread" hidden>
+      <div class="bubbles" id="bubbles"></div>
+      <form id="reply-form" class="reply">
+        <textarea id="reply-body" required maxlength="2000" aria-label="Message"></textarea>
+        <button class="btn dark" type="submit" data-t="send"></button>
+      </form>
+    </div>
+    <p class="msg" id="inbox-msg" hidden></p>
+  </div>
+</dialog>
+
+<!-- Add an old photo -->
+<dialog id="dlg-photo">
+  <div class="dlg-head"><h2 data-t="photo_add_h"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <form id="photo-form" novalidate>
+      <label class="photo-drop" id="ph-drop">
+        <input id="ph-file" type="file" accept="image/*">
+        <img id="ph-preview" alt="" hidden>
+        <span id="ph-drop-text" data-t="photo_pick"></span>
+      </label>
+      <label><span data-t="photo_caption"></span><textarea id="ph-caption" maxlength="500" data-ph="photo_caption_ph"></textarea></label>
+      <div class="two">
+        <label><span data-t="photo_town"></span><select id="ph-town"><option value="" data-t="photo_town_unknown"></option></select></label>
+        <label><span data-t="photo_year"></span><input id="ph-year" type="text" maxlength="20" inputmode="numeric" data-ph="photo_year_ph"></label>
+      </div>
+      <div class="tag-field">
+        <span class="lbl" data-t="photo_who"></span>
+        <div class="tag-chips" id="ph-tags"></div>
+        <div class="tag-picker" id="ph-picker"></div>
+      </div>
+      <p class="note" data-t="photo_rules"></p>
+      <button class="btn red big" type="submit" data-t="photo_share"></button>
+      <p class="msg" id="photo-msg" hidden></p>
+    </form>
+  </div>
+</dialog>
+
+<!-- Report -->
+<dialog id="dlg-report">
+  <div class="dlg-head"><h2 id="report-title"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <form id="report-form" novalidate>
+      <label><span class="req" data-t="report_why"></span><select id="rep-reason">
+        <option value="" data-t="report_pick"></option>
+        <option value="fake" data-t="rr_fake"></option>
+        <option value="scam" data-t="rr_scam"></option>
+        <option value="harass" data-t="rr_harass"></option>
+        <option value="photo" data-t="rr_photo"></option>
+        <option value="minor" data-t="rr_minor"></option>
+        <option value="other" data-t="rr_other"></option>
+      </select></label>
+      <label><span data-t="report_details"></span><textarea id="rep-details" maxlength="1000"></textarea></label>
+      <label class="check"><input id="rep-block" type="checkbox" checked><span data-t="report_also_block"></span></label>
+      <button class="btn red big" type="submit" data-t="report_send"></button>
+      <p class="note" data-t="report_note"></p>
+    </form>
+    <p class="msg" id="report-msg" hidden></p>
+  </div>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="towns.js"></script>
+<script src="depts.js"></script>
+<script src="geo.js"></script>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

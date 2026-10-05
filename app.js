@@ -338,11 +338,11 @@
       g.addEventListener("pointermove", ev => { if (ev.pointerType !== "touch") show(g, ev); });
       g.addEventListener("focus", () => show(g));
       g.addEventListener("blur", hide);
-      g.addEventListener("click", ev => { ev.preventDefault(); ev.stopPropagation(); hide(); const d = byId[g.dataset.dept]; if (d) openDept(d); });
-      g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); ev.stopPropagation(); hide(); const d = byId[g.dataset.dept]; if (d) openDept(d); } });
+      g.addEventListener("click", ev => { ev.preventDefault(); ev.stopPropagation(); hide(); go("#register"); });
+      g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); ev.stopPropagation(); hide(); go("#register"); } });
     });
     svg.addEventListener("pointerleave", hide);
-    // clicking the sea (not a department) opens the full town list, like before
+    // clicking anywhere on the map opens the register page, like the old site
     svg.addEventListener("click", () => go("#register"));
   })();
   async function loadTownCounts() {

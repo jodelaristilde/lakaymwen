@@ -1,4 +1,4 @@
-// Lakaymwen.com — site logic. Talks to Supabase for sign-in, notices and messages.
+// Lakaymwen.co — site logic. Talks to Supabase for sign-in, notices and messages.
 (() => {
   const C = window.LAKAYMWEN_CONFIG || {};
   const TOWNS = window.LAKAYMWEN_TOWNS || [];
@@ -26,7 +26,7 @@
   let townCounts = {}, recentData = [], lastResults = null;
   let thread = null, reportNotice = null;
   const L = () => TEXT[lang];
-  const norm = s => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+  const norm = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   const clean = s => norm(s).replace(/[%_,()*\\]/g, "");
   const pageUrl = () => location.origin + location.pathname;
 
@@ -669,7 +669,7 @@
   }
   async function afterAuth() {
     updateAccount();
-    if (!me) { profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; pymkData = null; renderPymk(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
+    if (!me) { profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; pymkData = null; renderPymk(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
     const { data } = await sb.from("profiles").select("*").eq("id", me.id).maybeSingle();
     profile = data || null; schoolData = null;
     say("search-msg", "");
@@ -786,6 +786,8 @@
     const { count } = await sb.from("messages").select("id", { count: "exact", head: true }).eq("recipient", me.id).is("read_at", null);
     $("unread").textContent = count || "";
     $("unread").hidden = !count;
+    $("unread-side").textContent = count || "";
+    $("unread-side").hidden = !count;
   }
   async function openInbox() {
     thread = null;

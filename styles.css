@@ -935,3 +935,15 @@ svg.hb-tag{display:block;width:82.3%;height:auto;margin-top:3px;overflow:visible
 svg.hb-tag text{font-family:var(--body);font-weight:500;font-size:34px;fill:#e8740a}
 @media (max-width:760px){.hb-logo{width:min(220px,100%)}.hb-logo img{width:100%}svg.hb-tag{width:82.3%}}
 @media (min-width:761px){.hb-logo{width:calc(clamp(40px,4.6vw,60px) * 600 / 99)}.hb-logo img{width:100%;height:auto}}
+/* languages lower down, on the sea, left of the houses */
+@media (min-width:761px){.hb-lang{top:auto;bottom:10px;left:52%}}
+/* language buttons also in the bottom banner (footer) */
+.foot-lang{background:rgba(255,255,255,.08);border-radius:999px;padding:4px;gap:4px}
+.foot-lang button{color:#fff;font-size:.95rem;font-weight:800;padding:7px 13px;gap:8px}
+.foot-lang button .lang-code{color:#fff}
+.foot-lang .flag{width:26px;height:18px;border-radius:4px}
+.foot-lang button[aria-pressed="true"]{background:#fff;color:#0b1530}
+.foot-lang button[aria-pressed="true"] .lang-code{color:#0b1530}
+.foot-lang button[aria-pressed="false"] .flag{opacity:1}
+.foot-lang button[aria-pressed="false"]:hover{background:rgba(255,255,255,.14)}
+@media (max-width:520px){.foot-lang .lang-code{display:inline}}

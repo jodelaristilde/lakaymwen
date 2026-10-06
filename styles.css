@@ -986,3 +986,21 @@ svg.hb-tag text{font-family:var(--body);font-weight:500;font-size:34px;fill:#e87
 .bday-who{flex:1 1 150px}
 .bday-who b{white-space:normal;overflow:visible}
 .hero-banner.sd-carnival::after{opacity:.75;-webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 42%,#000 62%);mask-image:linear-gradient(90deg,transparent 0,transparent 42%,#000 62%)}
+
+/* ---------- Groove FM live player, under its logo ---------- */
+.groove-live{display:grid;gap:6px;margin-top:-4px}
+.groove-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 14px;border-radius:999px;background:#0a0fb0;color:#fff;font-family:"Montserrat",var(--body);font-weight:700;font-size:.9rem;letter-spacing:.04em;text-decoration:none;box-shadow:0 6px 16px rgba(10,15,176,.25);transition:transform .15s,filter .15s}
+.groove-btn:hover{filter:brightness(1.12);transform:translateY(-1px);color:#fff}
+.groove-btn:focus-visible{outline:3px solid #f2c94c;outline-offset:2px}
+.gp-icon{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#f6e27a,#c9a227);color:#0a0fb0;font-size:.72rem;letter-spacing:-1px}
+.eq{display:none;align-items:flex-end;gap:2px;height:14px}
+.eq i{display:block;width:3px;height:100%;border-radius:2px;background:#f2c94c;transform-origin:bottom;animation:lkm-eq .9s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:.15s}.eq i:nth-child(3){animation-delay:.3s}.eq i:nth-child(4){animation-delay:.45s}
+@keyframes lkm-eq{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+.groove-btn.playing .eq{display:inline-flex}
+.groove-btn.loading .gp-icon{animation:lkm-pulse 1s ease-in-out infinite}
+@keyframes lkm-pulse{50%{opacity:.4}}
+@media (prefers-reduced-motion:reduce){.eq i,.groove-btn.loading .gp-icon{animation:none}}
+.groove-msg{margin:0;font-size:.8rem;color:var(--ink-2);text-align:center}
+.groove-msg a{color:#0a0fb0}
+@media (max-width:760px){.groove-live{max-width:420px;width:100%;margin:-6px auto 0}}

@@ -1004,3 +1004,9 @@ svg.hb-tag text{font-family:var(--body);font-weight:500;font-size:34px;fill:#e87
 .groove-msg{margin:0;font-size:.8rem;color:var(--ink-2);text-align:center}
 .groove-msg a{color:#0a0fb0}
 @media (max-width:760px){.groove-live{max-width:420px;width:100%;margin:-6px auto 0}}
+/* Jaeky: the tiny slogan in the picture is hidden and shown as bigger, sharp text */
+.crop-jaeky{display:block;overflow:hidden}
+.crop-jaeky img{margin-bottom:calc(-34 / 700 * 100%)}
+.sponsor-tag.jaeky-tag{font-family:"Cormorant SC",Georgia,"Times New Roman",serif;font-variant:normal;font-weight:700;font-size:1.02rem;letter-spacing:.05em;line-height:1.15;color:#111;margin-top:4px}
+.nowrap{white-space:nowrap}
+@media (max-width:760px){.sponsor-tag.jaeky-tag{font-size:1.2rem}}

@@ -765,17 +765,19 @@
     const wait = ms => new Promise(r => setTimeout(r, ms));
     const visible = () => new Promise(r => { if (!document.hidden) return r(); document.addEventListener("visibilitychange", function f() { if (!document.hidden) { document.removeEventListener("visibilitychange", f); r(); } }); });
     async function loop() {
-      // opening: "Welcome to" fills the banner for 2 seconds
+      // opening: "Welcome to" on its own, over the first Haiti photo, for 2 seconds (no logo yet)
       show.classList.add("intro", "on"); welcome.classList.add("on");   // already on in the page, so it shows instantly
-      await wait(2000);
-      // then the Haiti photos play behind the logo, one after another, without stopping
-      for (let t = 0; t < 40 && !ready.size; t++) await wait(250);         // give the first photo a moment to arrive
-      if (!ready.size) { welcome.classList.remove("on"); show.classList.remove("on"); await wait(1200); show.classList.remove("intro"); return; }   // no photos: keep the drawn scene
+      for (let t = 0; t < 12 && !ready.size; t++) await wait(250);         // wait up to 3 s for the first photo
       let prev = null, round = 0;
       const next = sl => { sl.classList.add("on"); if (prev && prev !== sl) prev.classList.remove("on"); prev = sl; };
-      next(slides.find(sl => ready.has(sl)));
-      show.classList.remove("intro"); welcome.classList.remove("on");     // the logo appears on top of the first photo
-      await wait(5000);
+      if (ready.size) { next(slides.find(sl => ready.has(sl))); welcome.classList.add("photo"); }
+      await wait(2000);
+      if (!ready.size) { welcome.classList.remove("on"); show.classList.remove("on"); await wait(1200); show.classList.remove("intro"); return; }   // no photos: keep the drawn scene
+      if (!prev) next(slides.find(sl => ready.has(sl)));
+      welcome.classList.remove("on");
+      await wait(500);
+      show.classList.remove("intro"); welcome.classList.remove("photo");   // the logo appears on top of the photos
+      await wait(4500);
       for (;;) {
         await visible();
         for (const sl of slides.filter(x => ready.has(x))) {

@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Montserrat:wght@500;600&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261005p">
+<link rel="stylesheet" href="styles.css?v=20261005r">
 </head>
 <body>
 
@@ -204,6 +204,9 @@
 
             <h3 class="form-h" data-t="sec_about"></h3>
             <label><span data-t="nickname"></span><input id="r-nick" type="text" maxlength="40" placeholder="Ti Djo, Gége…"></label>
+            <div class="bday-field" role="group" aria-labelledby="r-bday-l"><span id="r-bday-l" class="field-l" data-t="bday_label"></span>
+              <div class="two"><select id="r-bmonth" data-t-aria="bday_month"></select><select id="r-bday" data-t-aria="bday_day"></select></div>
+              <small class="note" data-t="bday_note"></small></div>
             <label><span data-t="katye"></span><input id="r-katye" type="text" maxlength="80" data-ph="katye_ph" placeholder="Lalue, Bel-Air, Carrefour-Feuilles…"></label>
             <div class="two">
               <label><span data-t="cur_country"></span><select id="r-country"><option value="" data-t="pick_country"></option></select></label>
@@ -292,6 +295,12 @@
           </figure>
         </div>
 
+        <div class="box bday-box" id="bday-box" hidden>
+          <div class="box-head"><h2 data-t="bday_h"></h2></div>
+          <p class="bday-mine" id="bday-mine" hidden></p>
+          <p class="box-text" id="bday-p" data-t="bday_p"></p>
+          <div class="bday-list" id="bday-list"></div>
+        </div>
         <div class="box" id="pymk-box" hidden>
           <div class="box-head"><h2 data-t="pymk_h"></h2></div>
           <p class="box-text" data-t="pymk_p"></p>
@@ -409,6 +418,9 @@
         <label><span class="req" data-t="last_name"></span><input id="pr-last" type="text" maxlength="40" autocomplete="family-name"></label>
       </div>
       <label><span data-t="nickname"></span><input id="pr-nick" type="text" maxlength="40" placeholder="Ti Djo, Gége…"></label>
+      <div class="bday-field" role="group" aria-labelledby="pr-bday-l"><span id="pr-bday-l" class="field-l" data-t="bday_label"></span>
+        <div class="two"><select id="pr-bmonth" data-t-aria="bday_month"></select><select id="pr-bday" data-t-aria="bday_day"></select></div>
+        <small class="note" data-t="bday_note"></small></div>
       <label><span data-t="your_town"></span><select id="pr-town"><option value="" data-t="pick_town"></option></select></label>
       <label><span data-t="katye"></span><input id="pr-katye" type="text" maxlength="80" data-ph="katye_ph" placeholder="Lalue, Bel-Air, Carrefour-Feuilles…"></label>
       <div class="two">
@@ -572,11 +584,11 @@ window.addEventListener("error", function (e) {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
-<script src="config.js?v=20261005p"></script>
-<script src="towns.js?v=20261005p"></script>
-<script src="depts.js?v=20261005p"></script>
-<script src="geo.js?v=20261005p"></script>
-<script src="i18n.js?v=20261005p"></script>
-<script src="app.js?v=20261005p"></script>
+<script src="config.js?v=20261005r"></script>
+<script src="towns.js?v=20261005r"></script>
+<script src="depts.js?v=20261005r"></script>
+<script src="geo.js?v=20261005r"></script>
+<script src="i18n.js?v=20261005r"></script>
+<script src="app.js?v=20261005r"></script>
 </body>
 </html>

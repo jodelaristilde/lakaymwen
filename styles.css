@@ -956,3 +956,33 @@ svg.hb-tag text{font-family:var(--body);font-weight:500;font-size:34px;fill:#e87
 @media (max-width:760px){
   .hb-lang button[aria-pressed="true"],.hb-lang button[aria-pressed="true"] .lang-code{color:#0b1530;text-shadow:none}
 }
+
+/* ---------- Birthdays ---------- */
+.bday-field{display:grid;gap:6px}
+.bday-field .field-l{font-size:.9rem;font-weight:600}
+.bday-field .two{margin:0}
+.bday-box .box-head h2{color:#a1460a}
+.bday-mine{margin:0 0 10px;padding:12px 14px;border-radius:12px;background:linear-gradient(90deg,#fff1d6,#ffe1ea);color:#5a2a00;font-weight:700}
+.bday-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.bday-card{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.bday-who{display:flex;align-items:center;gap:10px;min-width:0;color:var(--ink);text-decoration:none}
+.bday-who b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bday-card .btn{flex:none}
+@media (prefers-color-scheme:dark){.bday-mine{background:linear-gradient(90deg,#3a2a10,#3a1424);color:#ffe2b8}.bday-box .box-head h2{color:#ffb36b}}
+
+/* ---------- Special days on the banner ---------- */
+.hero-banner.sd .hb-kicker{font-weight:800}
+.hero-banner.sd-patriot::after{content:"";position:absolute;left:0;right:0;top:0;height:8px;z-index:3;background:linear-gradient(90deg,#00209f 50%,#d21034 50%)}
+.hero-banner.sd-patriot .hb-kicker{color:#00209f}
+.hero-banner.sd-carnival::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.9;
+  background:radial-gradient(circle,#ffd34d 3px,transparent 4px) 0 0/46px 38px,radial-gradient(circle,#e8193c 3px,transparent 4px) 23px 19px/46px 38px,radial-gradient(circle,#1f3fd1 2.5px,transparent 3.5px) 11px 30px/58px 44px,radial-gradient(circle,#16a34a 2.5px,transparent 3.5px) 40px 8px/52px 41px}
+.hero-banner.sd-carnival .hb-kicker{color:#b0124a}
+.hero-banner.sd-christmas::after{content:"";position:absolute;left:0;right:0;top:0;height:18px;z-index:3;pointer-events:none;
+  background:radial-gradient(circle,#ffd34d 4px,transparent 5px) 0 6px/36px 14px repeat-x,radial-gradient(circle,#e8193c 4px,transparent 5px) 12px 6px/36px 14px repeat-x,radial-gradient(circle,#16a34a 4px,transparent 5px) 24px 6px/36px 14px repeat-x,linear-gradient(#2b2b2b,#2b2b2b) 0 9px/100% 1.5px no-repeat}
+.hero-banner.sd-christmas .hb-kicker{color:#b91c1c}
+.hero-banner.sd-family .hb-kicker{color:#b0124a}
+.bday-list{grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.bday-card{flex-wrap:wrap}
+.bday-who{flex:1 1 150px}
+.bday-who b{white-space:normal;overflow:visible}
+.hero-banner.sd-carnival::after{opacity:.75;-webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 42%,#000 62%);mask-image:linear-gradient(90deg,transparent 0,transparent 42%,#000 62%)}

@@ -277,7 +277,7 @@
     else if (a === "login") { openAuth(null, "login"); }
     else if (a === "signout") { $("btn-signout").click(); }
     else if (a === "tell") {
-      const text = L().tell_text + " " + pageUrl();
+      const text = L().tell_text + " " + pageUrl() + "#register";
       wa(text);
     }
   }));
@@ -1221,7 +1221,7 @@
     } });
     return el("div", { class: "alert-offer" + (none ? " big" : "") },
       el("p", { class: "ao-text", text: none ? L().alert_offer_none(q) : L().alert_offer(q) }),
-      el("div", { class: "row-btns" }, btn, waBtn(L().wa_btn, () => L().inv_search(q, pageUrl()), "ghost-wa")),
+      el("div", { class: "row-btns" }, btn, waBtn(L().wa_btn, () => L().inv_search(q, pageUrl() + "#register"), "ghost-wa")),
       msg);
   }
   var alertsReq = 0;

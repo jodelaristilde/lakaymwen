@@ -5,8 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Lakaymwen · Find your family in Haiti</title>
 <meta name="description" content="Lakaymwen helps Haitians everywhere find family and friends, in Haiti and across the diaspora. Free since 2004.">
-<meta property="og:title" content="Lakaymwen · Find your family">
-<meta property="og:description" content="Helping Haitians reconnect with family and friends since 2004. Free to search.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lakaymwen.co">
+<meta property="og:url" content="https://lakaymwen-2hr5.vercel.app/">
+<meta property="og:title" content="Ou sonje Lakaymwen.com? Li tounen! · It's back!">
+<meta property="og:description" content="Kote zanmi ak fanmi reyini. Chèche zanmi ak fanmi pa non, lekòl, katye oswa vil. Find old friends from Haiti. Gratis · Free.">
+<meta property="og:image" content="https://lakaymwen-2hr5.vercel.app/share-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Lakaymwen.co: Ou sonje Lakaymwen.com? Li tounen!">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#071330">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -16,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Montserrat:wght@500;600&family=Cormorant+SC:wght@700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261005t">
+<link rel="stylesheet" href="styles.css?v=20261006d">
 </head>
 <body>
 
@@ -70,6 +78,15 @@
           </g>
           <rect width="1200" height="180" fill="url(#hb-fade)"/>
         </svg>
+        <div class="hb-show intro on" id="hb-show" aria-hidden="true">
+          <div class="hb-slide" data-src="https://images.unsplash.com/photo-1580741186862-c5d0bf2aff33?auto=format&amp;fit=crop&amp;crop=entropy&amp;w=1600&amp;h=320&amp;q=75"><span class="hb-credit">Île-à-Vache · Photo: Claudia Altamimi / Unsplash</span></div>
+          <div class="hb-slide" data-src="https://images.unsplash.com/photo-1580835864686-c6c0446abbbb?auto=format&amp;fit=crop&amp;crop=entropy&amp;w=1600&amp;h=320&amp;q=75"><span class="hb-credit">Jacmel · Photo: Claudia Altamimi / Unsplash</span></div>
+          <div class="hb-slide" data-src="https://images.unsplash.com/photo-1603839957368-33fc4df9943e?auto=format&amp;fit=crop&amp;crop=entropy&amp;w=1600&amp;h=320&amp;q=75"><span class="hb-credit">Cap-Haïtien · Photo: Patrice S Dorsainville / Unsplash</span></div>
+          <div class="hb-slide" data-src="https://images.unsplash.com/photo-1580223530509-849e0ad583ca?auto=format&amp;fit=crop&amp;crop=entropy&amp;w=1600&amp;h=320&amp;q=75"><span class="hb-credit">Abaka Bay, Île-à-Vache · Photo: Claudia Altamimi / Unsplash</span></div>
+          <div class="hb-slide" data-src="https://images.unsplash.com/photo-1742095228943-1b0ceb0fd82e?auto=format&amp;fit=crop&amp;crop=entropy&amp;w=1600&amp;h=320&amp;q=75"><span class="hb-credit">Labadee · Photo: Katherine Bandin / Unsplash</span></div>
+          <div class="hb-slide" data-src="https://images.unsplash.com/photo-1548783102-00a8fdfc34a1?auto=format&amp;fit=crop&amp;crop=entropy&amp;w=1600&amp;h=320&amp;q=75"><span class="hb-credit">Ayiti · Photo: TopSphere Media / Unsplash</span></div>
+          <div class="hb-welcome on"><span data-t="welcome_to"></span></div>
+        </div>
         <div class="lang hb-lang" role="group" aria-label="Language">
         <button type="button" data-lang="ht" aria-pressed="false" aria-label="Kreyòl" title="Kreyòl"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="10" fill="#00209f"/><rect y="10" width="30" height="10" fill="#d21034"/><rect x="11" y="6.5" width="8" height="7" fill="#fff"/><path d="M15 7.6v4.8M13 12h4" stroke="#016a16" stroke-width="1.1"/></svg><span class="lang-code">KR</span></button>
         <button type="button" data-lang="fr" aria-pressed="false" aria-label="Français" title="Français"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="10" height="20" fill="#002395"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#ed2939"/></svg><span class="lang-code">FR</span></button>
@@ -589,11 +606,11 @@ window.addEventListener("error", function (e) {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
-<script src="config.js?v=20261005t"></script>
-<script src="towns.js?v=20261005t"></script>
-<script src="depts.js?v=20261005t"></script>
-<script src="geo.js?v=20261005t"></script>
-<script src="i18n.js?v=20261005t"></script>
-<script src="app.js?v=20261005t"></script>
+<script src="config.js?v=20261006d"></script>
+<script src="towns.js?v=20261006d"></script>
+<script src="depts.js?v=20261006d"></script>
+<script src="geo.js?v=20261006d"></script>
+<script src="i18n.js?v=20261006d"></script>
+<script src="app.js?v=20261006d"></script>
 </body>
 </html>

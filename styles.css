@@ -947,3 +947,12 @@ svg.hb-tag text{font-family:var(--body);font-weight:500;font-size:34px;fill:#e87
 .foot-lang button[aria-pressed="false"] .flag{opacity:1}
 .foot-lang button[aria-pressed="false"]:hover{background:rgba(255,255,255,.14)}
 @media (max-width:520px){.foot-lang .lang-code{display:inline}}
+/* phone: "Bringing families together since 2004" centered on one line; ☰ sits above the banner */
+@media (max-width:760px){
+  body{padding-top:60px}
+  .hb-text{padding:0 12px}
+  .hb-kicker{text-align:center;white-space:nowrap;font-size:clamp(.56rem,2.85vw,.75rem);letter-spacing:.08em;margin-bottom:4px}
+}
+@media (max-width:760px){
+  .hb-lang button[aria-pressed="true"],.hb-lang button[aria-pressed="true"] .lang-code{color:#0b1530;text-shadow:none}
+}

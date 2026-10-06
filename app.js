@@ -79,7 +79,7 @@
     renderTowns();
     renderHaiti();
     renderFeatured(); updateSide();
-    fillBdaySelects("r"); fillBdaySelects("pr"); applySpecialDay(); renderBirthdays();
+    fillBdaySelects("r"); fillBdaySelects("pr"); applySpecialDay(); renderBirthdays(); grooveUI();
     if (curHash === "#privacy") renderPrivacy();
     if (curHash === "#admin") renderAdmin();
     if (currentMember) renderMemberPage(currentMember);
@@ -755,6 +755,40 @@
         const r = $("reply-body"); if (r && !r.value) { r.value = L().bday_wish(p.first_name || p.display_name); r.focus(); }
       } }))));
   }
+
+  /* ---------- Groove FM live radio (sponsor) ---------- */
+  const GROOVE = typeof C.GROOVE_STREAM_URL === "string" && /^https:\/\//.test(C.GROOVE_STREAM_URL.trim()) ? C.GROOVE_STREAM_URL.trim() : "";
+  let grooveState = "idle";   // idle | loading | playing
+  function grooveUI() {
+    const btn = $("groove-play"); if (!btn) return;
+    btn.classList.toggle("playing", grooveState === "playing");
+    btn.classList.toggle("loading", grooveState === "loading");
+    btn.querySelector(".gp-icon").textContent = grooveState === "playing" ? "❚❚" : "▶";
+    $("groove-label").textContent = grooveState === "playing" ? L().groove_pause : grooveState === "loading" ? L().groove_loading : L().groove_listen;
+    btn.setAttribute("aria-pressed", String(grooveState !== "idle"));
+  }
+  (function grooveSetup() {
+    const btn = $("groove-play"), audio = $("groove-audio"); if (!btn || !audio || !GROOVE) return;   // no stream yet: the button opens the website
+    btn.removeAttribute("target"); btn.setAttribute("href", "#groove");
+    btn.addEventListener("click", async ev => {
+      ev.preventDefault(); $("groove-msg").hidden = true;
+      if (grooveState !== "idle") { audio.pause(); audio.removeAttribute("src"); audio.load(); grooveState = "idle"; grooveUI(); return; }
+      grooveState = "loading"; grooveUI();
+      audio.src = GROOVE + (GROOVE.includes("?") ? "&" : "?") + "t=" + Date.now();   // always join the live broadcast, not an old buffer
+      try {
+        await audio.play();
+        if ("mediaSession" in navigator && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({ title: "Groove FM Radio", artist: "Live · Lakaymwen.co",
+          artwork: [{ src: new URL("sponsor-groovefm.png", location.href).href, sizes: "600x269", type: "image/png" }] });
+      } catch (e) { grooveFail(); }
+    });
+    audio.addEventListener("playing", () => { grooveState = "playing"; grooveUI(); });
+    audio.addEventListener("waiting", () => { if (grooveState === "playing") { grooveState = "loading"; grooveUI(); } });
+    audio.addEventListener("error", () => { if (grooveState !== "idle") grooveFail(); });
+    function grooveFail() {
+      audio.pause(); audio.removeAttribute("src"); grooveState = "idle"; grooveUI();
+      const m = $("groove-msg"); m.replaceChildren(L().groove_err.replace(/[^.!]*$/, "") + " ", el("a", { href: "https://radiogroovefm.com", target: "_blank", rel: "noopener", text: "radiogroovefm.com" })); m.hidden = false;
+    }
+  })();
 
   /* ---------- Special days: the banner celebrates Haitian holidays ---------- */
   function easter(y) {   // Gregorian Easter Sunday

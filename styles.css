@@ -1042,3 +1042,11 @@ svg.hb-tag text{font-family:var(--body);font-weight:500;font-size:34px;fill:#e87
 .hb-show.intro .hb-welcome{display:grid;place-items:center;padding:0;background:linear-gradient(180deg,#f4f6fc,#e6ebf8);transition:opacity .3s}
 .hb-show.intro .hb-welcome span{text-shadow:3px 3px 0 rgba(14,84,48,.18)}
 @media (max-width:760px){.hb-show.intro .hb-welcome{display:grid}}
+/* opening "Welcome to" over a photo, by itself */
+.hb-show.intro .hb-welcome.photo{background:linear-gradient(180deg,rgba(7,19,48,.15),rgba(7,19,48,.35))}
+.hb-show.intro .hb-welcome.photo span{color:#fff;text-shadow:0 3px 18px rgba(0,0,0,.55),0 1px 2px rgba(0,0,0,.6)}
+.hb-show.intro ~ .hb-lang{opacity:0;transition:opacity .4s}
+.hb-lang{transition:opacity .4s}
+.hb-show.intro ~ .hb-text{opacity:0}
+.hb-text{transition:opacity .6s ease}
+.hb-show.intro .hb-slide{transition:opacity .5s ease}

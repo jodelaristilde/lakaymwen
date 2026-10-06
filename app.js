@@ -79,6 +79,7 @@
     renderTowns();
     renderHaiti();
     renderFeatured(); updateSide();
+    fillBdaySelects("r"); fillBdaySelects("pr"); applySpecialDay(); renderBirthdays();
     if (curHash === "#privacy") renderPrivacy();
     if (curHash === "#admin") renderAdmin();
     if (currentMember) renderMemberPage(currentMember);
@@ -532,6 +533,7 @@
     // required fields, in the order they appear on the page
     if (!USER_RE.test(u)) return bad(L().user_bad, "r-user");
     const ap = aboutProblem("r"); if (ap) return bad(ap[0], ap[1]);
+    const bday = readBday("r"); if (bday === false) return bad(L().bday_bad, "r-bmonth");
     if (!EMAIL_RE.test(email)) return bad(L().email_bad, "r-email");
     if (!$("r-terms").checked) { /* checked last, below */ }
     if ($("r-pass").value.length < 6) return bad(L().pass_short, "r-pass");
@@ -548,7 +550,7 @@
       founding: $("r-founding").checked, old_username: $("r-founding").checked ? ($("r-old").value.trim() || null) : null,
       accepted_terms_at: new Date().toISOString() });
     const { data, error } = await sb.auth.signUp({ email, password: $("r-pass").value,
-      options: { emailRedirectTo: pageUrl(), data: { username: u, profile: about, lang } } });
+      options: { emailRedirectTo: pageUrl(), data: { username: u, profile: about, lang, birthday: bday || null } } });
     done();
     if (error) {
       registering = false;
@@ -556,7 +558,7 @@
       return bad(L().err + " (" + error.message + ")", "r-email");
     }
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { registering = false; return bad(L().email_taken, "r-email"); }
-    pendingReg = { username: u, about, photo: $("r-photo").files[0] || null };
+    pendingReg = { username: u, about, photo: $("r-photo").files[0] || null, birthday: bday || null };
     if (data.session) return finishRegistration(data.session.user);   // email confirmation turned off
     showVerify(email, false);
   });
@@ -588,7 +590,7 @@
   async function finishRegistration(user) {
     me = user;
     const meta = user.user_metadata || {};
-    const src = pendingReg || { username: meta.username, about: meta.profile || {}, photo: null };
+    const src = pendingReg || { username: meta.username, about: meta.profile || {}, photo: null, birthday: meta.birthday || null };
     let photo_url = null;
     if (src.photo) { try { photo_url = await uploadPhoto(await resizePhoto(src.photo)); } catch (err) { photo_url = null; } }
     const row = Object.assign({}, src.about, { id: user.id, username: src.username || null, photo_url });
@@ -601,6 +603,7 @@
     registering = false; pendingReg = null;
     if (error) { say("join-msg", L().err + " (" + error.message + ")", true); return; }
     profile = prof; store.set("lkm-town", null);
+    if (src.birthday && src.birthday.month) { try { await saveBday(src.birthday); } catch (e) {} }
     $("reg-form").reset(); $("r-family").replaceChildren(); $("r-schools").replaceChildren(); showRegForm();
     go("#member-" + user.id);
     afterAuth();
@@ -669,7 +672,7 @@
   }
   async function afterAuth() {
     updateAccount();
-    if (!me) { profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; pymkData = null; renderPymk(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
+    if (!me) { profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; pymkData = null; renderPymk(); bdayData = null; myBday = null; renderBirthdays(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
     const { data } = await sb.from("profiles").select("*").eq("id", me.id).maybeSingle();
     profile = data || null; schoolData = null;
     say("search-msg", "");
@@ -681,7 +684,7 @@
     if (currentMember) renderMemberPage(currentMember);
     if (!profile && !registering && me.user_metadata && me.user_metadata.profile) { finishRegistration(me); return; }
     if (!profile && !registering) openProfile(true);
-    refreshUnread(); refreshAlerts(); syncLangMeta(); loadPymk();
+    refreshUnread(); refreshAlerts(); syncLangMeta(); loadPymk(); loadBirthdays();
     if (pageFor(curHash)) route();
   }
   // Remember the member's language so alert emails come in Kreyòl or English
@@ -689,10 +692,112 @@
     if (sb && me && (me.user_metadata || {}).lang !== lang) sb.auth.updateUser({ data: { lang } }).catch(() => {});
   }
 
+  /* ---------- Birthdays: month + day only, private; friends and family get a reminder ---------- */
+  let bdayData = null, myBday = null;
+  const daysIn = m => [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1];
+  function fillBdaySelects(p) {
+    const ms = $(p + "-bmonth"), ds = $(p + "-bday"); if (!ms || !ds) return;
+    const mv = ms.value, dv = ds.value;
+    ms.replaceChildren(el("option", { value: "", text: L().bday_month }),
+      ...Array.from({ length: 12 }, (_, i) => el("option", { value: String(i + 1),
+        text: new Date(2000, i, 15).toLocaleDateString(locale(), { month: "long" }).replace(/^./, c => c.toUpperCase()) })));
+    ds.replaceChildren(el("option", { value: "", text: L().bday_day }),
+      ...Array.from({ length: 31 }, (_, i) => el("option", { value: String(i + 1), text: String(i + 1) })));
+    ms.value = mv; ds.value = dv;
+  }
+  function setBday(p, b) { fillBdaySelects(p); $(p + "-bmonth").value = b ? String(b.month) : ""; $(p + "-bday").value = b ? String(b.day) : ""; }
+  // null = nothing chosen, false = half filled or impossible date, else { month, day }
+  function readBday(p) {
+    const m = Number($(p + "-bmonth").value), d = Number($(p + "-bday").value);
+    if (!m && !d) return null;
+    if (!m || !d || d > daysIn(m)) return false;
+    return { month: m, day: d };
+  }
+  async function saveBday(b) {
+    if (!sb || !me) return;
+    if (b) await sb.from("birthdays").upsert({ user_id: me.id, month: b.month, day: b.day, updated_at: new Date().toISOString() });
+    else await sb.from("birthdays").delete().eq("user_id", me.id);
+    myBday = b || null;
+  }
+  function todayMD() {
+    const t = new Date(), y = t.getFullYear();
+    const leapYear = (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+    return { month: t.getMonth() + 1, day: t.getDate(), leap: t.getMonth() === 1 && t.getDate() === 28 && !leapYear };
+  }
+  async function loadBirthdays() {
+    bdayData = null; myBday = null;
+    if (sb && me) {
+      const t = todayMD();
+      const [{ data: mine }, { data: ids }] = await Promise.all([
+        sb.from("birthdays").select("month,day").eq("user_id", me.id).maybeSingle(),
+        sb.rpc("birthdays_today", { p_month: t.month, p_day: t.day, p_leap: t.leap })]);
+      myBday = mine || null;
+      const list = (ids || []).map(r => r.id).filter(id => !blockedIds.has(id));
+      const { data: people } = list.length ? await sb.from("profiles").select(PROFILE_COLS).in("id", list) : { data: [] };
+      bdayData = people || [];
+    }
+    renderBirthdays();
+  }
+  function renderBirthdays() {
+    const box = $("bday-box"); if (!box) return;
+    const t = todayMD();
+    const mineToday = !!(me && myBday && ((myBday.month === t.month && myBday.day === t.day) || (t.leap && myBday.month === 2 && myBday.day === 29)));
+    const list = me ? (bdayData || []) : [];
+    box.hidden = !me || (!list.length && !mineToday);
+    if (box.hidden) return;
+    $("bday-mine").hidden = !mineToday;
+    if (mineToday) $("bday-mine").textContent = L().bday_mine((profile && (profile.first_name || profile.display_name)) || "");
+    $("bday-p").hidden = !list.length;
+    $("bday-list").replaceChildren(...list.map(p => el("div", { class: "bday-card" },
+      el("a", { class: "bday-who", href: "#member-" + p.id }, avatar(p), el("b", {}, p.display_name, foundingStar(p))),
+      el("button", { class: "btn small red", type: "button", text: L().bday_send, onclick: async () => {
+        await openThread({ noticeId: null, other: p.id, title: p.display_name });
+        const r = $("reply-body"); if (r && !r.value) { r.value = L().bday_wish(p.first_name || p.display_name); r.focus(); }
+      } }))));
+  }
+
+  /* ---------- Special days: the banner celebrates Haitian holidays ---------- */
+  function easter(y) {   // Gregorian Easter Sunday
+    const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25),
+      g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4,
+      l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+      month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(y, month - 1, day);
+  }
+  function lastSunday(y, m) { const d = new Date(y, m + 1, 0); d.setDate(d.getDate() - d.getDay()); return d; }
+  function specialDay(date) {
+    const y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate();
+    const same = x => x.getMonth() === date.getMonth() && x.getDate() === d;
+    if (m === 1 && d === 1) return "indep";
+    if (m === 1 && d === 2) return "ancestors";
+    if (m === 5 && d === 18) return "flag";
+    if (m === 11 && d === 18) return "vertieres";
+    if (m === 12 && (d === 24 || d === 25)) return "christmas";
+    const e = easter(y);
+    for (const back of [49, 48, 47]) { const c = new Date(e); c.setDate(c.getDate() - back); if (same(c)) return "carnival"; }
+    if (same(lastSunday(y, 4))) return "mother";   // Haiti: last Sunday of May
+    if (same(lastSunday(y, 5))) return "father";   // Haiti: last Sunday of June
+    return null;
+  }
+  function applySpecialDay() {
+    const banner = document.querySelector(".hero-banner"); if (!banner) return;
+    let date = new Date();
+    const q = (new URLSearchParams(location.search).get("day") || "").match(/^(\d{1,2})-(\d{1,2})$/);   // preview: ?day=05-18
+    if (q) date = new Date(date.getFullYear(), Number(q[1]) - 1, Number(q[2]));
+    const key = specialDay(date);
+    banner.classList.remove("sd", "sd-patriot", "sd-carnival", "sd-christmas", "sd-family");
+    const k = document.querySelector(".hb-kicker");
+    if (!key) { if (k) k.textContent = L().since; return; }
+    banner.classList.add("sd", ["indep", "ancestors", "flag", "vertieres"].includes(key) ? "sd-patriot" : key === "carnival" ? "sd-carnival" : key === "christmas" ? "sd-christmas" : "sd-family");
+    if (k) k.textContent = L()["sd_" + key];
+  }
+
   /* ---------- Profile / my account ---------- */
   async function openProfile(isNew) {
     if (!me) { openAuth(); return; }
     fillAbout("pr", profile);
+    setBday("pr", myBday);
+    if (sb) sb.from("birthdays").select("month,day").eq("user_id", me.id).maybeSingle().then(({ data }) => { myBday = data || null; setBday("pr", myBday); });
     $("pr-listed").checked = profile ? profile.listed : true;
     $("pr-founding").checked = !!profile?.founding; $("pr-old").value = profile?.old_username || "";
     $("pr-old-wrap").hidden = !$("pr-founding").checked;
@@ -738,6 +843,8 @@
     e.preventDefault();
     const ap = aboutProblem("pr");
     if (ap) { say("profile-msg", ap[0], true); $(ap[1]).focus(); return; }
+    const bday = readBday("pr");
+    if (bday === false) { say("profile-msg", L().bday_bad, true); $("pr-bmonth").focus(); return; }
     const row = Object.assign({ id: me.id, username: profile?.username || me.user_metadata?.username || null, listed: $("pr-listed").checked,
       founding: $("pr-founding").checked, old_username: $("pr-founding").checked ? ($("pr-old").value.trim() || null) : null }, readAbout("pr"));
     let photoFailed = false;
@@ -752,6 +859,8 @@
     if (btn) btn.disabled = false;
     if (error) { say("profile-msg", L().err, true); return; }
     pendingPhoto = null; removePhoto = false;
+    try { await saveBday(bday); } catch (err) {}
+    renderBirthdays();
     const wasNew = !profile;
     profile = data; schoolData = null; store.set("lkm-town", null);
     updateSide(); loadFeatured();

@@ -1010,3 +1010,35 @@ svg.hb-tag text{font-family:var(--body);font-weight:500;font-size:34px;fill:#e87
 .sponsor-tag.jaeky-tag{font-family:"Cormorant SC",Georgia,"Times New Roman",serif;font-variant:normal;font-weight:700;font-size:1.02rem;letter-spacing:.05em;line-height:1.15;color:#111;margin-top:4px}
 .nowrap{white-space:nowrap}
 @media (max-width:760px){.sponsor-tag.jaeky-tag{font-size:1.2rem}}
+
+/* ---------- Banner slideshow (Haiti photos → "Welcome to" → logo) ---------- */
+.hb-show{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;transition:opacity 1.2s ease}
+.hb-show.on{opacity:1}
+.hb-slide{position:absolute;inset:0;background:#0b1530 center/cover no-repeat;opacity:0;transition:opacity 1.4s ease}
+.hb-slide.on{opacity:1}
+.hb-img{position:absolute;inset:0;background:center/cover no-repeat}
+.hb-slide.on .hb-img{animation:lkm-kb 6s ease-out both}
+@keyframes lkm-kb{from{transform:scale(1.08)}to{transform:scale(1)}}
+.hb-credit{position:absolute;left:12px;bottom:8px;font-size:.68rem;color:#fff;opacity:.85;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+.hb-welcome{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,#f4f6fc,#e6ebf8);opacity:0;transition:opacity 1s ease}
+.hb-welcome.on{opacity:1}
+.hb-welcome span{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,5.5vw,3.6rem);letter-spacing:.14em;text-transform:uppercase;color:#0e5430;text-shadow:3px 3px 0 rgba(14,84,48,.18)}
+.hb-welcome.on span{animation:lkm-in 1.6s ease-out both}
+@keyframes lkm-in{from{letter-spacing:.5em;opacity:0}to{letter-spacing:.14em;opacity:1}}
+.hb-lang{z-index:6}
+@media (max-width:760px){.hb-credit{font-size:.6rem;bottom:auto;top:6px}}
+@media (prefers-reduced-motion:reduce){.hb-show{display:none}}
+/* photos play behind the logo: photos → light mist → logo and languages on top; no photo credits shown */
+.hb-show{z-index:0}
+.hero-banner::before{z-index:1}
+.hb-text{z-index:2}
+.hb-credit{display:none}
+.hb-welcome{background:none;place-items:center end;padding-right:6%}
+.hb-welcome span{text-shadow:0 2px 14px rgba(255,255,255,.9),0 0 2px #fff;color:#0e5430}
+.hb-show.on ~ .hb-text .hb-kicker{text-shadow:0 0 8px rgba(255,255,255,.9)}
+@media (max-width:760px){.hb-welcome{display:none}}
+/* opening: "Welcome to" fills the whole banner for 2 seconds */
+.hb-show.intro{z-index:5;transition:opacity .9s ease}
+.hb-show.intro .hb-welcome{display:grid;place-items:center;padding:0;background:linear-gradient(180deg,#f4f6fc,#e6ebf8);transition:opacity .3s}
+.hb-show.intro .hb-welcome span{text-shadow:3px 3px 0 rgba(14,84,48,.18)}
+@media (max-width:760px){.hb-show.intro .hb-welcome{display:grid}}

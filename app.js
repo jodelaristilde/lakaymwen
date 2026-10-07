@@ -74,7 +74,7 @@
     document.querySelectorAll("[data-t-aria]").forEach(e => { const v = L()[e.dataset.tAria]; if (typeof v === "string") e.setAttribute("aria-label", v); });
     document.querySelectorAll("[data-ph]").forEach(e => { const v = L()[e.dataset.ph]; if (typeof v === "string") e.placeholder = v; });
     document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
-    if (!sb) { $("setup-banner").textContent = L().setup; $("setup-banner").hidden = false; }
+    if (!sb) { $("setup-banner").textContent = configured ? L().offline_msg : L().setup; $("setup-banner").hidden = false; }
     if ($("town-filter")) $("town-filter").placeholder = L().town_filter;
     renderTowns();
     renderHaiti();
@@ -435,8 +435,7 @@
       el("div", { class: "meta", text: `${L().by}: ${n.posted_by} · ${fmtDate(n.created_at)}` }),
       el("div", { class: "actions" },
         mine ? null : el("button", { class: "btn small", type: "button", text: L().know, onclick: () => knowPerson(n) }),
-        el("a", { class: "btn small ghost", href: "https://wa.me/?text=" + encodeURIComponent(shareText), target: "_blank", rel: "noopener", text: L().share_wa }),
-        el("a", { class: "btn small ghost", href: "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(link), target: "_blank", rel: "noopener", text: L().share_fb }),
+        el("button", { class: "btn small share-btn", type: "button", onclick: () => shareSheet(L().share_text(n.person_name, n.hometown), link) }, el("span", { class: "share-ic", "aria-hidden": "true" }), el("span", { text: L().share })),
         copyBtn,
         mine ? null : el("button", { class: "linkbtn", type: "button", text: L().report, onclick: () => openReport(n) })
       )
@@ -550,6 +549,37 @@
   /* ---------- Log in / register: email + password, email confirmed with a 6-digit code ---------- */
   const USER_RE = /^[a-z0-9._-]{3,20}$/;
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  // Members without email sign up with their phone number. No text message is sent (free):
+  // the phone number becomes a private sign-in name like p15551234567@phone.lakaymwen.co
+  const PHONE_DOMAIN = "phone.lakaymwen.co";
+  const phoneDigits = (cc, num) => {
+    let d = String(num || "").replace(/\D/g, "");
+    const c = String(cc || "").replace(/\D/g, "");
+    if (!d) return "";
+    if (String(num).trim().startsWith("+")) return d;          // they typed the full +country number
+    if (c && d.startsWith(c) && d.length > 10) return d;        // country code already included
+    return c + d.replace(/^0+/, "");
+  };
+  const phoneEmail = digits => "p" + digits + "@" + PHONE_DOMAIN;
+  const isPhoneEmail = e => String(e || "").endsWith("@" + PHONE_DOMAIN);
+  // the log-in box takes an email OR a phone number
+  function loginId(v) {
+    v = String(v || "").trim().toLowerCase();
+    if (v.includes("@")) return v;
+    const d = v.replace(/\D/g, "");
+    if (d.length < 7) return v;
+    // 10 digits without "+": a US/Canada number; otherwise they must include the country code
+    const plus = v.startsWith("+"); return phoneEmail(!plus && d.length === 10 ? "1" + d : !plus && d.length === 8 ? "509" + d : d);
+  }
+  const secretNorm = a => String(a || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  var usePhone = false;
+  function setPhoneMode(on) {
+    usePhone = on;
+    $("r-email-wrap").hidden = on; $("r-phone-wrap").hidden = !on;
+    $("r-phone-toggle").textContent = on ? L().use_email : L().no_email;
+    setTimeout(() => (on ? $("r-phone") : $("r-email")).focus(), 30);
+  }
+  $("r-phone-toggle").addEventListener("click", () => setPhoneMode(!usePhone));
   let registering = false, pendingReg = null, verifyEmail = "", verifyPass = "", verifyTimer = null;
   // Logging in uses a small window; registering has its own page (#join).
   function setJoinTown(town) {
@@ -574,8 +604,8 @@
   async function doLogin(email, pass, msgId, btn) {
     say(msgId, "");
     if (!needDb(msgId)) return;
-    email = email.trim().toLowerCase();
-    if (!EMAIL_RE.test(email)) { say(msgId, L().email_bad, true); return; }
+    email = loginId(email);
+    if (!EMAIL_RE.test(email)) { say(msgId, L().email_or_phone_bad, true); return; }
     if (btn) btn.disabled = true;
     const { error } = await sb.auth.signInWithPassword({ email, password: pass });
     if (btn) btn.disabled = false;
@@ -638,13 +668,16 @@
     e.preventDefault();
     say("join-msg", "");
     const u = $("r-user").value.trim().toLowerCase();
-    const email = $("r-email").value.trim().toLowerCase();
+    const pd = usePhone ? phoneDigits($("r-cc").value, $("r-phone").value) : "";
+    const email = usePhone ? phoneEmail(pd) : $("r-email").value.trim().toLowerCase();
     const bad = (msg, field) => { say("join-msg", msg, true); $(field).focus(); $("join-msg").scrollIntoView({ behavior: "smooth", block: "center" }); };
     // required fields, in the order they appear on the page
     if (!USER_RE.test(u)) return bad(L().user_bad, "r-user");
     const ap = aboutProblem("r"); if (ap) return bad(ap[0], ap[1]);
     const bday = readBday("r"); if (bday === false) return bad(L().bday_bad, "r-bmonth");
-    if (!EMAIL_RE.test(email)) return bad(L().email_bad, "r-email");
+    if (usePhone) { if (pd.length < 8 || pd.length > 15) return bad(L().phone_bad, "r-phone");
+      if (secretNorm($("r-seca").value).length < 2) return bad(L().secret_bad, "r-seca"); }
+    else if (!EMAIL_RE.test(email)) return bad(L().email_bad, "r-email");
     if (!$("r-terms").checked) { /* checked last, below */ }
     if ($("r-pass").value.length < 6) return bad(L().pass_short, "r-pass");
     if ($("r-pass").value !== $("r-pass2").value) return bad(L().pass_mismatch, "r-pass2");
@@ -664,16 +697,21 @@
     done();
     if (error) {
       registering = false;
-      if (/already|registered|exists/i.test(error.message)) return bad(L().email_taken, "r-email");
-      return bad(L().err + " (" + error.message + ")", "r-email");
+      if (/already|registered|exists/i.test(error.message)) return bad(usePhone ? L().phone_taken : L().email_taken, usePhone ? "r-phone" : "r-email");
+      return bad(L().err + " (" + error.message + ")", usePhone ? "r-phone" : "r-email");
     }
-    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { registering = false; return bad(L().email_taken, "r-email"); }
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { registering = false; return bad(usePhone ? L().phone_taken : L().email_taken, usePhone ? "r-phone" : "r-email"); }
     verifyPass = $("r-pass").value;
     pendingReg = { username: u, about, photo: $("r-photo").files[0] || null, birthday: bday || null };
     // keep a small copy of the photo, so it isn't lost if they confirm from the email link in another tab
     if (pendingReg.photo) { try { const b = await resizePhoto(pendingReg.photo);
       store.set("lkm-pending-photo", await new Promise((ok, no) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = no; fr.readAsDataURL(b); })); } catch (e) {} }
+    if (data.session && usePhone) {   // save the secret question so they can reset their own password later
+      const { error: rErr } = await sb.rpc("set_phone_recovery", { p_question: $("r-secq").value, p_answer: secretNorm($("r-seca").value) });
+      if (rErr) console.warn("secret question not saved", rErr.message);
+    }
     if (data.session) return finishRegistration(data.session.user);   // email confirmation turned off
+    if (usePhone) { registering = false; return bad(L().phone_unavailable, "r-phone"); }   // phone sign-up needs "Confirm email" off
     showVerify(email, false);
   });
 
@@ -766,7 +804,7 @@
   }
   function openForgot() {
     recoveryMode = false; $("f-code-wrap").hidden = false;
-    $("forgot-form").hidden = false; $("reset-form").hidden = true; say("forgot-msg", "");
+    $("forgot-form").hidden = false; $("reset-form").hidden = true; $("phone-reset-form").hidden = true; say("forgot-msg", "");
     $("f-email").value = ($("l-email").value || $("side-email").value || "").trim();
     if ($("dlg-auth").open) $("dlg-auth").close();
     openDlg("dlg-forgot"); $("f-email").focus();
@@ -775,8 +813,20 @@
   $("forgot-form").addEventListener("submit", async e => {
     e.preventDefault();
     if (!needDb("forgot-msg")) return;
-    const email = $("f-email").value.trim().toLowerCase();
-    if (!EMAIL_RE.test(email)) { say("forgot-msg", L().email_bad, true); return; }
+    const email = loginId($("f-email").value);
+    if (isPhoneEmail(email)) {   // phone members answer their secret question instead of getting an email
+      const btn = e.submitter; if (btn) btn.disabled = true;
+      const { data: q, error } = await sb.rpc("phone_recovery_question", { p_email: email });
+      if (btn) btn.disabled = false;
+      if (error || !q || !L()["q_" + q]) { say("forgot-msg", L().phone_forgot((C.CONTACT_EMAIL || "info@lakaymwen.co")), true); return; }
+      forgotEmail = email;
+      $("pr-q").textContent = L()["q_" + q];
+      ["pr-a", "pr-pass", "pr-pass2"].forEach(id => { $(id).value = ""; });
+      $("forgot-form").hidden = true; $("phone-reset-form").hidden = false; say("forgot-msg", "");
+      $("pr-a").focus();
+      return;
+    }
+    if (!EMAIL_RE.test(email)) { say("forgot-msg", L().email_or_phone_bad, true); return; }
     const btn = e.submitter; if (btn) btn.disabled = true;
     const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: pageUrl() });
     if (btn) btn.disabled = false;
@@ -785,6 +835,24 @@
     $("reset-text").textContent = L().reset_text(email);
     $("forgot-form").hidden = true; $("reset-form").hidden = false; say("forgot-msg", "");
     $("f-code").focus();
+  });
+  $("phone-reset-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    if (secretNorm($("pr-a").value).length < 2) { say("forgot-msg", L().secret_bad, true); $("pr-a").focus(); return; }
+    if ($("pr-pass").value.length < 6) { say("forgot-msg", L().pass_short, true); $("pr-pass").focus(); return; }
+    if ($("pr-pass").value !== $("pr-pass2").value) { say("forgot-msg", L().pass_mismatch, true); $("pr-pass2").focus(); return; }
+    const btn = e.submitter; if (btn) btn.disabled = true;
+    const { data: r, error } = await sb.rpc("phone_reset_password", { p_email: forgotEmail, p_answer: secretNorm($("pr-a").value), p_password: $("pr-pass").value });
+    if (error || r !== "ok") {
+      if (btn) btn.disabled = false;
+      const t = error ? L().err + " (" + error.message + ")" : r === "wrong" ? L().secret_wrong : r === "locked" ? L().secret_locked : r === "short" ? L().pass_short : L().phone_forgot((C.CONTACT_EMAIL || "info@lakaymwen.co"));
+      say("forgot-msg", t, true); return;
+    }
+    // new password saved: log them straight in
+    const { error: sErr } = await sb.auth.signInWithPassword({ email: forgotEmail, password: $("pr-pass").value });
+    if (btn) btn.disabled = false;
+    $("phone-reset-form").hidden = true; say("forgot-msg", sErr ? L().pass_changed : L().pass_changed);
+    setTimeout(() => $("dlg-forgot").close(), 1400);
   });
   $("reset-form").addEventListener("submit", async e => {
     e.preventDefault();
@@ -1278,6 +1346,28 @@
 
   /* ---------- Admin page (only for admins) ---------- */
   const REASONS = ["fake", "scam", "harass", "photo", "minor", "other"];
+  // Admin: new password for a member who signed up with a phone number (they have no email to reset it)
+  function phoneResetBox() {
+    const msg = el("p", { class: "msg", hidden: "" });
+    const cc = el("select", { "aria-label": "Country code" }, ...[["1","🇺🇸 +1"],["509","🇭🇹 +509"],["33","🇫🇷 +33"],["56","🇨🇱 +56"],["55","🇧🇷 +55"],["52","🇲🇽 +52"],["34","🇪🇸 +34"],["44","🇬🇧 +44"],["590","🇬🇵 +590"],["596","🇲🇶 +596"],["594","🇬🇫 +594"]].map(([v, t]) => el("option", { value: v, text: t })));
+    const ph = el("input", { type: "tel", inputmode: "tel", placeholder: "347 555 1234", "aria-label": L().phone_lbl });
+    const pw = el("input", { type: "text", placeholder: L().new_pass, autocomplete: "off", "aria-label": L().new_pass });
+    const go = el("button", { class: "btn dark", type: "button", text: L().phone_reset_btn, onclick: async () => {
+      const d = phoneDigits(cc.value, ph.value);
+      const show = (t, err) => { msg.hidden = false; msg.textContent = t; msg.classList.toggle("error", !!err); };
+      if (d.length < 8) return show(L().phone_bad, true);
+      if (pw.value.length < 6) return show(L().pass_short, true);
+      go.disabled = true;
+      const { data, error } = await sb.rpc("admin_reset_phone_password", { p_email: phoneEmail(d), p_password: pw.value });
+      go.disabled = false;
+      if (error) return show(L().err + " (" + error.message + ")", true);
+      show(data ? L().phone_reset_ok(pw.value) : L().phone_reset_none, !data);
+    } });
+    return el("div", { class: "box-lite phone-reset" },
+      el("h3", { class: "h3", text: L().phone_reset_h }),
+      el("p", { class: "note", text: L().phone_reset_p }),
+      el("div", { class: "phone-row" }, cc, ph), pw, go, msg);
+  }
   async function renderAdmin() {
     const box = $("admin-view");
     if (!sb || !me || !isAdmin) { box.replaceChildren(el("p", { class: "empty", text: L().admin_only })); return; }
@@ -1318,6 +1408,7 @@
         await sb.from("profiles").update({ suspended: false }).eq("id", p.id); renderAdmin(); loadFeatured(); loadTownCounts(); } }));
     box.replaceChildren(
       el("div", { class: "stats" }, tile(st.members, L().st_members), tile(st.new_this_week, L().st_new), tile(st.open_reports, L().st_reports), tile(st.hidden, L().st_hidden), tile(st.messages, L().st_messages), tile(st.photos, L().st_photos), tile(st.alerts, L().st_alerts), tile(st.family_links, L().st_family)),
+      phoneResetBox(),
       el("h3", { class: "h3", text: L().open_reports }),
       (reports || []).length ? el("div", { class: "reports" }, ...(reports || []).map(reportRow)) : el("p", { class: "empty", text: L().no_reports }),
       el("h3", { class: "h3", text: L().hidden_members }),
@@ -1442,10 +1533,11 @@
     openDlg("dlg-share");
   }
   function waBtn(label, textFn, extra) {
-    const b = el("button", { class: "btn wa" + (extra ? " " + extra : ""), type: "button", onclick: () => wa(textFn()) });
-    b.innerHTML = WA_ICON; b.append(el("span", { text: label }));
-    return b;
+    // was a WhatsApp-only button; now one Share button (WhatsApp, Facebook, Messenger, text…)
+    return el("button", { class: "btn share-btn" + (extra ? " small" : ""), type: "button", onclick: () => shareSheet(textFn()) },
+      el("span", { class: "share-ic", "aria-hidden": "true" }), el("span", { text: label }));
   }
+
   const schoolHash = n => "#school/" + encodeURIComponent(n);
   const katyeHash = (t, k) => "#katye/" + encodeURIComponent(t) + "/" + encodeURIComponent(k);
   const placeKey = s => norm(s).replace(/[^a-z0-9]+/g, "");
@@ -2133,6 +2225,7 @@
     document.body.classList.toggle("admin-mode", admin);
     if (privacy) { renderPrivacy(); window.scrollTo(0, 0); }
     if (admin) { renderAdmin(); window.scrollTo(0, 0); }
+    document.body.classList.toggle("about-mode", curHash === "#about");
     const search = curHash === "#search";
     document.body.classList.toggle("search-mode", search);
     if (search) { window.scrollTo(0, 0); setTimeout(() => $("s-name").focus(), 60); showMyTown(); }

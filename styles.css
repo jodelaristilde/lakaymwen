@@ -1300,3 +1300,29 @@ body:not(.logged-in):not(.about-mode) #about{display:none}
   .qr-t{margin:0;text-align:center;font-size:.78rem;font-weight:700;line-height:1.3;color:var(--ink,#0b1530)}
   .qr-card .qr-share{width:100%;padding:8px 10px;font-size:.86rem}
 }
+
+/* ---------- Computer landing: everything on ONE white panel, small even gaps, columns end at the same line ---------- */
+@media (min-width:761px){
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .portal-grid{box-sizing:border-box;width:calc(100% - 2*clamp(16px,4vw,32px));max-width:1116px;margin:12px auto 18px;padding:14px;background:#fff;border:1px solid #e6ebf3;border-radius:22px;box-shadow:0 10px 30px rgba(7,19,48,.07);column-gap:14px;row-gap:12px;grid-template-rows:auto auto auto 1fr}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) #landing{box-shadow:none;border:1px solid #e3eee7;border-radius:16px;margin:0}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .side-extra{grid-row:2/5;align-self:stretch;display:flex;flex-direction:column;gap:12px}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .pwoveb{border-radius:14px}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .qr-card{flex:1;align-content:center;padding:12px 12px 14px}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .qr-svg{width:96px;height:96px}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .sponsors{grid-row:3/5;align-self:stretch;grid-template-rows:auto 1fr;gap:10px 12px}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .sponsors-h{grid-column:1/4;grid-row:1;align-self:center;margin:0 0 0 2px}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .groove-live{grid-column:4;grid-row:1;margin:0;justify-self:end;align-self:center}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .groove-btn{padding:6px 14px;font-size:.82rem;box-shadow:none}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .groove-btn .gp-icon{width:20px;height:20px;font-size:.6rem}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .sponsor,body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .sponsor.dark{height:auto;min-height:104px;grid-row:2;border-radius:14px}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .side-menu a,body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .side-menu button{box-shadow:none}
+}
+@media (min-width:761px){body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) #home.portal{padding-bottom:22px}body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .portal-grid{margin-bottom:0}}
+
+/* ---------- Phones: no footer (nothing extra to scroll); Privacy + Contact live in the ☰ menu ---------- */
+.side-menu .phone-only{display:none}
+@media (max-width:760px){
+  footer{display:none}
+  .side-menu .phone-only{display:block}
+  #home.portal{padding-bottom:16px}
+}

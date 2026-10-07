@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Montserrat:wght@500;600&family=Cormorant+SC:wght@700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261006g">
+<link rel="stylesheet" href="styles.css?v=20261006j">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
         <button class="linkbtn" type="button" id="btn-signout" data-t="signout"></button>
       </div>
 </div>
+<button class="msg-alert" type="button" id="msg-alert" hidden><span class="msg-alert-ic" aria-hidden="true">✉️</span><span class="msg-alert-n" id="msg-alert-n"></span><span class="msg-alert-txt" id="msg-alert-txt"></span></button>
 <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="side-menu" data-t-aria="menu"><span></span><span></span><span></span></button>
 
 
@@ -487,6 +488,19 @@
 </dialog>
 
 <!-- Forgot password: email code, then a new password -->
+<dialog id="dlg-welcome" class="dlg-postcard">
+  <div class="dlg-head"><h2 data-t="pc_h"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <p class="pc-text" data-t="pc_p"></p>
+    <a class="postcard" id="pc-card" href="#" target="_blank" rel="noopener"><img src="share-preview.png" alt="" width="1200" height="630"><span class="pc-tap" data-t="pc_tap"></span></a>
+    <div class="pc-btns">
+      <a class="btn wa" id="pc-wa" href="#" target="_blank" rel="noopener"><span data-t="pc_wa"></span></a>
+      <a class="btn pc-fb" id="pc-fb" href="#" target="_blank" rel="noopener"><span data-t="share_fb"></span></a>
+      <button class="btn ghost" type="button" id="pc-copy" data-t="copy_link"></button>
+    </div>
+    <button class="btn dark big pc-go" type="button" data-close data-t="pc_go"></button>
+  </div>
+</dialog>
 <dialog id="dlg-forgot">
   <div class="dlg-head"><h2 data-t="forgot_h"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-body">
@@ -606,11 +620,11 @@ window.addEventListener("error", function (e) {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
-<script src="config.js?v=20261006g"></script>
-<script src="towns.js?v=20261006g"></script>
-<script src="depts.js?v=20261006g"></script>
-<script src="geo.js?v=20261006g"></script>
-<script src="i18n.js?v=20261006g"></script>
-<script src="app.js?v=20261006g"></script>
+<script src="config.js?v=20261006j"></script>
+<script src="towns.js?v=20261006j"></script>
+<script src="depts.js?v=20261006j"></script>
+<script src="geo.js?v=20261006j"></script>
+<script src="i18n.js?v=20261006j"></script>
+<script src="app.js?v=20261006j"></script>
 </body>
 </html>

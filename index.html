@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Montserrat:wght@500;600&family=Cormorant+SC:wght@700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261006j">
+<link rel="stylesheet" href="styles.css?v=20261006o">
 </head>
 <body>
 
@@ -259,7 +259,7 @@
             <h3 class="form-h" data-t="verify_h"></h3>
             <p id="verify-text"></p>
             <form id="verify-form" novalidate>
-              <label><span data-t="code_if_any"></span><input id="v-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
+              <label><span data-t="code_from_email"></span><input id="v-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10"></label>
               <button class="btn red big" type="submit" data-t="verify_btn"></button>
             </form>
             <p class="note"><button class="linkbtn" type="button" id="v-resend" data-t="resend_code"></button> · <button class="linkbtn" type="button" id="v-change" data-t="change_email"></button></p>
@@ -488,6 +488,7 @@
 </dialog>
 
 <!-- Forgot password: email code, then a new password -->
+<datalist id="school-options"></datalist>
 <dialog id="dlg-welcome" class="dlg-postcard">
   <div class="dlg-head"><h2 data-t="pc_h"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-body">
@@ -511,7 +512,7 @@
     </form>
     <form id="reset-form" novalidate hidden>
       <p id="reset-text"></p>
-      <label id="f-code-wrap"><span data-t="code_if_any"></span><input id="f-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
+      <label id="f-code-wrap"><span data-t="code_if_any"></span><input id="f-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10"></label>
       <div class="two">
         <label><span data-t="new_pass"></span><input id="f-pass" type="password" autocomplete="new-password"></label>
         <label><span data-t="password2"></span><input id="f-pass2" type="password" autocomplete="new-password"></label>
@@ -620,11 +621,11 @@ window.addEventListener("error", function (e) {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
-<script src="config.js?v=20261006j"></script>
-<script src="towns.js?v=20261006j"></script>
-<script src="depts.js?v=20261006j"></script>
-<script src="geo.js?v=20261006j"></script>
-<script src="i18n.js?v=20261006j"></script>
-<script src="app.js?v=20261006j"></script>
+<script src="config.js?v=20261006o"></script>
+<script src="towns.js?v=20261006o"></script>
+<script src="depts.js?v=20261006o"></script>
+<script src="geo.js?v=20261006o"></script>
+<script src="i18n.js?v=20261006o"></script>
+<script src="app.js?v=20261006o"></script>
 </body>
 </html>

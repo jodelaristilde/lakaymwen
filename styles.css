@@ -1113,3 +1113,23 @@ body.logged-in:not(.register-mode) .portal-side>.box{display:none}
 }
 .sb-short{display:none}
 @media (max-width:720px){.searchbar.light .sb-field>.sb-long{display:none}.searchbar.light .sb-field>.sb-short{display:block}}
+.pc-fb.pc-more{background:#0b1530;color:#fff}
+
+/* ---------- Member hover card (computers) ---------- */
+.hovercard{position:fixed;z-index:60;width:min(380px,calc(100vw - 16px));background:var(--card,#fff);color:var(--ink,#0b1530);border-radius:18px;box-shadow:0 18px 50px rgba(7,19,48,.28);border:1px solid var(--line,#dfe4ef);padding:18px;display:grid;gap:14px;animation:hcIn .15s ease-out}
+@keyframes hcIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.hc-top{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:start}
+.hovercard .avatar.hc-av{width:96px;height:96px;font-size:2rem;border-radius:50%}
+.hc-name{display:block;font-family:Bricolage Grotesque,sans-serif;font-weight:800;font-size:1.25rem;line-height:1.15;color:inherit;text-decoration:none}
+.hc-name:hover{text-decoration:underline}
+.hc-nick{color:var(--muted,#6b7490);font-size:.9rem;margin-top:2px}
+.hc-info{display:grid;gap:6px;margin-top:8px}
+.hc-line{display:grid;grid-template-columns:22px minmax(0,1fr);gap:6px;font-size:.88rem;line-height:1.35;color:#3d4763}
+.hc-ic{text-align:center}
+.hc-btns{display:flex;gap:8px;align-items:center}
+.hc-btns>*{flex:1 1 auto;justify-content:center;text-align:center}
+.hc-btns .hc-more{flex:0 0 44px;padding-inline:0}
+.hc-msg{background:#1877f2;color:#fff;border-color:#1877f2}
+.hc-msg:hover{background:#166fe0}
+.hc-btns .chip-item{display:inline-flex;justify-content:center;padding:8px 10px;border-radius:999px;background:#eef2fc;font-weight:700;font-size:.85rem}
+[data-hc]{cursor:pointer}

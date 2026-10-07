@@ -1143,3 +1143,71 @@ body.logged-in:not(.register-mode) .portal-side>.box{display:none}
   .who-bar{position:fixed;top:12px;left:12px;z-index:44;height:42px;margin:0;padding:0 14px;max-width:calc(100% - 150px);background:var(--bg,#fff);border:1.5px solid var(--line,#dfe4ef);border-radius:12px;box-shadow:0 4px 14px rgba(7,19,48,.12);font-size:.82rem}
 }
 @media (max-width:400px){#who-label{display:none}}
+
+/* ---------- Search results: Facebook-style list ---------- */
+.fb-row{padding:10px 12px;align-items:center;background:transparent;border-radius:14px}
+.fb-row:hover{background:var(--alt,#f2f5fb)}
+.fb-row .member-link{flex:1;min-width:0;align-items:center;gap:14px}
+.avatar.fb-av{width:56px;height:56px;flex:0 0 56px;font-size:1.15rem}
+.fb-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.fb-name{font-size:1.08rem;line-height:1.25;color:var(--ink,#0b1530);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fb-sub{font-size:.92rem;color:var(--muted,#6b7490);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fb-why{font-size:.82rem;color:var(--muted,#6b7490)}
+.fb-why i{font-style:normal}
+.fb-row mark{background:#fff1a8;color:inherit;border-radius:4px;padding:0 2px}
+.fb-msg{flex:0 0 42px;width:42px;height:42px;border-radius:50%;border:0;background:#e7f0ff;color:#1877f2;display:grid;place-items:center;cursor:pointer}
+.fb-msg:hover{background:#d6e6ff}
+.fb-msg svg{width:20px;height:20px}
+.people:has(.fb-row){gap:2px}
+
+/* ---------- One Share button with the share arrow ---------- */
+.share-ic{display:inline-block;width:20px;height:20px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 5l7 7-7 7'/%3E%3Cpath d='M21 12H11a8 8 0 0 0-8 8'/%3E%3C/svg%3E") center/contain no-repeat}
+.share-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#1877f2;color:#fff;border-color:#1877f2}
+.share-btn:hover{background:#166fe0}
+.dlg-share{max-width:420px;width:calc(100% - 24px)}
+.share-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.share-opt{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:14px;border:1px solid var(--line,#dfe4ef);background:var(--bg,#fff);color:var(--ink,#0b1530);font:inherit;font-size:.85rem;font-weight:700;text-decoration:none;cursor:pointer}
+.share-opt:hover{background:var(--alt,#f2f5fb)}
+.so-ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:1.3rem;font-weight:800;color:#fff}
+.so-wa{background:#25d366;font-size:0}.so-wa::before{content:"✆";font-size:1.4rem;color:#fff}
+.so-fb{background:#1877f2;font-family:Arial,sans-serif;font-size:1.6rem}
+.so-x{background:#000}
+.so-mail,.so-sms,.so-copy{background:#eef2fc}
+
+/* ---------- Sponsors on phones: small circles like Facebook highlights ---------- */
+@media (max-width:760px){
+  .sponsors{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-width:none;padding:6px 0 10px}
+  .sponsors-h{grid-column:1/-1;text-align:left;margin:0 0 2px 4px}
+  .sponsor,.sponsor.dark{background:none;border:0;padding:0;min-height:0;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:none}
+  .sponsor:hover{transform:none;box-shadow:none}
+  .sponsor>img,.sponsor>.crop-jaeky{width:74px;height:74px;max-height:none;border-radius:50%;background:#fff;border:2.5px solid #1877f2;padding:9px;object-fit:contain;box-sizing:border-box;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff,0 4px 10px rgba(7,19,48,.15)}
+  .sponsor>.crop-jaeky img{margin:0;width:100%;height:100%;object-fit:contain}
+  .sponsor .sponsor-tag{display:none}
+  .sponsor::after{content:attr(data-name);font-size:.74rem;font-weight:700;color:var(--ink,#0b1530);text-align:center;line-height:1.2}
+  .groove-live{grid-column:1/-1}
+}
+.people>.fb-row,.fb-row{min-width:0;max-width:100%}
+.people:has(.fb-row){grid-template-columns:minmax(0,1fr)}
+.avatar.fb-av{border-radius:50%;object-fit:cover}
+
+/* ---------- Lakaymwen colors (light green + orange) instead of Facebook blue ---------- */
+.share-btn{background:linear-gradient(90deg,#3fae6a,#f29a3b);border-color:transparent;color:#fff}
+.share-btn:hover{background:linear-gradient(90deg,#37a05f,#ea8d2b)}
+.fb-msg{background:#fff1e1;color:#e8740a}
+.fb-msg:hover{background:#ffe3c2}
+.hc-msg{background:#3fae6a;border-color:#3fae6a;color:#fff}
+.hc-msg:hover{background:#35995c}
+@media (max-width:760px){
+  .sponsor>img,.sponsor>.crop-jaeky{border:2.5px solid transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#3fae6a,#f29a3b) border-box}
+}
+
+/* ---------- Lakaymwen look (not Facebook blue): green + orange accents ---------- */
+:root{--blue:#178a57}
+.avatar{background:linear-gradient(135deg,#3fae6a,#178a57)}
+.fb-row:nth-child(3n+2) .avatar,.member-card:nth-child(3n+2) .avatar,.card:nth-child(3n+2) .avatar{background:linear-gradient(135deg,#f6a54a,#e8740a)}
+.fb-row:nth-child(3n) .avatar,.member-card:nth-child(3n) .avatar,.card:nth-child(3n) .avatar{background:linear-gradient(135deg,#ef6b5b,#d9452f)}
+img.avatar,.fb-row img.avatar{background:var(--chip)}
+.hovercard .avatar.hc-av{background:linear-gradient(135deg,#3fae6a,#f29a3b)}
+.hovercard img.avatar.hc-av{background:var(--chip)}
+.fb-row:hover{background:#f3faf5}
+.fb-row mark,.glance-card mark{background:#ffe2bf}

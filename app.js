@@ -319,8 +319,7 @@
     else if (a === "login") { openAuth(null, "login"); }
     else if (a === "signout") { $("btn-signout").click(); }
     else if (a === "tell") {
-      const text = L().tell_text + " " + location.origin.replace("://www.", "://");
-      wa(text);
+      shareSheet(L().tell_text, location.origin.replace("://www.", "://"));
     }
   }));
   let blockedIds = new Set(), isAdmin = false;
@@ -448,30 +447,35 @@
     box.replaceChildren(...list.map(noticeCard));
   }
   // A member at a glance: enough to say "that's the person I grew up with"
+  // Search results look like Facebook's list: picture, First Last, then City · Katye
+  const MSG_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.5 3 2 6.9 2 11.7c0 2.6 1.3 4.9 3.4 6.5L5 22l3.9-2.1c1 .3 2 .4 3.1.4 5.5 0 10-3.9 10-8.7S17.5 3 12 3Z"/></svg>';
   function memberRow(p, key) {
     const self = me && p.id === me.id;
     key = typeof key === "string" ? key : "";
     const hit = txt => key && norm(txt).includes(key);
     const mark = txt => hit(txt) ? el("mark", { text: txt }) : document.createTextNode(txt);
-    const glance = (icon, label, items) => items.length ? el("div", { class: "glance" },
-      el("span", { class: "g-label", text: icon + " " + label }), el("span", { class: "g-val" },
-        ...items.flatMap((it, i) => i ? [document.createTextNode(", "), it] : [it]))) : null;
-    const lives = [p.lives_in, p.state, p.country].filter(Boolean).join(", ");
-    const schools = schoolsOf(p);
-    const fam = p.family || [];
-    const famShown = fam.slice(0, 6).concat(fam.slice(6).filter(f => hit(f.name)));
-    const famItems = famShown.map(f => el("span", {}, el("i", { text: relName(f.relation) + " " }), mark(f.name)));
-    if (fam.length > famShown.length) famItems.push(el("span", { class: "muted", text: L().and_more(fam.length - famShown.length) }));
-    return el("div", { class: "member glance-card" },
-      el("a", { class: "member-link", href: "#member-" + p.id }, avatar(p, "sm"), el("div", { class: "glance-body" },
-        el("b", {}, mark(p.display_name), p.nickname ? el("span", { class: "nick" }, " “", mark(p.nickname), "”") : null, foundingStar(p)),
-        el("span", { class: "meta" }, `${L().from} `, mark(p.hometown || ""), p.katye ? [` · ${L().katye_short} `, mark(p.katye)] : null, lives ? ` · ${L().lives} ${lives}` : ""),
-        glance("🏫", L().card_schools, schools.map(o => el("span", {}, mark(o.name), o.years ? el("small", { text: ` (${o.years})` }) : null))),
-        glance("👪", L().card_family, famItems))),
-      self ? null : el("button", { class: "btn small", type: "button", text: L().contact_member,
-        onclick: () => openThread({ noticeId: null, other: p.id, title: p.display_name }) })
-    );
+    const full = [p.first_name, p.last_name].filter(Boolean).join(" ") || p.display_name || "";
+    const place = [p.hometown, p.katye].filter(Boolean).join(" · ");
+    // when the match came from family or school, say why in one small line
+    let why = null;
+    if (key) {
+      const fam = (p.family || []).find(f => hit(f.name));
+      const sch = schoolsOf(p).find(o => hit(o.name));
+      if (fam && !hit(full) && !hit(p.nickname || "")) why = el("span", { class: "fb-why" }, "👪 ", el("i", { text: relName(fam.relation) + " " }), mark(fam.name));
+      else if (sch && !hit(full)) why = el("span", { class: "fb-why" }, "🏫 ", mark(sch.name));
+    }
+    const msgBtn = self ? null : el("button", { class: "fb-msg", type: "button", title: L().contact_member, "aria-label": L().contact_member,
+      onclick: e => { e.preventDefault(); openThread({ noticeId: null, other: p.id, title: p.display_name }); } });
+    if (msgBtn) msgBtn.innerHTML = MSG_ICON;
+    return el("div", { class: "member fb-row" },
+      el("a", { class: "member-link", href: "#member-" + p.id }, avatar(p, "fb-av"),
+        el("span", { class: "fb-text" },
+          el("b", { class: "fb-name" }, mark(full), p.nickname ? el("span", { class: "nick" }, " “", mark(p.nickname), "”") : null, foundingStar(p)),
+          place ? el("span", { class: "fb-sub" }, mark(place)) : null,
+          why)),
+      msgBtn);
   }
+
   async function loadRecent() {}
 
   /* ---------- Search and results ---------- */
@@ -716,27 +720,10 @@
   /* After a new member registers: a postcard to share, then the member search */
   const siteLink = () => location.origin.replace("://www.", "://");
   function openPostcard() {
-    const link = siteLink(), msg = L().pc_share + " " + link;
-    const waUrl = "https://wa.me/?text=" + encodeURIComponent(msg);
-    $("pc-card").href = waUrl; $("pc-wa").href = waUrl;
-    $("pc-fb").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(link);
-    $("pc-copy").textContent = L().copy_link;
-    // phones: this button opens the phone's own share menu (Facebook, Messages, Instagram…)
-    $("pc-fb").classList.toggle("pc-more", !!navigator.share);
-    $("pc-fb-t").textContent = navigator.share ? L().pc_more : L().share_fb;
     openDlg("dlg-welcome");
   }
-  $("pc-fb").addEventListener("click", async e => {
-    if (!navigator.share) return;          // computers: the Facebook link opens normally
-    e.preventDefault();
-    try { await navigator.share({ title: "Lakaymwen.co", text: L().pc_share, url: siteLink() }); } catch (err) {}
-  });
-  $("pc-copy").addEventListener("click", async () => {
-    const msg = L().pc_share + " " + siteLink();
-    try { await navigator.clipboard.writeText(msg); } catch (e) {
-      const t = document.createElement("textarea"); t.value = msg; document.body.append(t); t.select(); try { document.execCommand("copy"); } catch (e2) {} t.remove(); }
-    $("pc-copy").textContent = L().copied;
-  });
+  $("pc-card").addEventListener("click", e => { e.preventDefault(); shareSheet(L().pc_share, siteLink()); });
+  $("pc-share").addEventListener("click", () => shareSheet(L().pc_share, siteLink()));
   // only the member closing the postcard (X or the button) takes them to Member search
   var navClosing = false;
   $("dlg-welcome").addEventListener("close", () => { if (!navClosing) go("#search"); });
@@ -1406,6 +1393,24 @@
   /* ---------- WhatsApp invites ---------- */
   const WA_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>';
   function wa(text) { window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener"); }
+  // One Share button, like Facebook's: phones open their own share menu (Facebook, WhatsApp, Messenger…);
+  // computers get a small menu with the same choices.
+  async function shareSheet(text, url) {
+    const full = url ? text + " " + url : text;
+    if (navigator.share) { try { await navigator.share(url ? { title: "Lakaymwen.co", text, url } : { title: "Lakaymwen.co", text }); } catch (e) {} return; }
+    const u = encodeURIComponent(url || siteLink()), t = encodeURIComponent(full);
+    $("sh-wa").href = "https://wa.me/?text=" + t;
+    $("sh-fb").href = "https://www.facebook.com/sharer/sharer.php?u=" + u;
+    $("sh-x").href = "https://x.com/intent/post?text=" + t;
+    $("sh-mail").href = "mailto:?subject=" + encodeURIComponent("Lakaymwen.co") + "&body=" + t;
+    $("sh-sms").href = "sms:?&body=" + t;
+    $("sh-copy").onclick = async () => {
+      try { await navigator.clipboard.writeText(full); } catch (e) { const x = document.createElement("textarea"); x.value = full; document.body.append(x); x.select(); try { document.execCommand("copy"); } catch (e2) {} x.remove(); }
+      $("sh-copy-t").textContent = L().copied;
+    };
+    $("sh-copy-t").textContent = L().copy_link;
+    openDlg("dlg-share");
+  }
   function waBtn(label, textFn, extra) {
     const b = el("button", { class: "btn wa" + (extra ? " " + extra : ""), type: "button", onclick: () => wa(textFn()) });
     b.innerHTML = WA_ICON; b.append(el("span", { text: label }));

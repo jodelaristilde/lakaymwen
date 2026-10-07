@@ -346,6 +346,12 @@
     $("side-out").hidden = !!me;
     $("side-in").hidden = !me;
     $("side-welcome").textContent = me ? L().welcome(profile?.display_name || "") : "";
+    // "Logged in as First Last" at the top of every page
+    const nm = profile ? ([profile.first_name, profile.last_name].filter(Boolean).join(" ") || profile.display_name || "") : "";
+    $("who-bar").hidden = !(me && nm);
+    $("who-label").textContent = L().logged_in_as;
+    $("who-name").textContent = nm;
+    if (me) $("who-name").setAttribute("href", "#member-" + me.id);
   }
 
   function openDept(d) {

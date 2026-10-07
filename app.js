@@ -181,18 +181,40 @@
   const schoolObj = s => typeof s === "string" ? { name: s, years: "" } : { name: s?.name || "", years: s?.years || "" };
   const schoolText = s => { const o = schoolObj(s); return o.name + (o.years ? ` (${o.years})` : ""); };
   const schoolsOf = p => ((p.school_list && p.school_list.length) ? p.school_list : (p.schools ? p.schools.split(" · ") : [])).map(schoolObj).filter(o => o.name);
-  function addSchoolRow(p, value) {
+  function addSchoolRow(p, value, noFocus) {
     const box = $(p + "-schools");
     if (box.children.length >= 15) return;
     const v = schoolObj(value);
-    const inp = el("input", { type: "text", class: "school-name", maxlength: "80", list: "school-options", autocomplete: "off", placeholder: L().school_ph, "aria-label": L().schools });
+    const inp = el("input", { type: "text", class: "school-name", maxlength: "80", autocomplete: "off", role: "combobox", "aria-expanded": "false", placeholder: L().school_ph, "aria-label": L().schools });
     const yrs = el("input", { type: "text", class: "school-years", maxlength: "15", inputmode: "numeric", placeholder: L().school_years_ph, "aria-label": L().school_years });
     inp.value = v.name; yrs.value = v.years;
-    const row = el("div", { class: "school-row" }, inp, yrs,
+    const menu = el("ul", { class: "school-menu", role: "listbox", hidden: "" });
+    const caret = el("button", { class: "school-caret", type: "button", tabindex: "-1", "aria-label": L().schools, text: "▾" });
+    const pick = el("div", { class: "school-pick" }, inp, caret, menu);
+    let hideT = null;
+    function fill() {
+      const f = norm(inp.value).replace(/[^a-z0-9]+/g, " ").trim();
+      const all = [...schoolOpts.values()].sort((x, y) => x.localeCompare(y, "fr"));
+      const list = (f ? all.filter(n => norm(n).replace(/[^a-z0-9]+/g, " ").includes(f)) : all).slice(0, 60);
+      menu.replaceChildren(...list.map(n => el("li", { role: "option",
+        onmousedown: e => { e.preventDefault(); inp.value = n; close(); yrs.focus(); } }, n)));
+      if (f && !list.some(n => norm(n) === norm(inp.value))) menu.append(el("li", { class: "school-new", role: "option",
+        onmousedown: e => { e.preventDefault(); close(); yrs.focus(); } }, L().school_add_new(inp.value.trim())));
+      menu.hidden = !menu.children.length; inp.setAttribute("aria-expanded", String(!menu.hidden));
+    }
+    function close() { menu.hidden = true; inp.setAttribute("aria-expanded", "false"); }
+    inp.addEventListener("focus", () => { clearTimeout(hideT); fill(); });
+    inp.addEventListener("input", fill);
+    inp.addEventListener("blur", () => { hideT = setTimeout(close, 150); });
+    inp.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
+    caret.addEventListener("mousedown", e => { e.preventDefault(); if (menu.hidden) { inp.focus(); fill(); } else close(); });
+    const row = el("div", { class: "school-row" }, pick, yrs,
       el("button", { class: "fam-x", type: "button", "aria-label": L().remove, text: "×", onclick: () => row.remove() }));
     box.append(row);
-    if (!value) inp.focus();
+    if (!value && !noFocus) inp.focus();
   }
+  // always show one empty school box, so people see the list without hunting for "+ Add a school"
+  function ensureSchoolRow(p) { const b = $(p + "-schools"); if (b && !b.children.length) addSchoolRow(p, null, true); }
   document.querySelectorAll("[data-add-school]").forEach(b => b.addEventListener("click", () => addSchoolRow(b.dataset.addSchool)));
   const HT_SCHOOLS = ["Lycée Alexandre Pétion", "Lycée Toussaint Louverture", "Lycée Marie-Jeanne", "Lycée du Cent-Cinquantenaire", "Lycée Anténor Firmin", "Lycée de Pétion-Ville", "Lycée Philippe Guerrier (Les Cayes)", "Lycée Pinchinat (Jacmel)", "Lycée Fabre Geffrard (Gonaïves)", "Lycée Nord Alexis (Jérémie)", "Lycée Sténio Vincent (Saint-Marc)", "Lycée Tertulien Guilbaud (Port-de-Paix)", "Institution Saint-Louis de Gonzague", "Petit Séminaire Collège Saint-Martial", "Collège Canado-Haïtien", "Collège Bird", "Nouveau Collège Bird", "Collège Catts Pressoir", "Collège Roger Anglade", "Institution du Sacré-Cœur", "Collège Sainte-Rose de Lima", "Collège Saint-Pierre", "Juvénat du Sacré-Cœur", "Centre d'Études Secondaires (CES)", "Collège Classique Féminin", "Collège Notre-Dame du Perpétuel Secours (Cap-Haïtien)", "Collège Regina Assumpta (Cap-Haïtien)", "Collège Immaculée Conception (Les Cayes)", "Louverture Cleary School", "Union School", "Quisqueya Christian School", "Lycée Français Alexandre Dumas", "École Haïtiano-Arabe", "Collège Évangélique Maranatha", "Université d'État d'Haïti (UEH)", "Faculté de Médecine et de Pharmacie", "Faculté de Droit et des Sciences Économiques", "Faculté des Sciences (FDS)", "Faculté d'Ethnologie", "École Normale Supérieure", "INAGHEI", "Université Quisqueya", "Université Notre-Dame d'Haïti", "Université Épiscopale d'Haïti", "Université Caraïbe", "École Nationale des Arts (ENARTS)", "CTPEA"];
   // School dropdown: well-known schools + every school members have added (new ones show up automatically)
@@ -205,6 +227,7 @@
     $("school-options").replaceChildren(...[...schoolOpts.values()].sort((x, y) => x.localeCompare(y, "fr")).map(n => el("option", { value: n })));
   }
   addSchoolOpts(HT_SCHOOLS);
+  ensureSchoolRow("r");
   async function loadSchoolOpts() {
     if (!sb) return;
     let { data, error } = await sb.rpc("school_names");
@@ -260,6 +283,7 @@
     $(p + "-lives").value = pr?.lives_in || "";
     $(p + "-schools").replaceChildren();
     (pr ? schoolsOf(pr) : []).forEach(s => addSchoolRow(p, s));
+    ensureSchoolRow(p);
     $(p + "-bio").value = pr?.bio || "";
     $(p + "-family").replaceChildren();
     (pr?.family || []).forEach(f => addFamilyRow(p, f.relation, f.name));
@@ -636,7 +660,7 @@
     if (error) { say("join-msg", L().err + " (" + error.message + ")", true); return; }
     profile = prof; store.set("lkm-town", null);
     if (src.birthday && src.birthday.month) { try { await saveBday(src.birthday); } catch (e) {} }
-    $("reg-form").reset(); $("r-family").replaceChildren(); $("r-schools").replaceChildren(); showRegForm();
+    $("reg-form").reset(); $("r-family").replaceChildren(); $("r-schools").replaceChildren(); ensureSchoolRow("r"); showRegForm();
     go("#member-" + user.id);
     afterAuth();
     openPostcard();
@@ -657,7 +681,9 @@
       const t = document.createElement("textarea"); t.value = msg; document.body.append(t); t.select(); try { document.execCommand("copy"); } catch (e2) {} t.remove(); }
     $("pc-copy").textContent = L().copied;
   });
-  $("dlg-welcome").addEventListener("close", () => go("#search"));
+  // only the member closing the postcard (X or the button) takes them to Member search
+  var navClosing = false;
+  $("dlg-welcome").addEventListener("close", () => { if (!navClosing) go("#search"); });
 
   /* ---------- Forgot password: code by email, then a new password ---------- */
   var forgotEmail = "", recoveryMode = false;
@@ -1893,7 +1919,9 @@
   let currentMember = null;
   let curHash = location.hash || "#home";
   function go(h) {
+    navClosing = true;
     document.querySelectorAll("dialog[open]").forEach(d => { if (!(recoveryMode && d.id === "dlg-forgot")) d.close(); });
+    setTimeout(() => { navClosing = false; }, 50);   // "close" events arrive a moment later
     if (h !== curHash) {
       curHash = h;
       try { history.pushState(null, "", h); } catch (e) {}

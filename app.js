@@ -94,7 +94,7 @@
 
   /* ---------- Town lists ---------- */
   function fillTownSelects() {
-    ["s-town", "pr-town", "r-town"].forEach(id => TOWNS.forEach(t => $(id).add(new Option(t, t))));
+    ["s-town", "pr-town", "r-town", "ls-town"].forEach(id => TOWNS.forEach(t => $(id).add(new Option(t, t))));
     ["r-country", "pr-country"].forEach(id => COUNTRIES.forEach(c => $(id).add(new Option(c, c))));
   }
   function renderTowns() {
@@ -487,6 +487,30 @@
     $("res-members").replaceChildren(...(found.length ? found.map(p => memberRow(p, clean(r.q)))
       : [el("p", { class: "empty", text: r.mine ? L().town_first(r.town) : L().search_none })]), ...(r.q ? [alertOffer(r.q, r.town, !found.length)] : []));
   }
+  /* ---------- Landing page for visitors: search first, then log in or join ---------- */
+  var pendingSearch = null;   // what a visitor searched, run for real after they log in
+  $("land-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const q = $("ls-name").value.trim(), key = clean(q), town = $("ls-town").value, box = $("land-result");
+    if (key.length < 2 && !town) { box.hidden = false; box.className = "land-result warn"; box.textContent = L().search_short; $("ls-name").focus(); return; }
+    pendingSearch = { q, town };
+    let n = null;
+    if (sb) { const { data, error } = await sb.rpc("search_count", { p_key: key, p_town: town || null }); if (!error && data != null) n = Number(data); }
+    const label = q || town;
+    box.hidden = false; box.className = "land-result";
+    const msg = n == null ? L().land_some(label) : n > 0 ? L().land_found(n, q, town) : L().land_none(label);
+    box.replaceChildren(el("p", { class: "land-msg", text: msg }),
+      el("div", { class: "land-btns" },
+        el("button", { class: "btn red", type: "button", text: L().login_btn, onclick: () => openAuth(null, "login") }),
+        el("a", { class: "btn ghost", href: "#register", text: L().land_join })));
+  });
+  function runPendingSearch() {
+    if (!pendingSearch || !me) return;
+    const ps = pendingSearch; pendingSearch = null;
+    $("s-name").value = ps.q; $("s-town").value = ps.town || "";
+    lastResults = null; go("#search");
+    setTimeout(() => $("search-form").requestSubmit(), 150);
+  }
   // On the search page, a member first sees everyone from the town they registered with
   async function showMyTown() {
     if (!sb || !me || !profile || !profile.hometown || lastResults) return;
@@ -801,6 +825,7 @@
     isAdmin = adm === true; document.body.classList.toggle("is-admin", isAdmin);
     updateSide(); loadFeatured(); loadTownCounts();
     if (curHash === "#search" || !curHash || curHash === "#home") showMyTown();
+    runPendingSearch();
     if (curHash === "#admin") renderAdmin();
     if (currentMember) renderMemberPage(currentMember);
     if (!profile && !registering && me.user_metadata && me.user_metadata.profile) { finishRegistration(me); return; }
@@ -1397,7 +1422,12 @@
   // computers get a small menu with the same choices.
   async function shareSheet(text, url) {
     const full = url ? text + " " + url : text;
-    if (navigator.share) { try { await navigator.share(url ? { title: "Lakaymwen.co", text, url } : { title: "Lakaymwen.co", text }); } catch (e) {} return; }
+    // phones/tablets: the phone's own share menu. Computers: our menu (the Windows/Mac share box is confusing)
+    const touch = window.matchMedia && matchMedia("(pointer: coarse)").matches;
+    if (navigator.share && touch) {
+      try { await navigator.share(url ? { title: "Lakaymwen.co", text, url } : { title: "Lakaymwen.co", text }); return; }
+      catch (e) { if (e && e.name === "AbortError") return; }   // they closed it themselves; anything else: show our menu
+    }
     const u = encodeURIComponent(url || siteLink()), t = encodeURIComponent(full);
     $("sh-wa").href = "https://wa.me/?text=" + t;
     $("sh-fb").href = "https://www.facebook.com/sharer/sharer.php?u=" + u;

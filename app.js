@@ -78,7 +78,7 @@
     if ($("town-filter")) $("town-filter").placeholder = L().town_filter;
     renderTowns();
     renderHaiti();
-    renderFeatured(); updateSide();
+    renderFeatured(); updateSide(); renderPwoveb();
     fillBdaySelects("r"); fillBdaySelects("pr"); applySpecialDay(); renderBirthdays(); grooveUI();
     if (curHash === "#privacy") renderPrivacy();
     if (curHash === "#admin") renderAdmin();
@@ -309,6 +309,16 @@
   $("side-menu").addEventListener("click", ev => { if (ev.target.closest("a,button")) setMenu(false); });
   document.addEventListener("keydown", ev => { if (ev.key === "Escape" && document.body.classList.contains("menu-open")) { setMenu(false); $("menu-btn").focus(); } });
   window.addEventListener("hashchange", () => setMenu(false));
+
+  /* ---------- Pwovèb of the day (changes every day, same for everyone) ---------- */
+  const PWOVEB = [["Piti piti zwazo fè nich li.", "Little by little, the bird builds its nest.", "Petit à petit, l'oiseau fait son nid."], ["Men anpil, chay pa lou.", "Many hands make the load light.", "Avec beaucoup de mains, le fardeau n'est pas lourd."], ["Dèyè mòn gen mòn.", "Beyond the mountains, there are more mountains.", "Derrière les montagnes, il y a encore des montagnes."], ["Tout moun se moun.", "Every person is a person.", "Tout le monde est quelqu'un."], ["Lespwa fè viv.", "Hope keeps us alive.", "L'espoir fait vivre."], ["Sak vid pa kanpe.", "An empty sack can't stand up.", "Un sac vide ne tient pas debout."], ["Chak jou pa Dimanch.", "Not every day is Sunday.", "Tous les jours ne sont pas dimanche."], ["Kreyon Bondye pa gen gòm.", "God's pencil has no eraser.", "Le crayon de Dieu n'a pas de gomme."], ["Bèl dan pa di zanmi.", "A nice smile doesn't make a friend.", "De belles dents ne font pas un ami."], ["Sèl pa vante tèt li di li sale.", "Salt doesn't brag that it's salty.", "Le sel ne se vante pas d'être salé."], ["Wòch nan dlo pa konnen doulè wòch nan solèy.", "The rock in the water doesn't know the pain of the rock in the sun.", "La pierre dans l'eau ne connaît pas la douleur de la pierre au soleil."], ["Bay kou bliye, pote mak sonje.", "The one who strikes forgets; the one who bears the scar remembers.", "Celui qui frappe oublie, celui qui porte la cicatrice se souvient."], ["Kabrit gade je mèt kay anvan li antre.", "The goat looks in the owner's eyes before it comes in.", "La chèvre regarde les yeux du maître avant d'entrer."], ["Tanbou lwen gen bon son.", "A faraway drum sounds sweet.", "Le tambour lointain a un beau son."], ["Pitit tig se tig.", "The tiger's cub is a tiger.", "Le petit du tigre est un tigre."], ["Sa ou fè, se li ou wè.", "What you do is what you get back.", "Ce que tu fais, c'est ce que tu reçois."], ["Je wè, bouch pe.", "The eyes see, the mouth stays quiet.", "Les yeux voient, la bouche se tait."], ["Mache sou pinga w, pou w pa pile si m te konnen.", "Walk with care, so you don't step on “if only I had known.”", "Marche avec prudence, pour ne pas marcher sur « si j'avais su »."], ["Kay koule twonpe solèy, men li pa twonpe lapli.", "A leaky roof can fool the sun, but not the rain.", "Une maison qui coule trompe le soleil, mais pas la pluie."], ["Ti chen gen fòs devan kay mèt li.", "A little dog is brave in front of its owner's house.", "Le petit chien est fort devant la maison de son maître."], ["Byen konte, mal kalkile.", "Counted right, figured wrong.", "Bien compté, mal calculé."], ["Ravèt pa janm gen rezon devan poul.", "The cockroach is never right in front of the chicken.", "Le cafard n'a jamais raison devant la poule."], ["Sa ki pa touye ou, angrese ou.", "What doesn't kill you makes you stronger.", "Ce qui ne te tue pas t'engraisse."], ["Pale franse pa di lespri.", "Speaking French doesn't make you wise.", "Parler français ne veut pas dire avoir de l'esprit."]];
+  function renderPwoveb() {
+    const d = new Date(), day = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 0)) / 864e5);
+    const [ht, en, fr] = PWOVEB[(day + d.getFullYear()) % PWOVEB.length];
+    $("pw-ht").textContent = "“" + ht + "”";
+    const tr = lang === "fr" ? fr : lang === "ht" ? "" : en;
+    $("pw-tr").textContent = tr; $("pw-tr").hidden = !tr;
+  }
   let featuredData = null;
   document.querySelectorAll("[data-action]").forEach(b => b.addEventListener("click", () => {
     const a = b.dataset.action;
@@ -820,10 +830,10 @@
       if (btn) btn.disabled = false;
       if (error || !q || !L()["q_" + q]) { say("forgot-msg", L().phone_forgot((C.CONTACT_EMAIL || "info@lakaymwen.co")), true); return; }
       forgotEmail = email;
-      $("pr-q").textContent = L()["q_" + q];
-      ["pr-a", "pr-pass", "pr-pass2"].forEach(id => { $(id).value = ""; });
+      $("ps-q").textContent = L()["q_" + q];
+      ["ps-a", "ps-pass", "ps-pass2"].forEach(id => { $(id).value = ""; });
       $("forgot-form").hidden = true; $("phone-reset-form").hidden = false; say("forgot-msg", "");
-      $("pr-a").focus();
+      $("ps-a").focus();
       return;
     }
     if (!EMAIL_RE.test(email)) { say("forgot-msg", L().email_or_phone_bad, true); return; }
@@ -838,18 +848,18 @@
   });
   $("phone-reset-form").addEventListener("submit", async e => {
     e.preventDefault();
-    if (secretNorm($("pr-a").value).length < 2) { say("forgot-msg", L().secret_bad, true); $("pr-a").focus(); return; }
-    if ($("pr-pass").value.length < 6) { say("forgot-msg", L().pass_short, true); $("pr-pass").focus(); return; }
-    if ($("pr-pass").value !== $("pr-pass2").value) { say("forgot-msg", L().pass_mismatch, true); $("pr-pass2").focus(); return; }
+    if (secretNorm($("ps-a").value).length < 2) { say("forgot-msg", L().secret_bad, true); $("ps-a").focus(); return; }
+    if ($("ps-pass").value.length < 6) { say("forgot-msg", L().pass_short, true); $("ps-pass").focus(); return; }
+    if ($("ps-pass").value !== $("ps-pass2").value) { say("forgot-msg", L().pass_mismatch, true); $("ps-pass2").focus(); return; }
     const btn = e.submitter; if (btn) btn.disabled = true;
-    const { data: r, error } = await sb.rpc("phone_reset_password", { p_email: forgotEmail, p_answer: secretNorm($("pr-a").value), p_password: $("pr-pass").value });
+    const { data: r, error } = await sb.rpc("phone_reset_password", { p_email: forgotEmail, p_answer: secretNorm($("ps-a").value), p_password: $("ps-pass").value });
     if (error || r !== "ok") {
       if (btn) btn.disabled = false;
       const t = error ? L().err + " (" + error.message + ")" : r === "wrong" ? L().secret_wrong : r === "locked" ? L().secret_locked : r === "short" ? L().pass_short : L().phone_forgot((C.CONTACT_EMAIL || "info@lakaymwen.co"));
       say("forgot-msg", t, true); return;
     }
     // new password saved: log them straight in
-    const { error: sErr } = await sb.auth.signInWithPassword({ email: forgotEmail, password: $("pr-pass").value });
+    const { error: sErr } = await sb.auth.signInWithPassword({ email: forgotEmail, password: $("ps-pass").value });
     if (btn) btn.disabled = false;
     $("phone-reset-form").hidden = true; say("forgot-msg", sErr ? L().pass_changed : L().pass_changed);
     setTimeout(() => $("dlg-forgot").close(), 1400);

@@ -131,13 +131,15 @@
   }
   /* ---------- Photos ---------- */
   const initialsOf = name => (name || "?").split(/[\s-]+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join("");
+  const memberCache = new Map();
   function avatar(p, cls) {
+    let node;
     if (p && p.photo_url) {
-      const img = el("img", { class: "avatar photo " + (cls || ""), src: p.photo_url, alt: "", loading: "lazy" });
-      img.addEventListener("error", () => img.replaceWith(avatar({ display_name: p.display_name }, cls)), { once: true });
-      return img;
-    }
-    return el("div", { class: "avatar " + (cls || ""), "aria-hidden": "true", text: initialsOf(p && p.display_name) });
+      node = el("img", { class: "avatar photo " + (cls || ""), src: p.photo_url, alt: "", loading: "lazy" });
+      node.addEventListener("error", () => node.replaceWith(avatar(Object.assign({}, p, { photo_url: null }), cls)), { once: true });
+    } else node = el("div", { class: "avatar " + (cls || ""), "aria-hidden": "true", text: initialsOf(p && p.display_name) });
+    if (p && p.id && p.display_name) { node.dataset.hc = p.id; memberCache.set(p.id, Object.assign(memberCache.get(p.id) || {}, p)); }
+    return node;
   }
   function resizePhoto(file) {
     return new Promise((resolve, reject) => {
@@ -653,9 +655,17 @@
     if (!/^\d{6,10}$/.test(token)) { say("join-msg", L().bad_code, true); $("v-code").focus(); return; }
     const btn = e.submitter; if (btn) btn.disabled = true;
     registering = true;
-    const { data, error } = await sb.auth.verifyOtp({ email: verifyEmail, token, type: "signup" });
+    let { data, error } = await sb.auth.verifyOtp({ email: verifyEmail, token, type: "signup" });
+    if (error || !data || !data.session) ({ data, error } = await sb.auth.verifyOtp({ email: verifyEmail, token, type: "email" }));
+    if (error || !data || !data.session) {
+      // the code may be used up because they already tapped the button in the email: then just sign them in
+      registering = false;
+      const ok = await tryConfirmedLogin(true);
+      if (btn) btn.disabled = false;
+      if (!ok) { say("join-msg", L().bad_code, true); $("v-code").focus(); }
+      return;
+    }
     if (btn) btn.disabled = false;
-    if (error || !data.session) { registering = false; say("join-msg", L().bad_code, true); $("v-code").focus(); return; }
     finishRegistration(data.session.user);
   });
   $("v-resend").addEventListener("click", async () => {
@@ -705,8 +715,16 @@
     $("pc-card").href = waUrl; $("pc-wa").href = waUrl;
     $("pc-fb").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(link);
     $("pc-copy").textContent = L().copy_link;
+    // phones: this button opens the phone's own share menu (Facebook, Messages, Instagram…)
+    $("pc-fb").classList.toggle("pc-more", !!navigator.share);
+    $("pc-fb-t").textContent = navigator.share ? L().pc_more : L().share_fb;
     openDlg("dlg-welcome");
   }
+  $("pc-fb").addEventListener("click", async e => {
+    if (!navigator.share) return;          // computers: the Facebook link opens normally
+    e.preventDefault();
+    try { await navigator.share({ title: "Lakaymwen.co", text: L().pc_share, url: siteLink() }); } catch (err) {}
+  });
   $("pc-copy").addEventListener("click", async () => {
     const msg = L().pc_share + " " + siteLink();
     try { await navigator.clipboard.writeText(msg); } catch (e) {
@@ -780,6 +798,7 @@
   }
   async function afterAuth() {
     updateAccount(); loadSchoolOpts();
+    myLinks = null; hideHC();
     if (!me) { lastResults = null; $("results").hidden = true; profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; showMsgAlert(0); pymkData = null; renderPymk(); bdayData = null; myBday = null; renderBirthdays(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
     const { data } = await sb.from("profiles").select("*").eq("id", me.id).maybeSingle();
     profile = data || null; schoolData = null;
@@ -1286,6 +1305,96 @@
       el("h3", { class: "h3", text: L().hidden_members }),
       (hidden || []).length ? el("div", { class: "people" }, ...(hidden || []).map(hiddenRow)) : el("p", { class: "empty", text: L().no_hidden }),
       el("p", { class: "note", text: L().admin_note }));
+  }
+
+  /* ---------- Hover card: point at a member's picture to see who they are (computers only) ---------- */
+  var myLinks = null;   // my friendships, loaded once
+  const hoverOK = window.matchMedia && matchMedia("(hover: hover) and (pointer: fine)").matches;
+  let hcCard = null, hcFor = null, hcShowT = null, hcHideT = null;
+  function hideHC() { if (hcCard) hcCard.remove(); hcCard = null; hcFor = null; }
+  async function hcFriends(id) {
+    if (!myLinks) { const { data } = await sb.from("friendships").select("requester,addressee,status").or(`requester.eq.${me.id},addressee.eq.${me.id}`).limit(2000); myLinks = data || []; }
+    const { data } = await sb.from("friendships").select("requester,addressee").eq("status", "accepted").or(`requester.eq.${id},addressee.eq.${id}`).limit(2000);
+    const theirs = new Set((data || []).map(f => f.requester === id ? f.addressee : f.requester));
+    const mine = new Set(myLinks.filter(f => f.status === "accepted").map(f => f.requester === me.id ? f.addressee : f.requester));
+    const mutual = [...theirs].filter(x => mine.has(x));
+    const names = [];
+    const need = mutual.slice(0, 2).filter(x => !memberCache.has(x));
+    if (need.length) { const { data: ps } = await sb.from("profiles").select("id,display_name").in("id", need); (ps || []).forEach(q => memberCache.set(q.id, Object.assign(memberCache.get(q.id) || {}, q))); }
+    mutual.slice(0, 2).forEach(x => { const q = memberCache.get(x); if (q && q.display_name) names.push(q.display_name); });
+    const link = myLinks.find(f => f.requester === id || f.addressee === id);
+    return { count: theirs.size, mutual: mutual.length, names, link };
+  }
+  async function showHC(t) {
+    const id = t.dataset.hc, p = memberCache.get(id);
+    if (!p || !me) return;
+    hideHC(); hcFor = t;
+    const lives = [p.lives_in, p.state, p.country].filter(Boolean).join(", ");
+    const sch = schoolsOf(p)[0];
+    const self = id === me.id;
+    const info = el("div", { class: "hc-info" });
+    const btns = el("div", { class: "hc-btns" });
+    const card = el("div", { class: "hovercard", role: "dialog", "aria-label": p.display_name },
+      el("div", { class: "hc-top" }, avatar(Object.assign({}, p, { id: null }), "hc-av"),
+        el("div", { class: "hc-main" },
+          el("a", { class: "hc-name", href: "#member-" + id }, p.display_name, foundingStar(p)),
+          p.nickname ? el("div", { class: "hc-nick", text: "“" + p.nickname + "”" }) : null,
+          info)),
+      btns);
+    const line = (ic, txt) => txt ? info.append(el("div", { class: "hc-line" }, el("span", { class: "hc-ic", text: ic }), el("span", { text: txt }))) : null;
+    line("📍", p.hometown ? `${L().from} ${p.hometown}${p.katye ? " · " + p.katye : ""}` : "");
+    line("🏠", lives ? `${L().lives} ${lives}` : "");
+    line("🏫", sch ? sch.name + (sch.years ? ` (${sch.years})` : "") : "");
+    const fLine = el("div", { class: "hc-line hc-friends" }); info.append(fLine);
+    const fBtn = el("span");
+    btns.append(...(self ? [el("a", { class: "btn small dark", href: "#member-" + id, text: L().hc_view })] : [
+      fBtn,
+      el("button", { class: "btn small hc-msg", type: "button", text: L().contact_member, onclick: () => { hideHC(); openThread({ noticeId: null, other: id, title: p.display_name }); } }),
+      el("a", { class: "btn small ghost hc-more", href: "#member-" + id, title: L().hc_view, text: "•••" })]));
+    document.body.append(card); hcCard = card;
+    // place it under (or above) the picture
+    const r = t.getBoundingClientRect(), w = card.offsetWidth, h = card.offsetHeight;
+    let left = Math.min(Math.max(8, r.left + r.width / 2 - 60), window.innerWidth - w - 8);
+    let top = r.bottom + 10; if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 10);
+    card.style.left = left + "px"; card.style.top = top + "px";
+    card.addEventListener("mouseenter", () => clearTimeout(hcHideT));
+    card.addEventListener("mouseleave", () => { hcHideT = setTimeout(hideHC, 250); });
+    card.addEventListener("click", e => { if (e.target.closest("a[href^='#']")) hideHC(); });
+    try {
+      const f = await hcFriends(id);
+      if (hcCard !== card) return;
+      const bits = [L().friend_count(f.count)];
+      if (!self && f.mutual) bits.push(L().hc_mutual(f.mutual, f.names));
+      fLine.replaceChildren(el("span", { class: "hc-ic", text: "👥" }), el("span", { text: bits.join(" · ") }));
+      if (!self) {
+        const l = f.link; let b;
+        if (!l) b = el("button", { class: "btn small ghost", type: "button", text: L().add_friend, onclick: async () => {
+          b.disabled = true; const { error } = await sb.from("friendships").insert({ addressee: id });
+          if (!error) { myLinks = null; b.textContent = L().request_sent; } else b.disabled = false; } });
+        else if (l.status === "accepted") b = el("span", { class: "chip-item friends-yes", text: "✓ " + L().friends_yes });
+        else if (l.requester === me.id) b = el("span", { class: "chip-item", text: L().request_sent });
+        else b = el("button", { class: "btn small dark", type: "button", text: L().accept, onclick: async () => {
+          b.disabled = true; await sb.from("friendships").update({ status: "accepted" }).eq("requester", id).eq("addressee", me.id);
+          myLinks = null; b.replaceWith(el("span", { class: "chip-item friends-yes", text: "✓ " + L().friends_yes })); } });
+        fBtn.replaceWith(b);
+      }
+    } catch (e) { fLine.remove(); }
+  }
+  if (hoverOK) {
+    document.addEventListener("mouseover", e => {
+      const t = e.target.closest && e.target.closest("[data-hc]");
+      if (!t || !me || t.closest(".hovercard")) return;
+      clearTimeout(hcHideT);
+      if (hcFor === t) return;
+      clearTimeout(hcShowT); hcShowT = setTimeout(() => showHC(t), 400);
+    });
+    document.addEventListener("mouseout", e => {
+      const t = e.target.closest && e.target.closest("[data-hc]");
+      if (!t || (e.relatedTarget && t.contains(e.relatedTarget))) return;
+      clearTimeout(hcShowT); hcHideT = setTimeout(hideHC, 250);
+    });
+    window.addEventListener("scroll", hideHC, { passive: true });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") hideHC(); });
   }
 
   /* ---------- WhatsApp invites ---------- */

@@ -1223,3 +1223,34 @@ body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.
 .land-result.warn{background:#fff6e6;border-color:#ffd9a3}
 .land-msg{margin:0;font-weight:700;color:var(--ink,#0b1530);line-height:1.4}
 #land-result:not([hidden])+.land-btns{display:none}
+
+/* landing: just "Name of the person" + search icon on one line; Log in bigger and centered */
+.searchbar.light.land-sb{grid-template-columns:minmax(0,1fr) auto}
+.land-sb .sb-go span{display:none}
+.land-sb .sb-go{min-width:56px;padding:0 18px;justify-content:center}
+.land-sb .sb-field>span{display:block;white-space:nowrap}
+.landing .land-btns{flex-direction:column;align-items:center;gap:12px}
+.landing .land-btns .btn{min-width:min(280px,100%);justify-content:center;text-align:center}
+.landing .land-btns .btn.dark,.landing .land-btns .btn.red{font-size:1.15rem;padding:16px 40px}
+.land-result .land-btns{align-items:center}
+
+/* ---------- Visitors: the home page is ONLY the banner + the landing box ---------- */
+body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) #home .portal-main>*:not(#landing){display:none!important}
+body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .portal-side{display:none!important}
+body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .portal-grid{grid-template-columns:230px minmax(0,1fr)}
+@media (max-width:1100px){body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .portal-grid{grid-template-columns:210px minmax(0,1fr)}}
+@media (max-width:760px){body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .portal-grid{grid-template-columns:1fr}}
+body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) #landing{max-width:760px;width:100%;justify-self:center}
+body:not(.logged-in):not(.about-mode) #about{display:none}
+
+/* ---------- Phone number instead of email ---------- */
+.phone-wrap{display:grid;gap:6px}
+.phone-wrap .lbl{font-size:.88rem;font-weight:700}
+.phone-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px}
+.phone-row select{width:auto;min-width:96px}
+.phone-toggle{justify-self:start;color:var(--blue)!important;font-weight:700;margin-top:-4px}
+.phone-reset{display:grid;gap:8px;padding:14px 16px;border:1px solid var(--line,#dfe4ef);border-radius:14px;margin:6px 0 14px;background:#f6fbf8}
+.phone-reset .btn{justify-self:start}
+
+.pr-q{font-weight:700;font-size:1.05rem;margin:.2rem 0 .6rem;padding:.6rem .8rem;border-radius:12px;background:#fff4e8;border:1px solid #f6d3ad}
+#r-phone-wrap>label{display:block;margin-top:.7rem}

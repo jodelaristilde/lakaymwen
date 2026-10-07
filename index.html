@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Montserrat:wght@500;600&family=Cormorant+SC:wght@700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261007e">
+<link rel="stylesheet" href="styles.css?v=20261007i">
 </head>
 <body>
 
@@ -119,10 +119,10 @@
       </nav>
       <aside class="sponsors" aria-labelledby="sponsors-h">
         <h2 class="sponsors-h" id="sponsors-h" data-t="sponsors_h"></h2>
-        <a class="sponsor jaeky" href="https://jaeky.us/place-new-order" target="_blank" rel="noopener sponsored"><span class="crop-jaeky"><img src="sponsor-jaeky.png?v=2" alt="Jaeky Got You: Just About Everything, Kindly Yours" width="700" height="363" loading="lazy"></span><span class="sponsor-tag jaeky-tag">Just About Everything, <span class="nowrap">Kindly Yours</span></span></a>
-        <a class="sponsor" href="https://seating4u.com" target="_blank" rel="noopener sponsored"><img src="sponsor-seating4u.png?v=2" alt="Seating4U: We've Got Your Seats" width="1000" height="358" loading="lazy"></a>
-        <a class="sponsor" href="https://vipservice4u.us" target="_blank" rel="noopener sponsored"><img src="sponsor-vipservice4u.png?v=2" alt="VIP Service4U" width="700" height="392" loading="lazy"><span class="sponsor-tag">Where Every Guest Is a VIP</span></a>
-        <a class="sponsor" href="https://radiogroovefm.com" target="_blank" rel="noopener sponsored"><img src="sponsor-groovefm.png?v=1" alt="Groove FM Radio" width="600" height="269" loading="lazy"><span class="sponsor-tag groove">Feel the Groove, Anywhere</span></a>
+        <a data-name="Jaeky" class="sponsor jaeky" href="https://jaeky.us/place-new-order" target="_blank" rel="noopener sponsored"><span class="crop-jaeky"><img src="sponsor-jaeky.png?v=2" alt="Jaeky Got You: Just About Everything, Kindly Yours" width="700" height="363" loading="lazy"></span><span class="sponsor-tag jaeky-tag">Just About Everything, <span class="nowrap">Kindly Yours</span></span></a>
+        <a data-name="Seating4U" class="sponsor" href="https://seating4u.com" target="_blank" rel="noopener sponsored"><img src="sponsor-seating4u.png?v=2" alt="Seating4U: We've Got Your Seats" width="1000" height="358" loading="lazy"></a>
+        <a data-name="VIP Service4U" class="sponsor" href="https://vipservice4u.us" target="_blank" rel="noopener sponsored"><img src="sponsor-vipservice4u.png?v=2" alt="VIP Service4U" width="700" height="392" loading="lazy"><span class="sponsor-tag">Where Every Guest Is a VIP</span></a>
+        <a data-name="Groove FM" class="sponsor" href="https://radiogroovefm.com" target="_blank" rel="noopener sponsored"><img src="sponsor-groovefm.png?v=1" alt="Groove FM Radio" width="600" height="269" loading="lazy"><span class="sponsor-tag groove">Feel the Groove, Anywhere</span></a>
         <div class="groove-live">
           <a class="groove-btn" id="groove-play" href="https://radiogroovefm.com" target="_blank" rel="noopener" role="button"><span class="gp-icon" aria-hidden="true">▶</span><span id="groove-label" data-t="groove_listen"></span><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></a>
           <p class="groove-msg" id="groove-msg" hidden></p>
@@ -492,13 +492,22 @@
   <div class="dlg-head"><h2 data-t="pc_h"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-body">
     <p class="pc-text" data-t="pc_p"></p>
-    <a class="postcard" id="pc-card" href="#" target="_blank" rel="noopener"><img src="share-preview.png" alt="" width="1200" height="630"></a>
-    <div class="pc-btns">
-      <a class="btn wa" id="pc-wa" href="#" target="_blank" rel="noopener"><span data-t="pc_wa"></span></a>
-      <a class="btn pc-fb" id="pc-fb" href="#" target="_blank" rel="noopener"><span id="pc-fb-t"></span></a>
-      <button class="btn ghost" type="button" id="pc-copy" data-t="copy_link"></button>
-    </div>
+    <a class="postcard" id="pc-card" href="#"><img src="share-preview.png" alt="" width="1200" height="630"></a>
+    <button class="btn share-btn big" type="button" id="pc-share"><span class="share-ic" aria-hidden="true"></span><span data-t="share"></span></button>
     <button class="btn dark big pc-go" type="button" data-close data-t="pc_go"></button>
+  </div>
+</dialog>
+<dialog id="dlg-share" class="dlg-share">
+  <div class="dlg-head"><h2 data-t="share"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <div class="share-grid">
+      <a class="share-opt" id="sh-wa" target="_blank" rel="noopener"><span class="so-ic so-wa">🟢</span><span>WhatsApp</span></a>
+      <a class="share-opt" id="sh-fb" target="_blank" rel="noopener"><span class="so-ic so-fb">f</span><span>Facebook</span></a>
+      <a class="share-opt" id="sh-x" target="_blank" rel="noopener"><span class="so-ic so-x">𝕏</span><span>X</span></a>
+      <a class="share-opt" id="sh-mail"><span class="so-ic so-mail">✉️</span><span data-t="email_short"></span></a>
+      <a class="share-opt" id="sh-sms"><span class="so-ic so-sms">💬</span><span data-t="sms_short"></span></a>
+      <button class="share-opt" type="button" id="sh-copy"><span class="so-ic so-copy">🔗</span><span id="sh-copy-t" data-t="copy_link"></span></button>
+    </div>
   </div>
 </dialog>
 <dialog id="dlg-forgot">
@@ -620,11 +629,11 @@ window.addEventListener("error", function (e) {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
-<script src="config.js?v=20261007e"></script>
-<script src="towns.js?v=20261007e"></script>
-<script src="depts.js?v=20261007e"></script>
-<script src="geo.js?v=20261007e"></script>
-<script src="i18n.js?v=20261007e"></script>
-<script src="app.js?v=20261007e"></script>
+<script src="config.js?v=20261007i"></script>
+<script src="towns.js?v=20261007i"></script>
+<script src="depts.js?v=20261007i"></script>
+<script src="geo.js?v=20261007i"></script>
+<script src="i18n.js?v=20261007i"></script>
+<script src="app.js?v=20261007i"></script>
 </body>
 </html>

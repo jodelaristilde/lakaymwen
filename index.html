@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Montserrat:wght@500;600&family=Cormorant+SC:wght@700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261007w">
+<link rel="stylesheet" href="styles.css?v=20261007z">
 </head>
 <body>
 
@@ -224,31 +224,31 @@
           <div class="msg join-loggedin" id="join-loggedin" hidden><span id="join-loggedin-text"></span> <button class="linkbtn" type="button" id="join-logout" data-t="signout"></button></div>
           <div class="join-town"><span data-t="join_from"></span> <b id="join-town-name"></b> <a href="#register" data-t="change_town"></a></div>
           <form id="reg-form" novalidate>
-            <h3 class="form-h" data-t="sec_account"></h3>
+            <div id="reg-step1" class="reg-step">
+            <p class="reg-steps"><span class="rs on">1</span><span class="rs-l" data-t="step1_l"></span><span class="rs-line"></span><span class="rs">2</span><span class="rs-l" data-t="step2_l"></span></p>
             <p class="note req-note" data-t="req_note"></p>
             <label><span class="req" data-t="username"></span><input id="r-user" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"><small class="note" data-t="user_rule"></small></label>
             <div class="two">
               <label><span class="req" data-t="first_name"></span><input id="r-first" type="text" maxlength="40" autocomplete="given-name"></label>
               <label><span class="req" data-t="last_name"></span><input id="r-last" type="text" maxlength="40" autocomplete="family-name"></label>
             </div>
-            <label id="r-email-wrap"><span class="req" data-t="email"></span><input id="r-email" type="email" maxlength="120" autocomplete="email" autocapitalize="none" spellcheck="false" data-ph="email_ph"></label>
+            <label id="r-email-wrap"><span class="req" data-t="email_or_phone"></span><input id="r-email" type="text" maxlength="120" autocomplete="email" autocapitalize="none" spellcheck="false" data-ph="email_or_phone_ph"><small class="note" id="r-id-note" data-t="id_note"></small></label>
             <div id="r-phone-wrap" class="phone-wrap" hidden>
-              <span class="req lbl" data-t="phone_lbl"></span>
-              <div class="phone-row">
-                <select id="r-cc" aria-label="Country code"><option value="1">🇺🇸 +1</option><option value="509" selected>🇭🇹 +509</option><option value="33">🇫🇷 +33</option><option value="1c">🇨🇦 +1</option><option value="56">🇨🇱 +56</option><option value="55">🇧🇷 +55</option><option value="52">🇲🇽 +52</option><option value="34">🇪🇸 +34</option><option value="44">🇬🇧 +44</option><option value="590">🇬🇵 +590</option><option value="596">🇲🇶 +596</option><option value="594">🇬🇫 +594</option></select>
-                <input id="r-phone" type="tel" inputmode="tel" maxlength="20" autocomplete="tel-national" placeholder="347 555 1234">
-              </div>
               <small class="note" data-t="phone_note"></small>
               <label><span class="req" data-t="secret_q"></span><select id="r-secq"><option value="nick" data-t="q_nick"></option><option value="school" data-t="q_school"></option><option value="friend" data-t="q_friend"></option><option value="street" data-t="q_street"></option><option value="word" data-t="q_word"></option></select></label>
               <label><span class="req" data-t="secret_a"></span><input id="r-seca" type="text" maxlength="60" autocomplete="off" autocapitalize="none" spellcheck="false"><small class="note" data-t="secret_note"></small></label>
             </div>
-            <button type="button" class="linkbtn phone-toggle" id="r-phone-toggle" data-t="no_email"></button>
             <div class="two">
               <label><span class="req" data-t="password"></span><input id="r-pass" type="password" autocomplete="new-password"></label>
               <label><span class="req" data-t="password2"></span><input id="r-pass2" type="password" autocomplete="new-password"></label>
             </div>
+            <button class="btn red big reg-next" type="submit" data-t="next_step"></button>
+            </div>
             <select id="r-town" hidden aria-hidden="true" tabindex="-1"><option value=""></option></select>
 
+            <div id="reg-step2" class="reg-step" hidden>
+            <p class="reg-steps"><span class="rs done">✓</span><span class="rs-l" data-t="step1_l"></span><span class="rs-line"></span><span class="rs on">2</span><span class="rs-l" data-t="step2_l"></span></p>
+            <button class="linkbtn reg-back" type="button" id="reg-back" data-t="back_step"></button>
             <h3 class="form-h" data-t="sec_about"></h3>
             <label><span data-t="nickname"></span><input id="r-nick" type="text" maxlength="40" placeholder="Ti Djo, Gége…"></label>
             <div class="bday-field" role="group" aria-labelledby="r-bday-l"><span id="r-bday-l" class="field-l" data-t="bday_label"></span>
@@ -278,6 +278,7 @@
             <label id="r-old-wrap" hidden><span data-t="old_username"></span><input id="r-old" type="text" maxlength="40" placeholder="BETHSAIDA, JODEL…"></label>
             <label class="check terms"><input id="r-terms" type="checkbox"><span class="req"><span data-t="terms_1"></span> <a href="#privacy" data-t="privacy_link"></a></span></label>
             <button class="btn red big" type="submit" data-t="create_account"></button>
+            </div>
           </form>
           <div id="verify-step" class="verify" hidden>
             <h3 class="form-h" data-t="verify_h"></h3>
@@ -316,8 +317,8 @@
           </form>
           <div class="land-result" id="land-result" hidden></div>
           <div class="land-btns">
-            <button class="btn dark" type="button" data-action="login" data-t="login_btn"></button>
-            <a class="btn ghost" href="#register" data-t="land_join"></a>
+            <button class="btn red" type="button" data-action="login" data-t="login_btn"></button>
+            <a class="btn dark" href="#register" data-t="land_join"></a>
           </div>
           <ol class="land-how">
             <li><span class="lh-i" aria-hidden="true">🔍</span><span data-t="how1"></span></li>
@@ -550,7 +551,7 @@
       <a class="share-opt" id="sh-x" target="_blank" rel="noopener"><span class="so-ic so-x">𝕏</span><span>X</span></a>
       <a class="share-opt" id="sh-mail"><span class="so-ic so-mail">✉️</span><span data-t="email_short"></span></a>
       <a class="share-opt" id="sh-sms"><span class="so-ic so-sms">💬</span><span data-t="sms_short"></span></a>
-      <button class="share-opt" type="button" id="sh-copy"><span class="so-ic so-copy">🔗</span><span id="sh-copy-t" data-t="copy_link"></span></button>
+      <button class="share-opt" type="button" id="sh-copy"><span class="so-ic so-copy">🔗</span><span class="so-txt"><span id="sh-copy-t" data-t="copy_link"></span><small id="sh-copy-u" class="so-url"></small></span></button>
     </div>
   </div>
 </dialog>
@@ -686,11 +687,11 @@ window.addEventListener("error", function (e) {
 <script src="supabase.js?v=2.117.2"></script>
 <script>if (!window.supabase) document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"><\/script>');</script>
 <script>if (!window.supabase) document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"><\/script>');</script>
-<script src="config.js?v=20261007w"></script>
-<script src="towns.js?v=20261007w"></script>
-<script src="depts.js?v=20261007w"></script>
-<script src="geo.js?v=20261007w"></script>
-<script src="i18n.js?v=20261007w"></script>
-<script src="app.js?v=20261007w"></script>
+<script src="config.js?v=20261007z"></script>
+<script src="towns.js?v=20261007z"></script>
+<script src="depts.js?v=20261007z"></script>
+<script src="geo.js?v=20261007z"></script>
+<script src="i18n.js?v=20261007z"></script>
+<script src="app.js?v=20261007z"></script>
 </body>
 </html>

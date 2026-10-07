@@ -329,7 +329,7 @@
     else if (a === "login") { openAuth(null, "login"); }
     else if (a === "signout") { $("btn-signout").click(); }
     else if (a === "tell") {
-      shareSheet(L().tell_text, location.origin.replace("://www.", "://"));
+      shareSheet(L().tell_text, siteLink());
     }
   }));
   let blockedIds = new Set(), isAdmin = false;
@@ -426,7 +426,7 @@
 
   /* ---------- Notice cards ---------- */
   function noticeCard(n) {
-    const link = pageUrl() + "#notice-" + n.id;
+    const link = siteLink() + "/#notice-" + n.id;
     const shareText = L().share_text(n.person_name, n.hometown) + " " + link;
     const mine = me && n.author === me.id;
     const copyBtn = el("button", { class: "btn small ghost", type: "button", text: L().copy_link });
@@ -511,7 +511,7 @@
     box.replaceChildren(el("p", { class: "land-msg", text: msg }),
       el("div", { class: "land-btns" },
         el("button", { class: "btn red", type: "button", text: L().login_btn, onclick: () => openAuth(null, "login") }),
-        el("a", { class: "btn ghost", href: "#register", text: L().land_join })));
+        el("a", { class: "btn dark", href: "#register", text: L().land_join })));
   });
   function runPendingSearch() {
     if (!pendingSearch || !me) return;
@@ -582,14 +582,26 @@
     const plus = v.startsWith("+"); return phoneEmail(!plus && d.length === 10 ? "1" + d : !plus && d.length === 8 ? "509" + d : d);
   }
   const secretNorm = a => String(a || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
-  var usePhone = false;
-  function setPhoneMode(on) {
-    usePhone = on;
-    $("r-email-wrap").hidden = on; $("r-phone-wrap").hidden = !on;
-    $("r-phone-toggle").textContent = on ? L().use_email : L().no_email;
-    setTimeout(() => (on ? $("r-phone") : $("r-email")).focus(), 30);
+  // Sign-up: ONE box for "email or phone number". A phone number becomes a hidden login address, and the secret question shows.
+  const looksPhone = v => { v = String(v || "").trim(); return !!v && !v.includes("@") && /^[+\d\s().-]+$/.test(v) && /\d/.test(v); };
+  function regId(v) {
+    v = String(v || "").trim();
+    if (!looksPhone(v)) return { email: v.toLowerCase() };
+    const d = v.replace(/\D/g, "");
+    let full = "";
+    if (v.startsWith("+")) full = d;
+    else if (d.length === 10 && !/^[01]/.test(d)) full = "1" + d;        // US / Canada
+    else if (d.length === 8 && !/^0/.test(d)) full = "509" + d;      // Haiti
+    else if (d.length >= 11) full = d;                                  // already has the country code
+    if (!full) return { needCc: true };
+    return { phone: full, email: phoneEmail(full) };
   }
-  $("r-phone-toggle").addEventListener("click", () => setPhoneMode(!usePhone));
+  var usePhone = false;
+  function syncIdBox() {
+    usePhone = looksPhone($("r-email").value);
+    $("r-phone-wrap").hidden = !usePhone;
+  }
+  $("r-email").addEventListener("input", syncIdBox);
   let registering = false, pendingReg = null, verifyEmail = "", verifyPass = "", verifyTimer = null;
   // Logging in uses a small window; registering has its own page (#join).
   function setJoinTown(town) {
@@ -635,6 +647,7 @@
 
   function showRegForm() {
     $("reg-form").hidden = false; $("verify-step").hidden = true;
+    $("reg-step1").hidden = false; $("reg-step2").hidden = true;
     document.querySelector("#join .join-town").hidden = false;
   }
   function showVerify(email, resend) {
@@ -674,23 +687,36 @@
     if (!document.hidden && !$("verify-step").hidden && verifyEmail && !me) tryConfirmedLogin(true);
   });
 
+  // sign-up is 2 steps: 1 = your account, 2 = about you
+  function setRegStep(n) {
+    $("reg-step1").hidden = n !== 1; $("reg-step2").hidden = n !== 2;
+    const top = $("reg-form").getBoundingClientRect().top + window.scrollY - 90;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    if (n === 2) setTimeout(() => $("r-nick").focus({ preventScroll: true }), 300);
+  }
+  $("reg-back").addEventListener("click", () => { say("join-msg", ""); setRegStep(1); });
   $("reg-form").addEventListener("submit", async e => {
     e.preventDefault();
     say("join-msg", "");
     const u = $("r-user").value.trim().toLowerCase();
-    const pd = usePhone ? phoneDigits($("r-cc").value, $("r-phone").value) : "";
-    const email = usePhone ? phoneEmail(pd) : $("r-email").value.trim().toLowerCase();
-    const bad = (msg, field) => { say("join-msg", msg, true); $(field).focus(); $("join-msg").scrollIntoView({ behavior: "smooth", block: "center" }); };
-    // required fields, in the order they appear on the page
+    syncIdBox();
+    const rid = regId($("r-email").value), pd = rid.phone || "";
+    const email = rid.email || "";
+    const bad = (msg, field) => { if ($("reg-step1").contains($(field))) setRegStep(1); say("join-msg", msg, true); $(field).focus(); $("join-msg").scrollIntoView({ behavior: "smooth", block: "center" }); };
+    // step 1 (your account), in the order the fields appear
     if (!USER_RE.test(u)) return bad(L().user_bad, "r-user");
     const ap = aboutProblem("r"); if (ap) return bad(ap[0], ap[1]);
-    const bday = readBday("r"); if (bday === false) return bad(L().bday_bad, "r-bmonth");
-    if (usePhone) { if (pd.length < 8 || pd.length > 15) return bad(L().phone_bad, "r-phone");
+    if (usePhone) { if (rid.needCc) return bad(L().phone_cc, "r-email"); if (pd.length < 8 || pd.length > 15) return bad(L().phone_bad, "r-email");
       if (secretNorm($("r-seca").value).length < 2) return bad(L().secret_bad, "r-seca"); }
-    else if (!EMAIL_RE.test(email)) return bad(L().email_bad, "r-email");
-    if (!$("r-terms").checked) { /* checked last, below */ }
+    else if (!EMAIL_RE.test(email)) return bad(L().email_or_phone_bad, "r-email");
     if ($("r-pass").value.length < 6) return bad(L().pass_short, "r-pass");
     if ($("r-pass").value !== $("r-pass2").value) return bad(L().pass_mismatch, "r-pass2");
+    if ($("reg-step2").hidden) {   // still on step 1: check the username is free, then go to step 2
+      if (sb) { const { data: free1 } = await sb.rpc("username_available", { u }); if (free1 === false) return bad(L().user_taken, "r-user"); }
+      setRegStep(2); return;
+    }
+    // step 2 (about you)
+    const bday = readBday("r"); if (bday === false) return bad(L().bday_bad, "r-bmonth");
     if (!$("r-terms").checked) return bad(L().terms_req, "r-terms");
     if (!needDb("join-msg")) return;
     const btn = e.submitter; if (btn) btn.disabled = true;
@@ -707,10 +733,10 @@
     done();
     if (error) {
       registering = false;
-      if (/already|registered|exists/i.test(error.message)) return bad(usePhone ? L().phone_taken : L().email_taken, usePhone ? "r-phone" : "r-email");
-      return bad(L().err + " (" + error.message + ")", usePhone ? "r-phone" : "r-email");
+      if (/already|registered|exists/i.test(error.message)) return bad(usePhone ? L().phone_taken : L().email_taken, "r-email");
+      return bad(L().err + " (" + error.message + ")", "r-email");
     }
-    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { registering = false; return bad(usePhone ? L().phone_taken : L().email_taken, usePhone ? "r-phone" : "r-email"); }
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { registering = false; return bad(usePhone ? L().phone_taken : L().email_taken, "r-email"); }
     verifyPass = $("r-pass").value;
     pendingReg = { username: u, about, photo: $("r-photo").files[0] || null, birthday: bday || null };
     // keep a small copy of the photo, so it isn't lost if they confirm from the email link in another tab
@@ -721,7 +747,7 @@
       if (rErr) console.warn("secret question not saved", rErr.message);
     }
     if (data.session) return finishRegistration(data.session.user);   // email confirmation turned off
-    if (usePhone) { registering = false; return bad(L().phone_unavailable, "r-phone"); }   // phone sign-up needs "Confirm email" off
+    if (usePhone) { registering = false; return bad(L().phone_unavailable, "r-email"); }   // phone sign-up needs "Confirm email" off
     showVerify(email, false);
   });
 
@@ -790,7 +816,7 @@
     openPostcard();
   }
   /* After a new member registers: a postcard to share, then the member search */
-  const siteLink = () => location.origin.replace("://www.", "://");
+  const siteLink = () => "https://lakaymwen.co";   // shares always point to the real site
   function openPostcard() {
     openDlg("dlg-welcome");
   }
@@ -1535,11 +1561,14 @@
     $("sh-x").href = "https://x.com/intent/post?text=" + t;
     $("sh-mail").href = "mailto:?subject=" + encodeURIComponent("Lakaymwen.co") + "&body=" + t;
     $("sh-sms").href = "sms:?&body=" + t;
+    // "Copy link" copies ONLY the web address (lakaymwen.co…), not the whole message
+    const link = url || (String(text).match(/https?:\/\/\S+/) || [])[0] || siteLink();
     $("sh-copy").onclick = async () => {
-      try { await navigator.clipboard.writeText(full); } catch (e) { const x = document.createElement("textarea"); x.value = full; document.body.append(x); x.select(); try { document.execCommand("copy"); } catch (e2) {} x.remove(); }
+      try { await navigator.clipboard.writeText(link); } catch (e) { const x = document.createElement("textarea"); x.value = link; document.body.append(x); x.select(); try { document.execCommand("copy"); } catch (e2) {} x.remove(); }
       $("sh-copy-t").textContent = L().copied;
     };
     $("sh-copy-t").textContent = L().copy_link;
+    $("sh-copy-u").textContent = link.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
     openDlg("dlg-share");
   }
   function waBtn(label, textFn, extra) {
@@ -1599,7 +1628,7 @@
     } });
     return el("div", { class: "alert-offer" + (none ? " big" : "") },
       el("p", { class: "ao-text", text: none ? L().alert_offer_none(q) : L().alert_offer(q) }),
-      el("div", { class: "row-btns" }, btn, waBtn(L().wa_btn, () => L().inv_search(q, location.origin.replace("://www.", "://")), "ghost-wa")),
+      el("div", { class: "row-btns" }, btn, waBtn(L().wa_btn, () => L().inv_search(q, siteLink()), "ghost-wa")),
       msg);
   }
   var alertsReq = 0;
@@ -1727,7 +1756,7 @@
     box.replaceChildren(
       el("h2", { class: "join-h", text: "🏫 " + display }),
       el("p", { class: "lead", text: L().members_n(people.length) }),
-      el("div", { class: "row-btns place-actions" }, waBtn(L().wa_classmates, () => L().inv_school(display, pageUrl() + schoolHash(display))), addBtn),
+      el("div", { class: "row-btns place-actions" }, waBtn(L().wa_classmates, () => L().inv_school(display, siteLink() + "/" + schoolHash(display))), addBtn),
       addMsg,
       people.length ? el("div", { class: "decades" }, ...groupByDecade(people, yearOf).map(([d, ps]) => el("section", {},
         el("h3", { class: "h3 decade-h", text: d ? L().decade(d) : L().school_years_unknown }),
@@ -1750,7 +1779,7 @@
     box.replaceChildren(
       el("h2", { class: "join-h", text: "📍 " + L().katye_in(display, town) }),
       el("p", { class: "lead", text: L().members_n(people.length) }),
-      el("div", { class: "row-btns place-actions" }, waBtn(L().wa_neighbors, () => L().inv_katye(display, town, pageUrl() + katyeHash(town, display)))),
+      el("div", { class: "row-btns place-actions" }, waBtn(L().wa_neighbors, () => L().inv_katye(display, town, siteLink() + "/" + katyeHash(town, display)))),
       people.length ? el("div", { class: "people" }, ...people.map(p => memberRow(p))) : el("p", { class: "empty", text: L().place_none }),
       rest.length ? el("div", { class: "other-katye" }, el("h3", { class: "h3", text: L().katye_others(town) }),
         el("div", { class: "chips" }, ...rest.map(o => el("a", { class: "chip-link", href: katyeHash(town, o.katye) }, o.katye, el("span", { class: "count", text: String(o.members) }))))) : null);
@@ -1977,7 +2006,7 @@
       renderPhoto(id);
     });
     const actions = el("div", { class: "row-btns photo-actions" },
-      waBtn(L().wa_photo, () => L().inv_photo(ph.caption || "", pageUrl() + "#photo/" + ph.id), "ghost-wa"),
+      waBtn(L().wa_photo, () => L().inv_photo(ph.caption || "", siteLink() + "/" + "#photo/" + ph.id), "ghost-wa"),
       mine ? el("button", { class: "btn ghost", type: "button", text: L().photo_delete, onclick: async () => {
         if (!confirm(L().photo_delete_q)) return;
         await sb.from("photos").delete().eq("id", ph.id); sb.storage.from("photos").remove([ph.path]); go("#photos/mine"); } }) : null,
@@ -2170,7 +2199,7 @@
       !all.length ? el("p", { class: "empty", text: p.id === me.id ? L().tree_empty_self : L().tree_empty }) : null,
       el("div", { class: "row-btns place-actions" },
         el("a", { class: "btn ghost", href: "#member-" + p.id, text: L().tree_profile }),
-        p.id === me.id ? waBtn(L().wa_family, () => L().inv_tree(p.display_name, pageUrl() + "#tree/" + p.id)) : null),
+        p.id === me.id ? waBtn(L().wa_family, () => L().inv_tree(p.display_name, siteLink())) : null),
       linkedN ? el("p", { class: "note", text: L().tree_count(linkedN) }) : null);
   }
 
@@ -2336,7 +2365,7 @@
       else fBtn = el("button", { class: "btn dark", type: "button", text: L().accept_request, onclick: async () => {
         await sb.from("friendships").update({ status: "accepted" }).eq("requester", p.id).eq("addressee", me.id); renderMemberPage(id);
       } });
-      actions = [msgBtn, fBtn, waBtn(L().wa_share_profile, () => L().inv_profile(p.display_name, p.hometown, pageUrl() + "#member-" + p.id), "ghost-wa")];
+      actions = [msgBtn, fBtn, waBtn(L().wa_share_profile, () => L().inv_profile(p.display_name, p.hometown, siteLink() + "/" + "#member-" + p.id), "ghost-wa")];
     }
 
     const requests = requestIds.map(x => byId[x]).filter(Boolean);

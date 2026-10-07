@@ -1353,3 +1353,16 @@ body:not(.logged-in):not(.about-mode) #about{display:none}
 .reg-steps .rs-l{white-space:nowrap}
 .share-opt .so-txt{display:grid;line-height:1.2;text-align:center;justify-items:center}
 .share-opt .so-url{font-size:.78rem;font-weight:600;color:#178a57}
+
+/* ---------- Admin: members list ---------- */
+.adm-members{display:grid;gap:10px;padding:14px 16px;border:1px solid var(--line,#dfe4ef);border-radius:14px;margin:6px 0 14px;background:#fff}
+.adm-list{display:grid;gap:6px;max-height:520px;overflow:auto}
+.adm-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:10px 12px;border:1px solid #eef1f6;border-radius:12px}
+.adm-row.is-hidden{background:#fff6ec}
+.adm-info{min-width:0;display:grid;gap:2px}
+.adm-name{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-weight:700}
+.adm-name a{color:var(--ink,#0b1530)}
+.adm-info small{color:var(--muted,#6b7490);overflow-wrap:anywhere}
+.adm-btns{display:flex;gap:6px}
+.tag-admin{font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:999px;background:#178a57;color:#fff}
+@media (max-width:560px){.adm-row{grid-template-columns:1fr}.adm-btns .btn{flex:1}}

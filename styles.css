@@ -1334,3 +1334,22 @@ body:not(.logged-in):not(.about-mode) #about{display:none}
   footer .foot-row{box-sizing:border-box;width:calc(100% - 2*clamp(16px,4vw,32px));max-width:1116px;margin:0 auto;padding:16px 24px;background:#040b20;border-radius:22px;box-shadow:0 10px 30px rgba(7,19,48,.12)}
 }
 @media (min-width:761px){body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .groove-live{justify-self:center}}
+/* landing: "Create an account" is black like "Log in", same size */
+.landing .land-btns .btn.dark{font-size:1.15rem;padding:16px 40px}
+@media (min-width:761px){body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .landing .land-btns .btn.dark{font-size:1.05rem;padding:13px 34px;min-width:220px}}
+@media (min-width:761px){body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .landing .land-btns .btn.red{font-size:1.05rem;padding:13px 34px;min-width:220px}}
+
+/* ---------- Sign-up in 2 steps ---------- */
+.reg-step{display:grid;gap:inherit}
+.reg-step[hidden]{display:none}
+.reg-steps{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:.84rem;font-weight:700;color:var(--muted,#6b7490)}
+.reg-steps .rs{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;background:#eef1f6;color:var(--muted,#6b7490)}
+.reg-steps .rs.on{background:linear-gradient(135deg,#3fae6a,#f29a3b);color:#fff}
+.reg-steps .rs.done{background:#178a57;color:#fff}
+.reg-steps .rs-line{flex:1;min-width:14px;height:2px;background:#e3e7f0;border-radius:2px}
+.reg-steps .rs.on+.rs-l{color:var(--ink,#0b1530)}
+.reg-back{justify-self:start;font-weight:700;color:var(--blue)!important}
+.reg-next{margin-top:6px}
+.reg-steps .rs-l{white-space:nowrap}
+.share-opt .so-txt{display:grid;line-height:1.2;text-align:center;justify-items:center}
+.share-opt .so-url{font-size:.78rem;font-weight:600;color:#178a57}

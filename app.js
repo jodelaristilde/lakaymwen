@@ -944,7 +944,7 @@
     $("reset-form").hidden = true; say("forgot-msg", L().pass_changed);
     setTimeout(() => $("dlg-forgot").close(), 1400);
   });
-  $("btn-signout").addEventListener("click", async () => { if (sb) await sb.auth.signOut(); });
+  $("btn-signout").addEventListener("click", async () => { if (sb) { await forgetPushSub(); await sb.auth.signOut(); } });
   $("join-logout").addEventListener("click", async () => { if (sb) await sb.auth.signOut(); });
 
   function updateAccount() {
@@ -952,10 +952,52 @@
     $("acct-in").hidden = !me;
     document.body.classList.toggle("logged-in", !!me);
   }
+  /* ---------- 🔔 Phone notifications (free web push): the phone buzzes when a message or friend request arrives ---------- */
+  const VAPID_PUBLIC = "BJr6Xyp60l6h-Xmot-P08T7QkoDdzzvpoOYwGmqVzZdRiVwQHjGwVN3PZQwuJW7JvishnMdHlcIrVue1Ma0AR2Q";
+  const pushOK = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const pushStandalone = window.matchMedia && matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const b64key = k => { const p = "=".repeat((4 - k.length % 4) % 4), b = atob((k + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from(b, c => c.charCodeAt(0)); };
+  async function savePushSub() {
+    if (!pushOK || !sb || !me || Notification.permission !== "granted") return false;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64key(VAPID_PUBLIC) });
+      const j = sub.toJSON();
+      const { error } = await sb.from("push_subs").upsert({ endpoint: j.endpoint, user_id: me.id, p256dh: j.keys.p256dh, auth: j.keys.auth }, { onConflict: "endpoint" });
+      return !error;
+    } catch (e) { return false; }
+  }
+  async function forgetPushSub() {   // on sign out: this phone stops getting this member's alerts
+    try { if (!pushOK || !sb) return; const reg = await navigator.serviceWorker.getRegistration(); const sub = reg && await reg.pushManager.getSubscription();
+      if (sub) await sb.from("push_subs").delete().eq("endpoint", sub.endpoint); } catch (e) {}
+  }
+  function renderPushBox() {
+    const box = $("push-box"); if (!box) return;
+    const later = Number(store.get("lkm-push-later") || 0) > Date.now();
+    const close = () => { store.set("lkm-push-later", String(Date.now() + 7 * 864e5)); box.hidden = true; };
+    const x = el("button", { class: "push-x", type: "button", "aria-label": L().close || "Close", text: "×", onclick: close });
+    if (!me || later) { box.hidden = true; return; }
+    if (isIOS && !pushStandalone) {   // iPhone: alerts only work from the home-screen icon
+      box.replaceChildren(el("span", { class: "push-ic", text: "📲" }), el("div", { class: "push-txt" }, el("b", { text: L().push_h }), el("span", { text: L().push_ios })), x);
+      box.hidden = false; return;
+    }
+    if (!pushOK || Notification.permission !== "default") { box.hidden = true; return; }
+    const msg = el("small", { class: "push-msg", hidden: "" });
+    const go = el("button", { class: "btn red small", type: "button", text: L().push_btn, onclick: async () => {
+      go.disabled = true;
+      let perm = "default"; try { perm = await Notification.requestPermission(); } catch (e) {}
+      if (perm === "granted" && await savePushSub()) { box.replaceChildren(el("span", { class: "push-ic", text: "✅" }), el("div", { class: "push-txt" }, el("b", { text: L().push_on }))); setTimeout(() => { box.hidden = true; }, 3500); }
+      else { go.disabled = false; msg.hidden = false; msg.textContent = perm === "denied" ? L().push_denied : L().push_fail; }
+    } });
+    box.replaceChildren(el("span", { class: "push-ic", text: "🔔" }), el("div", { class: "push-txt" }, el("b", { text: L().push_h }), el("span", { text: L().push_p }), msg), go, x);
+    box.hidden = false;
+  }
   async function afterAuth() {
     updateAccount(); loadSchoolOpts();
     myLinks = null; hideHC();
-    if (!me) { lastResults = null; $("results").hidden = true; profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; showMsgAlert(0); pymkData = null; renderPymk(); bdayData = null; myBday = null; renderBirthdays(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
+    if (!me) { if ($("push-box")) $("push-box").hidden = true; lastResults = null; $("results").hidden = true; profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; showMsgAlert(0); pymkData = null; renderPymk(); bdayData = null; myBday = null; renderBirthdays(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
     const { data } = await sb.from("profiles").select("*").eq("id", me.id).maybeSingle();
     profile = data || null; schoolData = null;
     say("search-msg", "");
@@ -970,6 +1012,7 @@
     if (!profile && !registering && me.user_metadata && me.user_metadata.profile) { finishRegistration(me); return; }
     if (!profile && !registering) openProfile(true);
     refreshUnread(); refreshAlerts(); syncLangMeta(); loadPymk(); loadBirthdays();
+    renderPushBox(); savePushSub();
     if (pageFor(curHash)) route();
   }
   // Remember the member's language so alert emails come in Kreyòl or English

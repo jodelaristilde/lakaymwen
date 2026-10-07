@@ -1076,3 +1076,13 @@ svg.hb-tag text{font-family:var(--body);font-weight:500;font-size:34px;fill:#e87
 .pc-btns .btn{flex:1 1 auto;justify-content:center;text-align:center;text-decoration:none}
 .pc-fb{background:#1877f2;color:#fff}
 .pc-go{width:100%}
+
+/* ---------- School picker: list drops down under the box ---------- */
+.school-pick{position:relative;min-width:0}
+.school-pick .school-name{width:100%;padding-right:44px}
+.school-caret{position:absolute;top:0;right:0;bottom:0;width:42px;border:0;background:none;color:var(--muted,#6b7490);font-size:1.1rem;cursor:pointer}
+.school-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;margin:0;padding:6px;list-style:none;max-height:280px;overflow:auto;background:var(--card,#fff);border:1px solid var(--line,#dfe4ef);border-radius:12px;box-shadow:0 14px 34px rgba(7,19,48,.18)}
+.school-menu[hidden]{display:none}
+.school-menu li{padding:10px 12px;border-radius:8px;cursor:pointer;line-height:1.3}
+.school-menu li:hover{background:#eef2fc}
+.school-menu li.school-new{color:#1f3fd1;font-weight:700;border-top:1px solid var(--line,#dfe4ef);margin-top:4px}

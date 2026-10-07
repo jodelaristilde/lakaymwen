@@ -1393,3 +1393,15 @@ body:not(.logged-in):not(.about-mode) #about{display:none}
 }
 .school-menu .school-hint{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#178a57;cursor:default;background:#f2faf5}
 .school-menu .school-near{font-weight:700}
+
+/* ---------- 🔔 "Get alerts on this phone" box ---------- */
+.push-box{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:10px 14px;padding:12px 14px;margin:0 0 14px;border-radius:16px;background:linear-gradient(135deg,#f2faf5,#fff6ec);border:1px solid #e3eee7}
+.push-box[hidden]{display:none}
+.push-ic{font-size:1.6rem;line-height:1}
+.push-txt{display:grid;gap:2px;min-width:0}
+.push-txt b{font-size:1rem}
+.push-txt span,.push-msg{font-size:.88rem;color:var(--muted,#6b7490)}
+.push-msg{color:#b4232a}
+.push-x{border:0;background:transparent;font-size:1.4rem;line-height:1;color:var(--muted,#6b7490);cursor:pointer;padding:4px 6px;border-radius:8px}
+.push-x:hover{background:#eef1f6}
+@media (max-width:560px){.push-box{grid-template-columns:auto minmax(0,1fr) auto}.push-box .push-x{grid-row:1;grid-column:3;align-self:start}.push-box .btn{grid-column:1/-1;width:100%}}

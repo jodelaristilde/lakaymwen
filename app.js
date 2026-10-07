@@ -185,7 +185,7 @@
     const box = $(p + "-schools");
     if (box.children.length >= 15) return;
     const v = schoolObj(value);
-    const inp = el("input", { type: "text", class: "school-name", maxlength: "80", placeholder: L().school_ph, "aria-label": L().schools });
+    const inp = el("input", { type: "text", class: "school-name", maxlength: "80", list: "school-options", autocomplete: "off", placeholder: L().school_ph, "aria-label": L().schools });
     const yrs = el("input", { type: "text", class: "school-years", maxlength: "15", inputmode: "numeric", placeholder: L().school_years_ph, "aria-label": L().school_years });
     inp.value = v.name; yrs.value = v.years;
     const row = el("div", { class: "school-row" }, inp, yrs,
@@ -194,6 +194,23 @@
     if (!value) inp.focus();
   }
   document.querySelectorAll("[data-add-school]").forEach(b => b.addEventListener("click", () => addSchoolRow(b.dataset.addSchool)));
+  const HT_SCHOOLS = ["Lycée Alexandre Pétion", "Lycée Toussaint Louverture", "Lycée Marie-Jeanne", "Lycée du Cent-Cinquantenaire", "Lycée Anténor Firmin", "Lycée de Pétion-Ville", "Lycée Philippe Guerrier (Les Cayes)", "Lycée Pinchinat (Jacmel)", "Lycée Fabre Geffrard (Gonaïves)", "Lycée Nord Alexis (Jérémie)", "Lycée Sténio Vincent (Saint-Marc)", "Lycée Tertulien Guilbaud (Port-de-Paix)", "Institution Saint-Louis de Gonzague", "Petit Séminaire Collège Saint-Martial", "Collège Canado-Haïtien", "Collège Bird", "Nouveau Collège Bird", "Collège Catts Pressoir", "Collège Roger Anglade", "Institution du Sacré-Cœur", "Collège Sainte-Rose de Lima", "Collège Saint-Pierre", "Juvénat du Sacré-Cœur", "Centre d'Études Secondaires (CES)", "Collège Classique Féminin", "Collège Notre-Dame du Perpétuel Secours (Cap-Haïtien)", "Collège Regina Assumpta (Cap-Haïtien)", "Collège Immaculée Conception (Les Cayes)", "Louverture Cleary School", "Union School", "Quisqueya Christian School", "Lycée Français Alexandre Dumas", "École Haïtiano-Arabe", "Collège Évangélique Maranatha", "Université d'État d'Haïti (UEH)", "Faculté de Médecine et de Pharmacie", "Faculté de Droit et des Sciences Économiques", "Faculté des Sciences (FDS)", "Faculté d'Ethnologie", "École Normale Supérieure", "INAGHEI", "Université Quisqueya", "Université Notre-Dame d'Haïti", "Université Épiscopale d'Haïti", "Université Caraïbe", "École Nationale des Arts (ENARTS)", "CTPEA"];
+  // School dropdown: well-known schools + every school members have added (new ones show up automatically)
+  const schoolOpts = new Map();
+  function addSchoolOpts(names) {
+    let added = false;
+    (names || []).forEach(n => { n = String(n || "").trim(); const k = norm(n).replace(/[^a-z0-9]+/g, "");
+      if (n.length >= 2 && k && !schoolOpts.has(k)) { schoolOpts.set(k, n); added = true; } });
+    if (!added || !$("school-options")) return;
+    $("school-options").replaceChildren(...[...schoolOpts.values()].sort((x, y) => x.localeCompare(y, "fr")).map(n => el("option", { value: n })));
+  }
+  addSchoolOpts(HT_SCHOOLS);
+  async function loadSchoolOpts() {
+    if (!sb) return;
+    let { data, error } = await sb.rpc("school_names");
+    if (error && me) ({ data } = await sb.rpc("school_counts"));
+    addSchoolOpts((data || []).map(r => r.school));
+  }
   const readSchools = p => [...$(p + "-schools").querySelectorAll(".school-row")].map(r => ({
     name: r.querySelector(".school-name").value.trim(), years: r.querySelector(".school-years").value.trim() }))
     .filter(o => o.name.length >= 2).slice(0, 15);
@@ -227,7 +244,7 @@
       country: $(p + "-country").value || null,
       state: $(p + "-state-wrap").hidden ? null : ($(p + "-state").value || null),
       lives_in: $(p + "-lives").value.trim() || null,
-      school_list: readSchools(p), schools: readSchools(p).map(schoolText).join(" · ").slice(0, 300) || null,
+      school_list: (addSchoolOpts(readSchools(p).map(o => o.name)), readSchools(p)), schools: readSchools(p).map(schoolText).join(" · ").slice(0, 300) || null,
       bio: $(p + "-bio").value.trim() || null, family: readFamily(p)
     };
   }
@@ -432,7 +449,16 @@
     $("res-title").textContent = r.title || L().res_title(r.q);
     const found = (r.members || []).filter(notBlocked);
     $("res-members").replaceChildren(...(found.length ? found.map(p => memberRow(p, clean(r.q)))
-      : [el("p", { class: "empty", text: L().search_none })]), alertOffer(r.q, r.town, !found.length));
+      : [el("p", { class: "empty", text: r.mine ? L().town_first(r.town) : L().search_none })]), ...(r.q ? [alertOffer(r.q, r.town, !found.length)] : []));
+  }
+  // On the search page, a member first sees everyone from the town they registered with
+  async function showMyTown() {
+    if (!sb || !me || !profile || !profile.hometown || lastResults) return;
+    const town = profile.hometown;
+    const { data, error } = await sb.from("profiles").select(PROFILE_COLS).eq("suspended", false).eq("hometown", town).order("display_name").limit(500);
+    if (error || lastResults) return;
+    lastResults = { q: "", town, notices: [], members: (data || []).filter(p => p.id !== me.id), title: L().res_town(town), mine: true };
+    renderResults();
   }
   $("search-form").addEventListener("submit", async e => {
     e.preventDefault();
@@ -441,12 +467,14 @@
     if (!needDb("search-msg")) return;
     if (!me) { say("search-msg", L().search_login); openAuth(null, "login"); return; }
     const q = $("s-name").value.trim(), key = clean(q), town = $("s-town").value;
-    if (key.length < 2) { say("search-msg", L().search_short, true); $("s-name").focus(); return; }
-    let mq = sb.from("profiles").select(PROFILE_COLS).eq("suspended", false).or(`name_key.ilike.%${key}%,family_key.ilike.%${key}%,place_key.ilike.%${key}%`).order("display_name").limit(100);
+    if (key.length < 2 && !town) { say("search-msg", L().search_short, true); $("s-name").focus(); return; }
+    // a name is optional when a hometown is picked: then everyone from that town is listed
+    let mq = sb.from("profiles").select(PROFILE_COLS).eq("suspended", false).order("display_name").limit(key.length >= 2 ? 100 : 500);
+    if (key.length >= 2) mq = mq.or(`name_key.ilike.%${key}%,family_key.ilike.%${key}%,place_key.ilike.%${key}%`);
     if (town) mq = mq.eq("hometown", town);
     const { data, error } = await mq;
     if (error) { say("search-msg", L().err, true); return; }
-    lastResults = { q, town, notices: [], members: data || [] };
+    lastResults = { q, town, notices: [], members: data || [], title: key.length >= 2 ? null : L().res_town(town) };
     renderResults();
     $("results").scrollIntoView({ behavior: "smooth", block: "start" });
   });
@@ -556,6 +584,9 @@
     }
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { registering = false; return bad(L().email_taken, "r-email"); }
     pendingReg = { username: u, about, photo: $("r-photo").files[0] || null, birthday: bday || null };
+    // keep a small copy of the photo, so it isn't lost if they confirm from the email link in another tab
+    if (pendingReg.photo) { try { const b = await resizePhoto(pendingReg.photo);
+      store.set("lkm-pending-photo", await new Promise((ok, no) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = no; fr.readAsDataURL(b); })); } catch (e) {} }
     if (data.session) return finishRegistration(data.session.user);   // email confirmation turned off
     showVerify(email, false);
   });
@@ -568,7 +599,7 @@
       if (s0 && s0.session) { finishRegistration(s0.session.user); return; }
       say("join-msg", L().verify_click_link, true); return;
     }
-    if (token.length !== 6) { say("join-msg", L().bad_code, true); $("v-code").focus(); return; }
+    if (!/^\d{6,10}$/.test(token)) { say("join-msg", L().bad_code, true); $("v-code").focus(); return; }
     const btn = e.submitter; if (btn) btn.disabled = true;
     registering = true;
     const { data, error } = await sb.auth.verifyOtp({ email: verifyEmail, token, type: "signup" });
@@ -590,6 +621,10 @@
     const src = pendingReg || { username: meta.username, about: meta.profile || {}, photo: null, birthday: meta.birthday || null };
     let photo_url = null;
     if (src.photo) { try { photo_url = await uploadPhoto(await resizePhoto(src.photo)); } catch (err) { photo_url = null; } }
+    if (!photo_url && store.get("lkm-pending-photo")) {
+      try { photo_url = await uploadPhoto(await (await fetch(store.get("lkm-pending-photo"))).blob()); } catch (err) { photo_url = null; }
+    }
+    store.set("lkm-pending-photo", null);
     const row = Object.assign({}, src.about, { id: user.id, username: src.username || null, photo_url });
     if (!row.hometown) row.hometown = $("r-town").value || store.get("lkm-town") || "";
     let { data: prof, error } = await sb.from("profiles").upsert(row).select().single();
@@ -609,7 +644,7 @@
   /* After a new member registers: a postcard to share, then the member search */
   const siteLink = () => location.origin.replace("://www.", "://");
   function openPostcard() {
-    const link = siteLink(), msg = L().tell_text + " " + link;
+    const link = siteLink(), msg = L().pc_share + " " + link;
     const waUrl = "https://wa.me/?text=" + encodeURIComponent(msg);
     $("pc-card").href = waUrl; $("pc-wa").href = waUrl;
     $("pc-fb").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(link);
@@ -617,7 +652,7 @@
     openDlg("dlg-welcome");
   }
   $("pc-copy").addEventListener("click", async () => {
-    const msg = L().tell_text + " " + siteLink();
+    const msg = L().pc_share + " " + siteLink();
     try { await navigator.clipboard.writeText(msg); } catch (e) {
       const t = document.createElement("textarea"); t.value = msg; document.body.append(t); t.select(); try { document.execCommand("copy"); } catch (e2) {} t.remove(); }
     $("pc-copy").textContent = L().copied;
@@ -662,7 +697,7 @@
     e.preventDefault();
     const token = $("f-code").value.replace(/\D/g, "");
     if (!recoveryMode && !token) { say("forgot-msg", L().reset_click_link, true); return; }
-    if (!recoveryMode && token.length !== 6) { say("forgot-msg", L().bad_code, true); return; }
+    if (!recoveryMode && !/^\d{6,10}$/.test(token)) { say("forgot-msg", L().bad_code, true); return; }
     if ($("f-pass").value.length < 6) { say("forgot-msg", L().pass_short, true); return; }
     if ($("f-pass").value !== $("f-pass2").value) { say("forgot-msg", L().pass_mismatch, true); return; }
     const btn = e.submitter; if (btn) btn.disabled = true;
@@ -686,8 +721,8 @@
     document.body.classList.toggle("logged-in", !!me);
   }
   async function afterAuth() {
-    updateAccount();
-    if (!me) { profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; showMsgAlert(0); pymkData = null; renderPymk(); bdayData = null; myBday = null; renderBirthdays(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
+    updateAccount(); loadSchoolOpts();
+    if (!me) { lastResults = null; $("results").hidden = true; profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; showMsgAlert(0); pymkData = null; renderPymk(); bdayData = null; myBday = null; renderBirthdays(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
     const { data } = await sb.from("profiles").select("*").eq("id", me.id).maybeSingle();
     profile = data || null; schoolData = null;
     say("search-msg", "");
@@ -695,6 +730,7 @@
     blockedIds = new Set((bl || []).map(b => b.blocked));
     isAdmin = adm === true; document.body.classList.toggle("is-admin", isAdmin);
     updateSide(); loadFeatured(); loadTownCounts();
+    if (curHash === "#search") showMyTown();
     if (curHash === "#admin") renderAdmin();
     if (currentMember) renderMemberPage(currentMember);
     if (!profile && !registering && me.user_metadata && me.user_metadata.profile) { finishRegistration(me); return; }
@@ -1882,7 +1918,7 @@
     if (admin) { renderAdmin(); window.scrollTo(0, 0); }
     const search = curHash === "#search";
     document.body.classList.toggle("search-mode", search);
-    if (search) { window.scrollTo(0, 0); setTimeout(() => $("s-name").focus(), 60); }
+    if (search) { window.scrollTo(0, 0); setTimeout(() => $("s-name").focus(), 60); showMyTown(); }
     const pg = pageFor(curHash);
     document.body.classList.toggle("page-mode", !!pg);
     document.querySelectorAll(".page-box.page-on").forEach(b => b.classList.remove("page-on"));

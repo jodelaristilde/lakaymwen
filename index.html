@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Montserrat:wght@500;600&family=Cormorant+SC:wght@700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261007i">
+<link rel="stylesheet" href="styles.css?v=20261007k">
 </head>
 <body>
 
@@ -281,6 +281,20 @@
         </div>
 
 
+        <div class="box landing" id="landing">
+          <h1 class="land-h" data-t="land_h"></h1>
+          <p class="land-p" data-t="land_p"></p>
+          <form id="land-form" class="searchbar light" role="search" novalidate>
+            <label class="sb-field"><span class="sb-long" data-t="f_name"></span><span class="sb-short" data-t="f_name_s"></span><input id="ls-name" type="text" autocomplete="off" placeholder="Marie Joseph"></label>
+            <label class="sb-field"><span class="sb-long" data-t="f_town"></span><span class="sb-short" data-t="f_town_s"></span><select id="ls-town"><option value="" data-t="any"></option></select></label>
+            <button class="sb-go" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span data-t="b_search"></span></button>
+          </form>
+          <div class="land-result" id="land-result" hidden></div>
+          <div class="land-btns">
+            <button class="btn dark" type="button" data-action="login" data-t="login_btn"></button>
+            <a class="btn ghost" href="#register" data-t="land_join"></a>
+          </div>
+        </div>
         <div class="box" id="haiti">
           <div class="box-head"><h2 class="flash-h" data-t="cities_h"></h2></div>
           <p class="box-text" data-t="cities_p"></p>
@@ -629,11 +643,11 @@ window.addEventListener("error", function (e) {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
-<script src="config.js?v=20261007i"></script>
-<script src="towns.js?v=20261007i"></script>
-<script src="depts.js?v=20261007i"></script>
-<script src="geo.js?v=20261007i"></script>
-<script src="i18n.js?v=20261007i"></script>
-<script src="app.js?v=20261007i"></script>
+<script src="config.js?v=20261007k"></script>
+<script src="towns.js?v=20261007k"></script>
+<script src="depts.js?v=20261007k"></script>
+<script src="geo.js?v=20261007k"></script>
+<script src="i18n.js?v=20261007k"></script>
+<script src="app.js?v=20261007k"></script>
 </body>
 </html>

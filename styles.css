@@ -1326,3 +1326,11 @@ body:not(.logged-in):not(.about-mode) #about{display:none}
   .side-menu .phone-only{display:block}
   #home.portal{padding-bottom:16px}
 }
+
+/* ---------- Computers: the black footer is a rounded bar the same width as the page, no black running to the sides ---------- */
+@media (min-width:761px){
+  body{background:var(--alt)}
+  footer{background:var(--alt);padding:0 0 22px}
+  footer .foot-row{box-sizing:border-box;width:calc(100% - 2*clamp(16px,4vw,32px));max-width:1116px;margin:0 auto;padding:16px 24px;background:#040b20;border-radius:22px;box-shadow:0 10px 30px rgba(7,19,48,.12)}
+}
+@media (min-width:761px){body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .groove-live{justify-self:center}}

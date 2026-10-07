@@ -1133,3 +1133,13 @@ body.logged-in:not(.register-mode) .portal-side>.box{display:none}
 .hc-msg:hover{background:#166fe0}
 .hc-btns .chip-item{display:inline-flex;justify-content:center;padding:8px 10px;border-radius:999px;background:#eef2fc;font-weight:700;font-size:.85rem}
 [data-hc]{cursor:pointer}
+
+/* ---------- "Logged in as …" at the top ---------- */
+.who-bar{display:flex;align-items:center;gap:6px;margin:0 0 10px 4px;font-size:.9rem;color:var(--muted,#6b7490);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who-bar[hidden]{display:none}
+.who-bar a{color:var(--ink,#0b1530);font-weight:800;text-decoration:none;overflow:hidden;text-overflow:ellipsis}
+.who-bar a:hover{text-decoration:underline}
+@media (max-width:760px){
+  .who-bar{position:fixed;top:12px;left:12px;z-index:44;height:42px;margin:0;padding:0 14px;max-width:calc(100% - 150px);background:var(--bg,#fff);border:1.5px solid var(--line,#dfe4ef);border-radius:12px;box-shadow:0 4px 14px rgba(7,19,48,.12);font-size:.82rem}
+}
+@media (max-width:400px){#who-label{display:none}}

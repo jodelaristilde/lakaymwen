@@ -2,7 +2,7 @@
 // To change any text, edit it here.
 window.LAKAYMWEN_TEXT = {
 en: {
-  code_if_any:"Code (only if your email shows one)", verify_click_link:"Type the code from the email we sent you.", code_from_email:"Code from the email", reset_click_link:"Open the email we sent you and click the link in it to choose your new password.", reset_link_text:"Choose your new password.",
+  code_if_any:"Code (only if your email shows one)", verify_click_link:"Not confirmed yet. Type the code from the email, or tap the button in the email first (check Spam too).", code_from_email:"Code from the email", reset_click_link:"Open the email we sent you and click the link in it to choose your new password.", reset_link_text:"Choose your new password.",
   map_tip_towns:n=>n===1?"1 town":`${n} towns`, map_tip_members:n=>n===1?"1 member":`${n} members`, map_tip_hint:"Click to register",
   rel_grandchild:"Grandchild",
   rel_niece:"Niece",
@@ -252,7 +252,7 @@ en: {
   school_years:"Years attended", school_years_ph:"Years (optional)", card_schools:"School", card_family:"Family",
   and_more:n=>`+${n} more`,
   town_haiti:"Town in Haiti", add_school:"+ Add a school", school_ph:"Lycée Pétion, Collège Saint-Pierre…",
-  verify_h:"Check your email", verify_text:e=>`We sent a code to ${e}. Open the email and type the code below. (You can also tap the button in the email.)`,
+  verify_h:"Check your email", verify_text:e=>`We sent an email to ${e}. Type the code from the email below, or tap the button in the email and then tap “Confirm my email” here.`,
   code_label:"6-digit code", verify_btn:"Confirm my email", resend_code:"Send a new code", change_email:"Use a different email",
   code_resent:"A new code is on its way. Check your inbox and spam folder.",
   bad_code:"That code isn't right or has expired. Check the email or send a new code.",
@@ -297,7 +297,7 @@ en: {
   setup:"Setup needed: add your Supabase keys to config.js (see LAUNCH-GUIDE.md). Until then, searching and posting won't work."
 },
 ht: {
-  code_if_any:"Kòd (sèlman si imèl ou a gen youn)", verify_click_link:"Tape kòd ki nan imèl nou voye a.", code_from_email:"Kòd ki nan imèl la", reset_click_link:"Louvri imèl nou voye a epi klike sou lyen ki ladan l pou w chwazi nouvo modpas ou.", reset_link_text:"Chwazi nouvo modpas ou.",
+  code_if_any:"Kòd (sèlman si imèl ou a gen youn)", verify_click_link:"Poko konfime. Tape kòd ki nan imèl la, oswa klike sou bouton ki nan imèl la anvan (gade nan Spam tou).", code_from_email:"Kòd ki nan imèl la", reset_click_link:"Louvri imèl nou voye a epi klike sou lyen ki ladan l pou w chwazi nouvo modpas ou.", reset_link_text:"Chwazi nouvo modpas ou.",
   map_tip_towns:n=>`${n} vil`, map_tip_members:n=>`${n} manm`, map_tip_hint:"Klike pou enskri",
   rel_grandchild:"Pitit pitit",
   rel_niece:"Nyès",
@@ -547,7 +547,7 @@ ht: {
   school_years:"Ane ou te la", school_years_ph:"Ane (si w vle)", card_schools:"Lekòl", card_family:"Fanmi",
   and_more:n=>`+${n} lòt`,
   town_haiti:"Vil ann Ayiti", add_school:"+ Ajoute yon lekòl", school_ph:"Lise Petyon, Kolèj Sen Pyè…",
-  verify_h:"Gade nan imel ou", verify_text:e=>`Nou voye yon kòd nan ${e}. Louvri imèl la epi tape kòd la anba a. (Ou ka klike sou bouton ki nan imèl la tou.)`,
+  verify_h:"Gade nan imel ou", verify_text:e=>`Nou voye yon imèl nan ${e}. Tape kòd ki nan imèl la anba a, oswa klike sou bouton ki nan imèl la epi tape “Konfime imel mwen” isit la.`,
   code_label:"Kòd 6 chif", verify_btn:"Konfime imel mwen", resend_code:"Voye yon nouvo kòd", change_email:"Sèvi ak yon lòt imel",
   code_resent:"Yon nouvo kòd ap vini. Gade nan bwat imel ou ak nan spam.",
   bad_code:"Kòd sa a pa bon oswa li ekspire. Verifye imel la oswa mande yon nouvo kòd.",
@@ -592,7 +592,7 @@ ht: {
   setup:"Fòk ou mete kle Supabase yo nan config.js (gade LAUNCH-GUIDE.md). Jiskaske sa fèt, chèche ak poste p ap mache."
 },
 fr: {
-  code_if_any:"Code (seulement si votre e-mail en contient un)", verify_click_link:"Saisissez le code reçu dans l'e-mail.", code_from_email:"Code reçu par e-mail", reset_click_link:"Ouvrez l'e-mail que nous vous avons envoyé et cliquez sur le lien pour choisir votre nouveau mot de passe.", reset_link_text:"Choisissez votre nouveau mot de passe.",
+  code_if_any:"Code (seulement si votre e-mail en contient un)", verify_click_link:"Pas encore confirmé. Saisissez le code de l'e-mail, ou touchez d'abord le bouton dans l'e-mail (vérifiez aussi les spams).", code_from_email:"Code reçu par e-mail", reset_click_link:"Ouvrez l'e-mail que nous vous avons envoyé et cliquez sur le lien pour choisir votre nouveau mot de passe.", reset_link_text:"Choisissez votre nouveau mot de passe.",
   map_tip_towns:n=>n===1?"1 ville":`${n} villes`, map_tip_members:n=>n===1?"1 membre":`${n} membres`, map_tip_hint:"Cliquez pour vous inscrire",
   rel_grandchild:"Petit-enfant",
   rel_niece:"Nièce",
@@ -842,7 +842,7 @@ fr: {
   school_years:"Années de fréquentation", school_years_ph:"Années (facultatif)", card_schools:"École", card_family:"Famille",
   and_more:n=>`+${n} de plus`,
   town_haiti:"Ville en Haïti", add_school:"+ Ajouter une école", school_ph:"Lycée Pétion, Collège Saint-Pierre…",
-  verify_h:"Consultez votre e-mail", verify_text:e=>`Nous avons envoyé un code à ${e}. Ouvrez l'e-mail et saisissez le code ci-dessous. (Vous pouvez aussi toucher le bouton dans l'e-mail.)`,
+  verify_h:"Consultez votre e-mail", verify_text:e=>`Nous avons envoyé un e-mail à ${e}. Saisissez le code de l'e-mail ci-dessous, ou touchez le bouton dans l'e-mail puis « Confirmer mon e-mail » ici.`,
   code_label:"Code à 6 chiffres", verify_btn:"Confirmer mon e-mail", resend_code:"Envoyer un nouveau code", change_email:"Utiliser une autre adresse e-mail",
   code_resent:"Un nouveau code est en route. Vérifiez votre boîte de réception et vos courriers indésirables.",
   bad_code:"Ce code est incorrect ou a expiré. Vérifiez l'e-mail ou demandez un nouveau code.",

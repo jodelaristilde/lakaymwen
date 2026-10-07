@@ -109,8 +109,7 @@
     $("town-list").replaceChildren(...letters.map(k => el("div", { class: "letter" },
       el("h3", { id: "letter-" + k, text: k }),
       el("ul", {}, groups[k].map(t => el("li", {},
-        el("button", { type: "button", onclick: () => openAuth(t) }, t,
-          townCounts[t] ? el("span", { class: "count", text: "(" + townCounts[t] + ")" }) : null))))
+        el("button", { type: "button", onclick: () => openAuth(t) }, t))))
     )));
   }
   if ($("town-filter")) $("town-filter").addEventListener("input", renderTowns);
@@ -277,7 +276,7 @@
     else if (a === "login") { openAuth(null, "login"); }
     else if (a === "signout") { $("btn-signout").click(); }
     else if (a === "tell") {
-      const text = L().tell_text + " " + pageUrl() + "#register";
+      const text = L().tell_text + " " + location.origin.replace("://www.", "://");
       wa(text);
     }
   }));
@@ -310,8 +309,7 @@
     $("dept-title").textContent = d.name;
     $("dept-cap").textContent = L().dept_cap(d.capital);
     $("dept-towns").replaceChildren(...d.towns.map(t => el("li", {},
-      el("button", { type: "button", onclick: () => { $("dlg-dept").close(); me ? openTown(t) : openAuth(t); } }, t,
-        townCounts[t] ? el("span", { class: "count", text: String(townCounts[t]) }) : null))));
+      el("button", { type: "button", onclick: () => { $("dlg-dept").close(); me ? openTown(t) : openAuth(t); } }, t))));
     openDlg("dlg-dept");
   }
   /* ---------- The Haiti map: departments light up under the mouse ---------- */
@@ -330,9 +328,8 @@
         if (ev) g.parentNode.appendChild(g);   // mouse: bring to the front so its outline shows (not on keyboard focus, it would drop focus)
         const l = label(d.id); if (l) l.classList.add("on");
         svg.classList.add("hovering");
-        const members = d.towns.reduce((n, t) => n + (townCounts[t] || 0), 0);
         $("map-tip-name").textContent = d.name;
-        $("map-tip-info").textContent = L().map_tip_towns(d.towns.length) + (members ? " · " + L().map_tip_members(members) : "");
+        $("map-tip-info").textContent = L().map_tip_towns(d.towns.length);
         $("map-tip-hint").textContent = L().map_tip_hint;
         tip.hidden = false;
       }
@@ -607,7 +604,25 @@
     $("reg-form").reset(); $("r-family").replaceChildren(); $("r-schools").replaceChildren(); showRegForm();
     go("#member-" + user.id);
     afterAuth();
+    openPostcard();
   }
+  /* After a new member registers: a postcard to share, then the member search */
+  const siteLink = () => location.origin.replace("://www.", "://");
+  function openPostcard() {
+    const link = siteLink(), msg = L().tell_text + " " + link;
+    const waUrl = "https://wa.me/?text=" + encodeURIComponent(msg);
+    $("pc-card").href = waUrl; $("pc-wa").href = waUrl;
+    $("pc-fb").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(link);
+    $("pc-copy").textContent = L().copy_link;
+    openDlg("dlg-welcome");
+  }
+  $("pc-copy").addEventListener("click", async () => {
+    const msg = L().tell_text + " " + siteLink();
+    try { await navigator.clipboard.writeText(msg); } catch (e) {
+      const t = document.createElement("textarea"); t.value = msg; document.body.append(t); t.select(); try { document.execCommand("copy"); } catch (e2) {} t.remove(); }
+    $("pc-copy").textContent = L().copied;
+  });
+  $("dlg-welcome").addEventListener("close", () => go("#search"));
 
   /* ---------- Forgot password: code by email, then a new password ---------- */
   var forgotEmail = "", recoveryMode = false;
@@ -672,7 +687,7 @@
   }
   async function afterAuth() {
     updateAccount();
-    if (!me) { profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; pymkData = null; renderPymk(); bdayData = null; myBday = null; renderBirthdays(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
+    if (!me) { profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; showMsgAlert(0); pymkData = null; renderPymk(); bdayData = null; myBday = null; renderBirthdays(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
     const { data } = await sb.from("profiles").select("*").eq("id", me.id).maybeSingle();
     profile = data || null; schoolData = null;
     say("search-msg", "");
@@ -968,7 +983,17 @@
     $("unread").hidden = !count;
     $("unread-side").textContent = count || "";
     $("unread-side").hidden = !count;
+    showMsgAlert(count || 0);
   }
+  function showMsgAlert(n) {
+    const b = $("msg-alert"); if (!b) return;
+    b.hidden = !n;
+    $("msg-alert-n").textContent = n ? String(n) : "";
+    $("msg-alert-txt").textContent = n ? L().msg_new(n) : "";
+    b.setAttribute("aria-label", n ? L().msg_new(n) : "");
+    document.title = (n ? "(" + n + ") " : "") + document.title.replace(/^\(\d+\) /, "");
+  }
+  if ($("msg-alert")) $("msg-alert").addEventListener("click", () => { if (me) openInbox(); });
   async function openInbox() {
     thread = null;
     $("inbox-title").textContent = L().inbox_title;
@@ -1221,7 +1246,7 @@
     } });
     return el("div", { class: "alert-offer" + (none ? " big" : "") },
       el("p", { class: "ao-text", text: none ? L().alert_offer_none(q) : L().alert_offer(q) }),
-      el("div", { class: "row-btns" }, btn, waBtn(L().wa_btn, () => L().inv_search(q, pageUrl() + "#register"), "ghost-wa")),
+      el("div", { class: "row-btns" }, btn, waBtn(L().wa_btn, () => L().inv_search(q, location.origin.replace("://www.", "://")), "ghost-wa")),
       msg);
   }
   var alertsReq = 0;
@@ -2036,7 +2061,7 @@
       setTimeout(afterAuth, 0); // run Supabase calls outside the auth callback
     });
     loadRecent(); loadTownCounts(); openSharedNotice();
-    setInterval(refreshUnread, 60000);
+    setInterval(refreshUnread, 30000);
   }
   route();
 })();

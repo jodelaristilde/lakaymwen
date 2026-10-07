@@ -1366,3 +1366,30 @@ body:not(.logged-in):not(.about-mode) #about{display:none}
 .adm-btns{display:flex;gap:6px}
 .tag-admin{font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:999px;background:#178a57;color:#fff}
 @media (max-width:560px){.adm-row{grid-template-columns:1fr}.adm-btns .btn{flex:1}}
+
+/* ---------- 👁 show/hide password ---------- */
+.pw-wrap{position:relative;display:block}
+.pw-wrap input{padding-right:48px}
+.pw-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;border-radius:10px;background:transparent;color:var(--muted,#6b7490);display:grid;place-items:center;cursor:pointer;padding:0}
+.pw-eye:hover{background:#f0f3f8;color:var(--ink,#0b1530)}
+.pw-eye svg{width:22px;height:22px}
+
+/* ---------- Sign-up form: bigger, easier to read ---------- */
+#reg-form .form-h{font-size:1.35rem;font-weight:800;letter-spacing:-.01em}
+#reg-form label{font-size:1rem;color:var(--ink,#0b1530)}
+#reg-form input,#reg-form select,#reg-form textarea{font-size:1.05rem;padding:13px 15px}
+#reg-form .pw-wrap input{padding-right:48px}
+#reg-form .note{font-size:.9rem}
+#reg-form .add-fam{font-size:1rem;padding:11px 18px;min-height:46px}
+#reg-form .check{font-size:1rem}
+@media (min-width:761px){
+  #reg-form{gap:18px}
+  #reg-form .form-h{font-size:1.7rem}
+  #reg-form label{font-size:1.08rem}
+  #reg-form input,#reg-form select,#reg-form textarea{font-size:1.12rem;padding:15px 16px;border-radius:14px}
+  #reg-form .add-fam{font-size:1.05rem;padding:13px 22px}
+  #reg-form .reg-steps{font-size:.95rem}
+  #reg-form .reg-steps .rs{width:30px;height:30px;font-size:.9rem}
+}
+.school-menu .school-hint{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#178a57;cursor:default;background:#f2faf5}
+.school-menu .school-near{font-weight:700}

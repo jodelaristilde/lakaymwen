@@ -514,7 +514,7 @@
   /* ---------- Log in / register: email + password, email confirmed with a 6-digit code ---------- */
   const USER_RE = /^[a-z0-9._-]{3,20}$/;
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  let registering = false, pendingReg = null, verifyEmail = "";
+  let registering = false, pendingReg = null, verifyEmail = "", verifyPass = "", verifyTimer = null;
   // Logging in uses a small window; registering has its own page (#join).
   function setJoinTown(town) {
     if (town) { store.set("lkm-town", town); $("r-town").value = town; }
@@ -546,7 +546,7 @@
     if (error) {
       if (/confirm/i.test(error.message)) {        // registered but never entered the code
         if ($("dlg-auth").open) $("dlg-auth").close();
-        showVerify(email, true);
+        verifyPass = pass; showVerify(email, true);
         return;
       }
       say(msgId, /invalid/i.test(error.message) ? L().bad_login : L().err + " (" + error.message + ")", true);
@@ -571,7 +571,32 @@
     say("join-msg", resend ? L().not_confirmed : "");
     if (resend) sb.auth.resend({ type: "signup", email });
     setTimeout(() => $("v-code").focus(), 80);
+    // If they tap the button in the email (same browser, another tab), finish here by itself
+    clearInterval(verifyTimer);
+    verifyTimer = setInterval(async () => {
+      if ($("verify-step").hidden) { clearInterval(verifyTimer); return; }
+      const { data } = await sb.auth.getSession();
+      if (data && data.session) { clearInterval(verifyTimer); finishFromConfirmed(data.session.user); }
+    }, 3000);
   }
+  // Email already confirmed (button in the email, maybe on another phone): sign in with the password they just chose
+  async function tryConfirmedLogin(quiet) {
+    const { data: s0 } = await sb.auth.getSession();
+    if (s0 && s0.session) { finishFromConfirmed(s0.session.user); return true; }
+    if (!verifyEmail || !verifyPass) return false;
+    const { data, error } = await sb.auth.signInWithPassword({ email: verifyEmail, password: verifyPass });
+    if (!error && data && data.session) { finishFromConfirmed(data.session.user); return true; }
+    if (!quiet) say("join-msg", L().verify_click_link, true);
+    return false;
+  }
+  function finishFromConfirmed(user) {
+    clearInterval(verifyTimer); verifyPass = "";
+    if (profile) { go("#search"); return; }      // the other tab already finished
+    registering = true; finishRegistration(user);
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && !$("verify-step").hidden && verifyEmail && !me) tryConfirmedLogin(true);
+  });
 
   $("reg-form").addEventListener("submit", async e => {
     e.preventDefault();
@@ -607,6 +632,7 @@
       return bad(L().err + " (" + error.message + ")", "r-email");
     }
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { registering = false; return bad(L().email_taken, "r-email"); }
+    verifyPass = $("r-pass").value;
     pendingReg = { username: u, about, photo: $("r-photo").files[0] || null, birthday: bday || null };
     // keep a small copy of the photo, so it isn't lost if they confirm from the email link in another tab
     if (pendingReg.photo) { try { const b = await resizePhoto(pendingReg.photo);
@@ -618,10 +644,11 @@
   $("verify-form").addEventListener("submit", async e => {
     e.preventDefault();
     const token = $("v-code").value.replace(/\D/g, "");
-    if (!token) {   // most emails carry a link instead of a code
-      const { data: s0 } = await sb.auth.getSession();
-      if (s0 && s0.session) { finishRegistration(s0.session.user); return; }
-      say("join-msg", L().verify_click_link, true); return;
+    if (!token) {   // no code typed: maybe they already tapped the button in the email
+      const btn = e.submitter; if (btn) btn.disabled = true;
+      await tryConfirmedLogin(false);
+      if (btn) btn.disabled = false;
+      return;
     }
     if (!/^\d{6,10}$/.test(token)) { say("join-msg", L().bad_code, true); $("v-code").focus(); return; }
     const btn = e.submitter; if (btn) btn.disabled = true;
@@ -639,7 +666,12 @@
   $("v-change").addEventListener("click", () => { showRegForm(); say("join-msg", ""); $("r-email").focus(); });
 
   // Create the profile once the email is confirmed (also when the code is entered later, after logging in)
+  var finishingReg = false;
   async function finishRegistration(user) {
+    if (finishingReg) return; finishingReg = true;
+    try { await finishRegistrationNow(user); } finally { finishingReg = false; }
+  }
+  async function finishRegistrationNow(user) {
     me = user;
     const meta = user.user_metadata || {};
     const src = pendingReg || { username: meta.username, about: meta.profile || {}, photo: null, birthday: meta.birthday || null };

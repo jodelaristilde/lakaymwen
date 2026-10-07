@@ -1404,6 +1404,46 @@
       el("p", { class: "note", text: L().phone_reset_p }),
       el("div", { class: "phone-row" }, cc, ph), pw, go, msg);
   }
+  /* ---------- Admin: list of ALL members (search, hide, delete) ---------- */
+  function membersAdminBox() {
+    const list = el("div", { class: "adm-list" });
+    const note = el("p", { class: "msg", hidden: "" });
+    const inp = el("input", { type: "search", placeholder: L().adm_search_ph, "aria-label": L().adm_search_ph, autocomplete: "off" });
+    const when = d => { try { return new Date(d).toLocaleDateString(lang === "ht" ? "fr" : lang, { day: "numeric", month: "short", year: "numeric" }); } catch (e) { return ""; } };
+    const show = (t, err) => { note.hidden = false; note.textContent = t; note.classList.toggle("error", !!err); };
+    const row = m => {
+      const btns = m.is_admin ? null : el("div", { class: "adm-btns" },
+        el("button", { class: "btn small ghost", type: "button", text: m.suspended ? L().restore_member : L().hide_member, onclick: async () => {
+          const { error } = await sb.from("profiles").update({ suspended: !m.suspended }).eq("id", m.id);
+          if (error) return show(L().err + " (" + error.message + ")", true);
+          load(); loadFeatured(); } }),
+        el("button", { class: "btn small red", type: "button", text: L().adm_delete, onclick: async () => {
+          if (!window.confirm(L().adm_del_confirm(m.display_name))) return;
+          const { data, error } = await sb.rpc("admin_delete_member", { p_id: m.id });
+          if (error || !data) return show(L().err + (error ? " (" + error.message + ")" : ""), true);
+          show(L().adm_deleted(m.display_name)); load(); loadFeatured(); } }));
+      return el("div", { class: "adm-row" + (m.suspended ? " is-hidden" : "") },
+        el("div", { class: "adm-info" },
+          el("div", { class: "adm-name" }, el("a", { href: "#member-" + m.id, text: m.display_name }),
+            m.is_admin ? el("span", { class: "tag-admin", text: "Admin" }) : null,
+            m.suspended ? el("span", { class: "tag-hidden", text: L().hidden_tag }) : null),
+          el("small", { text: [m.hometown, m.contact, when(m.created_at)].filter(Boolean).join(" · ") })),
+        btns);
+    };
+    let timer = null, seq = 0;
+    async function load() {
+      const my = ++seq;
+      const { data, error } = await sb.rpc("admin_list_members", { p_q: inp.value.trim() });
+      if (my !== seq) return;
+      if (error) { list.replaceChildren(el("p", { class: "empty", text: L().err + " (" + error.message + ")" })); return; }
+      list.replaceChildren(...((data || []).length ? data.map(row) : [el("p", { class: "empty", text: L().adm_none })]));
+    }
+    inp.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(load, 300); });
+    load();
+    return el("div", { class: "box-lite adm-members" },
+      el("h3", { class: "h3", text: L().adm_members_h }),
+      el("p", { class: "note", text: L().adm_members_p }), inp, note, list);
+  }
   async function renderAdmin() {
     const box = $("admin-view");
     if (!sb || !me || !isAdmin) { box.replaceChildren(el("p", { class: "empty", text: L().admin_only })); return; }
@@ -1444,6 +1484,7 @@
         await sb.from("profiles").update({ suspended: false }).eq("id", p.id); renderAdmin(); loadFeatured(); loadTownCounts(); } }));
     box.replaceChildren(
       el("div", { class: "stats" }, tile(st.members, L().st_members), tile(st.new_this_week, L().st_new), tile(st.open_reports, L().st_reports), tile(st.hidden, L().st_hidden), tile(st.messages, L().st_messages), tile(st.photos, L().st_photos), tile(st.alerts, L().st_alerts), tile(st.family_links, L().st_family)),
+      membersAdminBox(),
       phoneResetBox(),
       el("h3", { class: "h3", text: L().open_reports }),
       (reports || []).length ? el("div", { class: "reports" }, ...(reports || []).map(reportRow)) : el("p", { class: "empty", text: L().no_reports }),

@@ -1211,3 +1211,15 @@ img.avatar,.fb-row img.avatar{background:var(--chip)}
 .hovercard img.avatar.hc-av{background:var(--chip)}
 .fb-row:hover{background:#f3faf5}
 .fb-row mark,.glance-card mark{background:#ffe2bf}
+
+/* ---------- Landing page for visitors ---------- */
+#landing{display:none}
+body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) #landing{display:grid}
+.landing{gap:14px;padding:26px 24px;background:linear-gradient(135deg,#f2faf5,#fff6ec)}
+.land-h{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,3.2vw,2.3rem);line-height:1.1;color:var(--ink,#0b1530)}
+.land-p{margin:-4px 0 4px;color:var(--muted,#6b7490);font-size:1.02rem}
+.land-btns{display:flex;flex-wrap:wrap;gap:10px}
+.land-result{display:grid;gap:10px;padding:14px 16px;border-radius:14px;background:#fff;border:1px solid #cfe9d9}
+.land-result.warn{background:#fff6e6;border-color:#ffd9a3}
+.land-msg{margin:0;font-weight:700;color:var(--ink,#0b1530);line-height:1.4}
+#land-result:not([hidden])+.land-btns{display:none}

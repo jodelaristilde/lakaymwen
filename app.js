@@ -756,7 +756,7 @@
     blockedIds = new Set((bl || []).map(b => b.blocked));
     isAdmin = adm === true; document.body.classList.toggle("is-admin", isAdmin);
     updateSide(); loadFeatured(); loadTownCounts();
-    if (curHash === "#search") showMyTown();
+    if (curHash === "#search" || !curHash || curHash === "#home") showMyTown();
     if (curHash === "#admin") renderAdmin();
     if (currentMember) renderMemberPage(currentMember);
     if (!profile && !registering && me.user_metadata && me.user_metadata.profile) { finishRegistration(me); return; }
@@ -1047,9 +1047,15 @@
     $("unread-side").hidden = !count;
     showMsgAlert(count || 0);
   }
+  // The flashing alert goes away as soon as the member opens their messages,
+  // and only comes back when a NEW message arrives.
+  var unreadNow = 0, msgAck = 0;
   function showMsgAlert(n) {
     const b = $("msg-alert"); if (!b) return;
-    b.hidden = !n;
+    unreadNow = n;
+    if (n < msgAck) msgAck = n;
+    if ($("dlg-inbox") && $("dlg-inbox").open) msgAck = n;
+    b.hidden = !n || n <= msgAck;
     $("msg-alert-n").textContent = n ? String(n) : "";
     $("msg-alert-txt").textContent = n ? L().msg_new(n) : "";
     b.setAttribute("aria-label", n ? L().msg_new(n) : "");
@@ -1057,6 +1063,7 @@
   }
   if ($("msg-alert")) $("msg-alert").addEventListener("click", () => { if (me) openInbox(); });
   async function openInbox() {
+    msgAck = unreadNow; showMsgAlert(unreadNow);
     thread = null;
     $("inbox-title").textContent = L().inbox_title;
     $("thread").hidden = true; $("inbox-back").hidden = true; $("thread-list").hidden = false;
@@ -1363,7 +1370,7 @@
       (alerts || []).length ? el("ul", { class: "watch-list" }, ...(alerts || []).map(alertRow)) : el("p", { class: "note", text: L().alerts_none }),
       form, formMsg,
       el("div", { class: "invite-box" }, el("p", { text: L().alerts_invite }),
-        waBtn(L().wa_family, () => L().inv_family(profile?.display_name || "", pageUrl() + "#register"))));
+        waBtn(L().wa_family, () => L().inv_family(profile?.display_name || "", siteLink()))));
     if (ms.some(m => !m.seen)) {
       await sb.from("alert_matches").update({ seen: true }).eq("seen", false);
       refreshAlerts();
@@ -1830,8 +1837,7 @@
 
     sec.hidden = false;
     sec.replaceChildren(
-      el("div", { class: "fam-head" }, el("h2", { text: L().fam_on_site }),
-        el("a", { class: "btn small dark", href: "#tree/" + p.id, text: "🌳 " + L().tree_btn })),
+      el("div", { class: "fam-head" }, el("h2", { text: L().fam_on_site })),
       ...(parts.length ? parts : [el("p", { class: "note", text: self ? L().fam_none_self : L().fam_none })]));
   }
 
@@ -1890,7 +1896,8 @@
     const dec = s => { try { return decodeURIComponent(s); } catch (e) { return s; } };
     if (h === "#alerts") return { box: "alerts-page", render: renderAlerts };
     if (h === "#schools") return { box: "schools-page", render: renderSchools };
-    if ((m = h.match(/^#tree\/([0-9a-f-]{36})$/i))) return { box: "tree-page", render: () => renderTree(m[1]) };
+    // family tree removed: old tree links open the member's profile instead
+    if ((m = h.match(/^#tree\/([0-9a-f-]{36})$/i))) { setTimeout(() => go("#member-" + m[1]), 0); return null; }
     if (h === "#photos" || h === "#photos/me" || h === "#photos/mine") return { box: "photos-page", render: () => renderPhotos(h.split("/")[1] || "all") };
     if ((m = h.match(/^#photo\/([0-9a-z-]{8,40})$/i))) return { box: "photo-page", render: () => renderPhoto(m[1]) };
     if ((m = h.match(/^#school\/(.+)$/))) return { box: "place-page", render: () => renderSchool(dec(m[1])) };
@@ -1947,6 +1954,7 @@
     const search = curHash === "#search";
     document.body.classList.toggle("search-mode", search);
     if (search) { window.scrollTo(0, 0); setTimeout(() => $("s-name").focus(), 60); showMyTown(); }
+    if (me && (!h || h === "#home")) showMyTown();
     const pg = pageFor(curHash);
     document.body.classList.toggle("page-mode", !!pg);
     document.querySelectorAll(".page-box.page-on").forEach(b => b.classList.remove("page-on"));
@@ -2020,7 +2028,11 @@
       el("span", { text: "·" }),
       el("button", { class: "linkbtn", type: "button", text: L().report_btn, onclick: () => openReport(p) }));
     if (self) actions = [el("button", { class: "btn dark", type: "button", text: L().edit_profile, onclick: () => openProfile(false) }),
-      waBtn(L().wa_family, () => L().inv_family(p.display_name, pageUrl() + "#register"))];
+      waBtn(L().wa_family, () => L().inv_family(p.display_name, siteLink())),
+      el("button", { class: "linkbtn danger-link", type: "button", text: L().delete_account, onclick: async () => {
+        await openProfile(false);
+        $("del-confirm").hidden = false; $("del-word").value = "";
+        setTimeout(() => { $("del-confirm").scrollIntoView({ behavior: "smooth", block: "center" }); $("del-word").focus(); }, 80); } })];
     else if (isBlocked) actions = [el("span", { class: "chip-item", text: L().you_blocked })];
     else {
       const msgBtn = el("button", { class: "btn red", type: "button", text: L().contact_member,

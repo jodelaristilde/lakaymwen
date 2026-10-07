@@ -2413,6 +2413,7 @@
   /* ---------- Start ---------- */
   $("year").textContent = new Date().getFullYear();
   $("contact-email").textContent = C.CONTACT_EMAIL || "";
+  if (C.CONTACT_EMAIL) $("menu-contact").href = "mailto:" + C.CONTACT_EMAIL;
   fillTownSelects();
   applyLang();
   if (sb) {

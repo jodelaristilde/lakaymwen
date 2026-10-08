@@ -1426,3 +1426,23 @@ body:not(.logged-in):not(.about-mode) #about{display:none}
   .profile-intro{position:sticky;top:84px}
 }
 @media (max-width:640px){.profile-actions{justify-content:center;flex-wrap:wrap}.profile-actions .safety-links,.profile-actions .safety{width:100%;text-align:center}}
+
+/* ---------- Required profile photo on sign-up ---------- */
+.photo-req{display:grid;gap:8px;padding:14px;border:2px dashed #cfe9d9;border-radius:16px;background:#f7fbf8}
+.photo-req.need{border-color:#e8193c;background:#fff4f5}
+.photo-pick{display:flex;align-items:center;gap:16px}
+.r-prev{flex:none;width:92px;height:92px;border-radius:50%;display:grid;place-items:center;font-size:2.2rem;background:#fff;border:3px solid transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#3fae6a,#f29a3b) border-box;overflow:hidden}
+.r-prev img{width:100%;height:100%;object-fit:cover}
+.photo-pick-btns{display:grid;gap:6px;min-width:0}
+.photo-pick-btns .file-btn{justify-self:start;cursor:pointer}
+#r-photo-btn,#r-photo-btn span{color:#fff!important}
+#r-photo-btn{background:var(--ink,#0b1530);padding:11px 20px;font-size:1rem}
+/* "Logged in as" on the same line as "Back to home", on the right (computers) */
+@media (min-width:761px){
+  .who-bar.inline{float:right;margin:0 0 6px 16px;max-width:55%;font-size:.88rem;line-height:1.6}
+}
+/* Member search: title the same size as "Members from …", in green, tight spacing */
+#search-page .join-h{font-size:1.15rem;font-weight:800;color:#178a57;margin:2px 0 8px;letter-spacing:-.01em}
+#search-page .searchbar{margin-top:0}
+#search-page #results{margin-top:12px}
+#search-page #results .h3{margin:0 0 6px;color:#178a57}

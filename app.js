@@ -407,7 +407,7 @@
     $("who-name").textContent = nm;
     if (me) $("who-name").setAttribute("href", "#member-" + me.id);
     // members have no separate Home: "Back" links go to Member search
-    document.querySelectorAll(".back-home").forEach(a => { a.textContent = me ? L().back_search : L().back_home; });
+    document.querySelectorAll(".back-home").forEach(a => { a.textContent = a.getAttribute("href") === "#register" ? L().back_towns : me ? L().back_search : L().back_home; });
     requestAnimationFrame(placeWho);
   }
 
@@ -455,12 +455,12 @@
       g.addEventListener("pointermove", ev => { if (ev.pointerType !== "touch") show(g, ev); });
       g.addEventListener("focus", () => show(g));
       g.addEventListener("blur", hide);
-      g.addEventListener("click", ev => { ev.preventDefault(); ev.stopPropagation(); hide(); go("#register"); });
-      g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); ev.stopPropagation(); hide(); go("#register"); } });
+      g.addEventListener("click", ev => { ev.preventDefault(); ev.stopPropagation(); hide(); openDept(byId[g.dataset.dept]); });
+      g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); ev.stopPropagation(); hide(); openDept(byId[g.dataset.dept]); } });
     });
     svg.addEventListener("pointerleave", hide);
     // clicking anywhere on the map opens the register page, like the old site
-    svg.addEventListener("click", () => go("#register"));
+    svg.addEventListener("click", () => { if (curHash !== "#register") go("#register"); });
   })();
   async function loadTownCounts() {
     townCounts = {};
@@ -2450,9 +2450,9 @@
   function route(scroll) {
     setTimeout(placeWho, 0); setTimeout(placeWho, 400);
     const h = curHash;
-    // #register goes straight to the sign-up form (hometown is a dropdown in the form now)
-    let join = h === "#join" || h === "#register" || h === "#towns";
-    if (join && !$("r-town").value && store.get("lkm-town")) $("r-town").value = store.get("lkm-town");
+    // #register = "Where are you from in Haiti?" map; #join = the form (hometown comes from the map)
+    let join = h === "#join";
+    if (join && !$("r-town").value) { curHash = "#register"; try { history.replaceState(null, "", curHash); } catch (e) {} join = false; }
     if (join) {
       setJoinTown(); say("join-msg", "");
       $("join-loggedin").hidden = !me;

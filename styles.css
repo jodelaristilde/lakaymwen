@@ -1556,3 +1556,6 @@ body.register-mode:not(.join-mode):not(.logged-in) #home .portal-main>#towns{dis
 body.register-mode:not(.join-mode):not(.logged-in) #towns .towns-or{display:block;font-size:clamp(1.2rem,2vw,1.5rem);margin:0}
 body.register-mode:not(.join-mode):not(.logged-in) #towns>.back-home,body.register-mode:not(.join-mode):not(.logged-in) #towns .eyebrow,body.register-mode:not(.join-mode):not(.logged-in) #towns .head-row h2:not(.towns-or),body.register-mode:not(.join-mode):not(.logged-in) #towns .lead{display:none!important}
 body.register-mode:not(.join-mode):not(.logged-in) #home .portal-main>#join-why{order:0}
+/* map click -> A-Z list: the clicked department's towns stand out */
+.letter button.hl{color:var(--blue);font-weight:800;background:#eaf6ee}
+#towns{scroll-margin-top:16px}

@@ -177,7 +177,32 @@
     if (list) list.forEach(s => sel.add(new Option(s, s)));
     sel.value = list && value && list.includes(value) ? value : "";
   }
-  ["r", "pr"].forEach(p => $(p + "-country").addEventListener("change", () => syncState(p)));
+  // "What city?": pick the country first. In Haiti the city must be a Haitian town (from the chosen department).
+  const HT_DEPTS = window.LAKAYMWEN_DEPTS || [];
+  const HT_TOWNS = window.LAKAYMWEN_TOWNS || [];
+  const isHaiti = c => /^ha(i|ï)ti$/i.test(String(c || "").trim());
+  const haitiTownsFor = dept => { const d = HT_DEPTS.find(x => norm(x.name) === norm(dept || "")); return d ? d.towns : HT_TOWNS; };
+  function syncCity(p) {
+    const c = $(p + "-country").value, inp = $(p + "-lives");
+    let dl = $(p + "-lives-list"); if (!dl) { dl = el("datalist", { id: p + "-lives-list" }); inp.after(dl); inp.setAttribute("list", dl.id); }
+    inp.disabled = !c;
+    inp.placeholder = !c ? L().city_pick_country : isHaiti(c) ? L().city_pick_ht : "";
+    dl.replaceChildren(...(isHaiti(c) ? haitiTownsFor($(p + "-state").value) : []).map(t => el("option", { value: t })));
+    if (!c) inp.value = "";
+  }
+  function livesProblem(p) {
+    const c = $(p + "-country").value, v = $(p + "-lives").value.trim();
+    if (!v || !isHaiti(c)) return null;
+    const list = haitiTownsFor($(p + "-state").value), hit = list.find(t => norm(t) === norm(v));
+    if (hit) { $(p + "-lives").value = hit; return null; }
+    const dept = $(p + "-state-wrap").hidden ? "" : $(p + "-state").value;
+    return [dept ? L().city_not_in_dept(v, dept) : L().city_not_in_ht(v), p + "-lives"];
+  }
+  ["r", "pr"].forEach(p => {
+    $(p + "-country").addEventListener("change", () => { syncState(p); $(p + "-lives").value = ""; syncCity(p); });
+    $(p + "-state").addEventListener("change", () => syncCity(p));
+    syncCity(p);
+  });
   // Schools: one row per school, like family
   // A school is { name, years }; very old profiles stored just the name as text
   const schoolObj = s => typeof s === "string" ? { name: s, years: "" } : { name: s?.name || "", years: s?.years || "" };
@@ -301,7 +326,8 @@
     $(p + "-katye").value = pr?.katye || "";
     $(p + "-country").value = pr?.country || "";
     syncState(p, pr?.state);
-    $(p + "-lives").value = pr?.lives_in || "";
+    syncCity(p);
+    $(p + "-lives").value = pr?.country ? (pr?.lives_in || "") : "";
     $(p + "-schools").replaceChildren();
     (pr ? schoolsOf(pr) : []).forEach(s => addSchoolRow(p, s));
     ensureSchoolRow(p);
@@ -752,6 +778,7 @@
     }
     // step 2 (about you)
     const bday = readBday("r"); if (bday === false) return bad(L().bday_bad, "r-bmonth");
+    const lp = livesProblem("r"); if (lp) return bad(lp[0], lp[1]);
     if (!$("r-terms").checked) return bad(L().terms_req, "r-terms");
     if (!needDb("join-msg")) return;
     const btn = e.submitter; if (btn) btn.disabled = true;
@@ -1244,6 +1271,7 @@
     if (ap) { say("profile-msg", ap[0], true); $(ap[1]).focus(); return; }
     const bday = readBday("pr");
     if (bday === false) { say("profile-msg", L().bday_bad, true); $("pr-bmonth").focus(); return; }
+    const lpp = livesProblem("pr"); if (lpp) { say("profile-msg", lpp[0], true); $(lpp[1]).focus(); return; }
     const row = Object.assign({ id: me.id, username: profile?.username || me.user_metadata?.username || null, listed: $("pr-listed").checked,
       founding: $("pr-founding").checked, old_username: $("pr-founding").checked ? ($("pr-old").value.trim() || null) : null }, readAbout("pr"));
     let photoFailed = false;
@@ -2484,7 +2512,7 @@
       else fBtn = el("button", { class: "btn dark", type: "button", text: L().accept_request, onclick: async () => {
         await sb.from("friendships").update({ status: "accepted" }).eq("requester", p.id).eq("addressee", me.id); renderMemberPage(id);
       } });
-      actions = [msgBtn, fBtn, waBtn(L().wa_share_profile, () => L().inv_profile(p.display_name, p.hometown, siteLink() + "/" + "#member-" + p.id), "ghost-wa")];
+      actions = [msgBtn, fBtn];
     }
 
     const requests = requestIds.map(x => byId[x]).filter(Boolean);
@@ -2507,20 +2535,23 @@
           el("h1", { text: p.display_name }),
           el("p", { class: "handle", text: [p.username ? "@" + p.username : "", p.nickname ? "“" + p.nickname + "”" : ""].filter(Boolean).join(" · ") })),
         el("div", { class: "profile-actions" }, ...actions, safety)),
-      el("div", { class: "profile-chips" },
-        p.founding ? el("span", { class: "chip-item founding", text: "★ " + L().founding_badge + (p.old_username ? " · " + p.old_username : "") }) : null,
-        el("span", { class: "chip-item red", text: `${L().from} ${p.hometown}` }),
-        p.katye ? el("a", { class: "chip-item", href: katyeHash(p.hometown, p.katye), text: `📍 ${L().katye_short} ${p.katye}` }) : null,
-        ...schoolsOf(p).map(o => el("a", { class: "chip-item", href: schoolHash(o.name), text: "🏫 " + o.name + (o.years ? ` (${o.years})` : "") })),
-        p.lives_in || p.country ? el("span", { class: "chip-item", text: `${L().lives} ${[p.lives_in, p.state, p.country].filter(Boolean).join(", ")}` }) : null,
-        el("span", { class: "chip-item", text: L().friend_count(friends.length) })),
-      el("div", { class: "profile-body" },
-        requestsBox,
-        p.bio ? el("p", { class: "profile-bio", text: p.bio }) : null,
-        el("section", {}, el("h2", { text: L().sec_family }), family),
-        el("section", { class: "profile-family-links", hidden: "" }),
-        el("section", {}, el("h2", { text: L().friend_list(p.first_name || p.display_name) }), friendsBox),
-        el("section", { class: "profile-photos", hidden: "" })))
+      el("div", { class: "profile-main" },
+        el("aside", { class: "profile-intro" },
+          el("h2", { text: L().intro_h }),
+          p.bio ? el("p", { class: "intro-bio", text: p.bio }) : null,
+          el("ul", { class: "intro-list" },
+            p.founding ? el("li", { class: "founding" }, el("span", { class: "ii", text: "★" }), el("span", {}, L().founding_badge + (p.old_username ? " · " + p.old_username : ""))) : null,
+            el("li", {}, el("span", { class: "ii", text: "🏠" }), el("span", {}, L().from + " ", el("b", { text: p.hometown }))),
+            p.katye ? el("li", {}, el("span", { class: "ii", text: "📍" }), el("span", {}, L().katye_short + " ", el("a", { href: katyeHash(p.hometown, p.katye) }, el("b", { text: p.katye })))) : null,
+            ...schoolsOf(p).map(o => el("li", {}, el("span", { class: "ii", text: "🏫" }), el("span", {}, L().studied_at + " ", el("a", { href: schoolHash(o.name) }, el("b", { text: o.name })), o.years ? el("small", { text: " · " + o.years }) : null))),
+            p.lives_in || p.country ? el("li", {}, el("span", { class: "ii", text: "🌎" }), el("span", {}, L().lives + " ", el("b", { text: [p.lives_in, p.state, p.country].filter(Boolean).join(", ") }))) : null,
+            el("li", {}, el("span", { class: "ii", text: "👥" }), el("span", {}, el("b", { text: L().friend_count(friends.length) }))))),
+        el("div", { class: "profile-body" },
+          requestsBox,
+          el("section", {}, el("h2", { text: me && p.id === me.id ? L().sec_family : L().fam_h }), family),
+          el("section", { class: "profile-family-links", hidden: "" }),
+          el("section", {}, el("h2", { text: L().friend_list(p.first_name || p.display_name) }), friendsBox),
+          el("section", { class: "profile-photos", hidden: "" }))))
     );
     const famSec = box.querySelector(".profile-family-links");
     if (famSec) familySection(p, famSec, req).catch(() => {});

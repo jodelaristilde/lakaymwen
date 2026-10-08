@@ -1405,3 +1405,24 @@ body:not(.logged-in):not(.about-mode) #about{display:none}
 .push-x{border:0;background:transparent;font-size:1.4rem;line-height:1;color:var(--muted,#6b7490);cursor:pointer;padding:4px 6px;border-radius:8px}
 .push-x:hover{background:#eef1f6}
 @media (max-width:560px){.push-box{grid-template-columns:auto minmax(0,1fr) auto}.push-box .push-x{grid-row:1;grid-column:3;align-self:start}.push-box .btn{grid-column:1/-1;width:100%}}
+#r-lives:disabled,#pr-lives:disabled{background:#f3f5fa;cursor:not-allowed}
+
+/* ---------- Profile: "About" list on the side (computer), under the name (phone) ---------- */
+.profile-main{display:grid;gap:18px;padding:18px 22px 30px;align-items:start}
+.profile-main .profile-body{padding:0}
+.profile-intro{background:#f7f9fc;border:1px solid var(--line,#e3e7f0);border-radius:18px;padding:16px 18px}
+.profile-intro h2{font-size:1.2rem;margin:0 0 8px}
+.intro-bio{margin:0 0 10px;text-align:center;color:var(--ink-2);white-space:pre-wrap;overflow-wrap:anywhere;padding-bottom:10px;border-bottom:1px solid var(--line,#e3e7f0)}
+.intro-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.intro-list li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;align-items:start;font-size:1rem;line-height:1.35;color:var(--ink-2);overflow-wrap:anywhere}
+.intro-list .ii{font-size:1.15rem;line-height:1.2;text-align:center}
+.intro-list b{color:var(--ink,#0b1530)}
+.intro-list a{text-decoration:none;color:inherit}
+.intro-list a:hover b{text-decoration:underline}
+.intro-list small{color:var(--muted)}
+.intro-list li.founding{color:#a46a00;font-weight:700}
+@media (min-width:900px){
+  .profile-main{grid-template-columns:minmax(260px,320px) minmax(0,1fr);gap:22px}
+  .profile-intro{position:sticky;top:84px}
+}
+@media (max-width:640px){.profile-actions{justify-content:center;flex-wrap:wrap}.profile-actions .safety-links,.profile-actions .safety{width:100%;text-align:center}}

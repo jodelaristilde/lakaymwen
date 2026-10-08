@@ -78,7 +78,7 @@
     if ($("town-filter")) $("town-filter").placeholder = L().town_filter;
     renderTowns();
     renderHaiti();
-    renderFeatured(); updateSide(); renderPwoveb();
+    renderFeatured(); updateSide(); renderPwoveb(); renderFact();
     fillBdaySelects("r"); fillBdaySelects("pr"); applySpecialDay(); renderBirthdays(); grooveUI();
     if (curHash === "#privacy") renderPrivacy();
     if (curHash === "#admin") renderAdmin();
@@ -1037,6 +1037,21 @@
     box.replaceChildren(el("span", { class: "push-ic", text: "🔔" }), el("div", { class: "push-txt" }, el("b", { text: L().push_h }), el("span", { text: L().push_p }), msg), go, x);
     box.hidden = false;
   }
+  /* ---------- 🇭🇹 "Did you know?": a different Haiti fact each time someone logs in (or opens the site) ---------- */
+  const DIDYOU = window.LAKAYMWEN_DIDYOU || [];
+  var factIdx = -1, lastFactUser = null;
+  function pickFact() {
+    if (!DIDYOU.length) return;
+    let last = Number(store.get("lkm-fact") || -1), i = Math.floor(Math.random() * DIDYOU.length);
+    if (DIDYOU.length > 1 && i === last) i = (i + 1) % DIDYOU.length;
+    factIdx = i; store.set("lkm-fact", String(i)); renderFact();
+  }
+  function renderFact() {
+    if (factIdx < 0 || !$("fact-card")) return;
+    const f = DIDYOU[factIdx]; $("fact-txt").textContent = lang === "ht" ? f[1] : lang === "fr" ? f[2] : f[0];
+    $("fact-card").hidden = false;
+  }
+  pickFact();   // visitors: a new fact each time they open the site
   async function afterAuth() {
     updateAccount(); loadSchoolOpts();
     myLinks = null; hideHC();
@@ -1056,6 +1071,7 @@
     if (!profile && !registering) openProfile(true);
     refreshUnread(); refreshAlerts(); syncLangMeta(); loadPymk(); loadBirthdays();
     renderPushBox(); savePushSub();
+    if (me && lastFactUser !== me.id) { lastFactUser = me.id; pickFact(); }
     if (pageFor(curHash)) route();
   }
   // Remember the member's language so alert emails come in Kreyòl or English
@@ -2424,6 +2440,13 @@
     bar.classList.add("inline");
   }
   window.addEventListener("resize", () => requestAnimationFrame(placeWho));
+  // "About us" shows inside the white panel (next to the menu, proverb and sponsors), not as a full-width black band
+  const aboutHome = $("about").parentNode, aboutNext = $("about").nextSibling;
+  function placeAbout(on) {
+    const ab = $("about"), main = document.querySelector("#home .portal-main");
+    if (on && main) { if (ab.parentNode !== main) main.insertBefore(ab, main.firstChild); ab.classList.add("in-panel"); }
+    else { if (ab.parentNode !== aboutHome) aboutHome.insertBefore(ab, aboutNext); ab.classList.remove("in-panel"); }
+  }
   function route(scroll) {
     setTimeout(placeWho, 0); setTimeout(placeWho, 400);
     const h = curHash;
@@ -2442,6 +2465,7 @@
     if (privacy) { renderPrivacy(); window.scrollTo(0, 0); }
     if (admin) { renderAdmin(); window.scrollTo(0, 0); }
     document.body.classList.toggle("about-mode", curHash === "#about");
+    placeAbout(curHash === "#about");
     const search = curHash === "#search";
     document.body.classList.toggle("search-mode", search);
     if (search) { window.scrollTo(0, 0); setTimeout(() => $("s-name").focus(), 60); showMyTown(); }

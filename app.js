@@ -338,7 +338,7 @@
   function aboutProblem(p) {
     if ($(p + "-first").value.trim().length < 1) return [L().first_req, p + "-first"];
     if ($(p + "-last").value.trim().length < 1) return [L().last_req, p + "-last"];
-    if (!$(p + "-town").value) return [L().town_req, p === "r" ? "r-first" : p + "-town"];
+    if (!$(p + "-town").value) return [L().town_req, p + "-town"];
     return null;
   }
 
@@ -704,7 +704,7 @@
     $("reg-form").hidden = true; $("verify-step").hidden = false;
     document.querySelector("#join .join-town").hidden = true;
     $("v-code").value = "";
-    if (curHash !== "#join") { if (!$("r-town").value) $("r-town").value = store.get("lkm-town") || TOWNS[0]; go("#join"); }
+    if (curHash !== "#join") go("#join");
     say("join-msg", resend ? L().not_confirmed : "");
     if (resend) sb.auth.resend({ type: "signup", email });
     setTimeout(() => $("v-code").focus(), 80);
@@ -2450,8 +2450,9 @@
   function route(scroll) {
     setTimeout(placeWho, 0); setTimeout(placeWho, 400);
     const h = curHash;
-    let join = h === "#join";
-    if (join && !$("r-town").value) { curHash = "#register"; try { history.replaceState(null, "", curHash); } catch (e) {} join = false; }
+    // #register goes straight to the sign-up form (hometown is a dropdown in the form now)
+    let join = h === "#join" || h === "#register" || h === "#towns";
+    if (join && !$("r-town").value && store.get("lkm-town")) $("r-town").value = store.get("lkm-town");
     if (join) {
       setJoinTown(); say("join-msg", "");
       $("join-loggedin").hidden = !me;

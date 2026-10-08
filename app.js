@@ -406,6 +406,7 @@
     $("who-label").textContent = L().logged_in_as;
     $("who-name").textContent = nm;
     if (me) $("who-name").setAttribute("href", "#member-" + me.id);
+    requestAnimationFrame(placeWho);
   }
 
   function openDept(d) {
@@ -747,6 +748,17 @@
   });
   const prettyPhone = d => d.startsWith("509") && d.length === 11 ? "+509 " + d.slice(3, 7) + " " + d.slice(7)
     : d.startsWith("1") && d.length === 11 ? "+1 " + d.slice(1, 4) + " " + d.slice(4, 7) + " " + d.slice(7) : "+" + d;
+  // Sign-up photo (required): show a round preview so people see it worked
+  let regPhotoUrl = null;
+  $("r-photo").addEventListener("change", async () => {
+    const f = $("r-photo").files[0], prev = $("r-photo-preview");
+    if (regPhotoUrl) { URL.revokeObjectURL(regPhotoUrl); regPhotoUrl = null; }
+    if (!f) { prev.replaceChildren("📷"); prev.classList.remove("has"); return; }
+    try { await resizePhoto(f); } catch (e) { $("r-photo").value = ""; prev.replaceChildren("📷"); prev.classList.remove("has"); say("join-msg", L().photo_bad, true); return; }
+    regPhotoUrl = URL.createObjectURL(f);
+    prev.replaceChildren(el("img", { src: regPhotoUrl, alt: "" })); prev.classList.add("has");
+    $("r-photo-btn").querySelector("span").textContent = L().change_photo; $("r-photo-wrap").classList.remove("need"); say("join-msg", "");
+  });
   // sign-up is 2 steps: 1 = your account, 2 = about you
   function setRegStep(n) {
     $("reg-step1").hidden = n !== 1; $("reg-step2").hidden = n !== 2;
@@ -778,6 +790,8 @@
     }
     // step 2 (about you)
     const bday = readBday("r"); if (bday === false) return bad(L().bday_bad, "r-bmonth");
+    if (!$("r-photo").files[0]) { say("join-msg", L().photo_req, true); $("r-photo-wrap").scrollIntoView({ behavior: "smooth", block: "center" }); $("r-photo-wrap").classList.add("need"); return; }
+    $("r-photo-wrap").classList.remove("need");
     const lp = livesProblem("r"); if (lp) return bad(lp[0], lp[1]);
     if (!$("r-terms").checked) return bad(L().terms_req, "r-terms");
     if (!needDb("join-msg")) return;
@@ -1249,7 +1263,7 @@
   let pendingPhoto = null, removePhoto = false, previewUrl = null;
   function showPhotoPreview(p) {
     $("pr-photo-preview").replaceChildren(avatar(p || { display_name: (($("pr-first").value + " " + $("pr-last").value).trim()) || (profile && profile.display_name) }, "lg"));
-    $("pr-photo-remove").hidden = !(p && p.photo_url);
+    $("pr-photo-remove").hidden = true;   // a photo is required: members can change it, not remove it
   }
   $("pr-photo").addEventListener("change", async () => {
     const f = $("pr-photo").files[0]; if (!f) return;
@@ -1272,6 +1286,7 @@
     const bday = readBday("pr");
     if (bday === false) { say("profile-msg", L().bday_bad, true); $("pr-bmonth").focus(); return; }
     const lpp = livesProblem("pr"); if (lpp) { say("profile-msg", lpp[0], true); $(lpp[1]).focus(); return; }
+    if (!pendingPhoto && (removePhoto || !(profile && profile.photo_url))) { say("profile-msg", L().photo_req, true); $("pr-photo-preview").scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     const row = Object.assign({ id: me.id, username: profile?.username || me.user_metadata?.username || null, listed: $("pr-listed").checked,
       founding: $("pr-founding").checked, old_username: $("pr-founding").checked ? ($("pr-old").value.trim() || null) : null }, readAbout("pr"));
     let photoFailed = false;
@@ -2395,7 +2410,20 @@
     }
     route(true);
   }
+  // Computers: put "👤 Logged in as …" on the same line as "← Back to home", on the right
+  const whoHome = $("who-bar").parentNode, whoNext = $("who-bar").nextSibling;
+  function placeWho() {
+    const bar = $("who-bar"); if (!bar) return;
+    if (window.matchMedia("(max-width:760px)").matches || bar.hidden) { if (bar.parentNode !== whoHome) whoHome.insertBefore(bar, whoNext); bar.classList.remove("inline"); return; }
+    const main = document.querySelector("#home .portal-main");
+    const box = main && [...main.children].find(c => c !== bar && c.offsetParent !== null && c.getBoundingClientRect().height > 0);
+    if (!box) { if (bar.parentNode !== whoHome) whoHome.insertBefore(bar, whoNext); bar.classList.remove("inline"); return; }
+    if (bar.parentNode !== box || box.firstElementChild !== bar) box.insertBefore(bar, box.firstChild);
+    bar.classList.add("inline");
+  }
+  window.addEventListener("resize", () => requestAnimationFrame(placeWho));
   function route(scroll) {
+    setTimeout(placeWho, 0); setTimeout(placeWho, 400);
     const h = curHash;
     let join = h === "#join";
     if (join && !$("r-town").value) { curHash = "#register"; try { history.replaceState(null, "", curHash); } catch (e) {} join = false; }

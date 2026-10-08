@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Montserrat:wght@500;600&family=Cormorant+SC:wght@700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261008h">
+<link rel="stylesheet" href="styles.css?v=20261008j">
 </head>
 <body>
 
@@ -251,6 +251,16 @@
             <p class="reg-steps"><span class="rs done">✓</span><span class="rs-l" data-t="step1_l"></span><span class="rs-line"></span><span class="rs on">2</span><span class="rs-l" data-t="step2_l"></span></p>
             <button class="linkbtn reg-back" type="button" id="reg-back" data-t="back_step"></button>
             <h3 class="form-h" data-t="sec_about"></h3>
+            <div class="photo-req" id="r-photo-wrap">
+              <span class="req field-l" data-t="your_photo_req"></span>
+              <div class="photo-pick">
+                <div class="r-prev" id="r-photo-preview" aria-hidden="true">📷</div>
+                <div class="photo-pick-btns">
+                  <label class="btn dark file-btn" id="r-photo-btn"><span data-t="choose_photo"></span><input id="r-photo" type="file" accept="image/*" hidden></label>
+                  <small class="note" data-t="photo_req_note"></small>
+                </div>
+              </div>
+            </div>
             <label><span data-t="nickname"></span><input id="r-nick" type="text" maxlength="40" placeholder="Ti Djo, Gége…"></label>
             <div class="bday-field" role="group" aria-labelledby="r-bday-l"><span id="r-bday-l" class="field-l" data-t="bday_label"></span>
               <div class="two"><select id="r-bmonth" data-t-aria="bday_month"></select><select id="r-bday" data-t-aria="bday_day"></select></div>
@@ -273,7 +283,6 @@
             <div class="family-list" id="r-family"></div>
             <button class="btn ghost small add-fam" type="button" data-add-family="r" data-t="add_family"></button>
 
-            <label><span data-t="your_photo"></span><input id="r-photo" type="file" accept="image/*"></label>
             <label class="check"><input id="r-listed" type="checkbox" checked><span data-t="listed"></span></label>
             <label class="check"><input id="r-founding" type="checkbox"><span data-t="founding_q"></span></label>
             <label id="r-old-wrap" hidden><span data-t="old_username"></span><input id="r-old" type="text" maxlength="40" placeholder="BETHSAIDA, JODEL…"></label>
@@ -696,11 +705,11 @@ window.addEventListener("error", function (e) {
 <script src="supabase.js?v=2.117.2"></script>
 <script>if (!window.supabase) document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"><\/script>');</script>
 <script>if (!window.supabase) document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"><\/script>');</script>
-<script src="config.js?v=20261008h"></script>
-<script src="towns.js?v=20261008h"></script>
-<script src="depts.js?v=20261008h"></script>
-<script src="geo.js?v=20261008h"></script>
-<script src="i18n.js?v=20261008h"></script>
-<script src="app.js?v=20261008h"></script>
+<script src="config.js?v=20261008j"></script>
+<script src="towns.js?v=20261008j"></script>
+<script src="depts.js?v=20261008j"></script>
+<script src="geo.js?v=20261008j"></script>
+<script src="i18n.js?v=20261008j"></script>
+<script src="app.js?v=20261008j"></script>
 </body>
 </html>

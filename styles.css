@@ -1241,7 +1241,7 @@ body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.
 @media (max-width:1100px){body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .portal-grid{grid-template-columns:210px minmax(0,1fr)}}
 @media (max-width:760px){body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .portal-grid{grid-template-columns:1fr}}
 body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) #landing{max-width:760px;width:100%;justify-self:center}
-body:not(.logged-in):not(.about-mode) #about{display:none}
+body:not(.about-mode) #about{display:none}
 
 /* ---------- Phone number instead of email ---------- */
 .phone-wrap{display:grid;gap:6px}
@@ -1446,3 +1446,28 @@ body:not(.logged-in):not(.about-mode) #about{display:none}
 #search-page .searchbar{margin-top:0}
 #search-page #results{margin-top:12px}
 #search-page #results .h3{margin:0 0 6px;color:#178a57}
+
+/* ---------- About us: a rounded dark card inside the white panel (no black running to the sides) ---------- */
+body.about-mode #home .portal-main>*:not(#about):not(.who-bar){display:none!important}
+#about.in-panel{display:block;border-radius:18px;padding:30px 32px;margin:0}
+#about.in-panel .wrap{padding:0;max-width:none;width:auto}
+#about.in-panel .split{gap:28px}
+#about.in-panel h2{font-size:clamp(1.7rem,3vw,2.3rem);line-height:1.08}
+@media (max-width:1100px){#about.in-panel .split{grid-template-columns:1fr}}
+@media (max-width:760px){#about.in-panel{padding:22px 18px}}
+body.about-mode #home .portal-main>#about#about.in-panel{display:block!important}
+body.about-mode #home .portal-main>#landing#landing{display:none!important}
+body.about-mode .side-extra .qr-card{flex:none!important}
+
+/* ---------- 🇭🇹 Did you know? ---------- */
+.fact-card{padding:14px 14px 12px;border-radius:14px;background:linear-gradient(160deg,#eef3ff,#fff4ef);border:1px solid #e1e7f5}
+.fact-card[hidden]{display:none}
+.fc-h{margin:0 0 6px;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#1d3fa8}
+.fc-t{margin:0;font-size:.88rem;line-height:1.4;color:var(--ink,#0b1530)}
+body.about-mode .side-extra .fact-card{flex:none!important}
+/* members (computers): proverb, QR and "Did you know?" under the menu too */
+@media (min-width:761px){
+  body.logged-in .side-col .side-extra{display:grid;gap:12px}
+  body.logged-in .side-extra .qr-svg{width:96px;height:96px}
+}
+body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode):not(.about-mode) .side-extra .fact-card{display:none}

@@ -97,6 +97,14 @@
     ["s-town", "pr-town", "r-town", "ls-town"].forEach(id => TOWNS.forEach(t => $(id).add(new Option(t, t))));
     ["r-country", "pr-country"].forEach(id => COUNTRIES.forEach(c => $(id).add(new Option(c, c))));
   }
+  let hlTowns = [];
+  // visitors: clicking the map shows the A-Z town list (the department's towns are highlighted)
+  function showTownList(d) {
+    hlTowns = d ? d.towns : [];
+    if ($("town-filter")) $("town-filter").value = "";
+    const scroll = () => { renderTowns(); const b = $("towns"); if (b) b.scrollIntoView({ behavior: "smooth", block: "start" }); };
+    if (curHash !== "#register") { go("#register"); setTimeout(scroll, 60); } else scroll();
+  }
   function renderTowns() {
     const groups = {};
     const f = norm($("town-filter") ? $("town-filter").value : "");
@@ -109,7 +117,7 @@
     $("town-list").replaceChildren(...letters.map(k => el("div", { class: "letter" },
       el("h3", { id: "letter-" + k, text: k }),
       el("ul", {}, groups[k].map(t => el("li", {},
-        el("button", { type: "button", onclick: () => openAuth(t) }, t))))
+        el("button", { type: "button", "data-town": t, class: hlTowns.includes(t) ? "hl" : null, onclick: () => openAuth(t) }, t))))
     )));
   }
   if ($("town-filter")) $("town-filter").addEventListener("input", renderTowns);
@@ -126,7 +134,7 @@
     }));
     if ($("map-spots")) $("map-spots").replaceChildren(...DEPTS.map(d => el("button", {
       class: "spot", type: "button", style: `left:${d.x}%;top:${d.y}%`, "aria-label": d.name, text: d.name,
-      onclick: () => openDept(d)
+      onclick: () => me ? openDept(d) : showTownList(d)
     })));
   }
   /* ---------- Photos ---------- */
@@ -426,6 +434,7 @@
     const groups = [...svg.querySelectorAll(".dept")];
     const label = id => svg.querySelector(`.map-labels text[data-dept="${id}"]`);
     let current = null;
+    const pick = d => me ? openDept(d) : showTownList(d);
     function show(g, ev) {
       const d = byId[g.dataset.dept]; if (!d) return;
       if (current !== g) {
@@ -455,12 +464,12 @@
       g.addEventListener("pointermove", ev => { if (ev.pointerType !== "touch") show(g, ev); });
       g.addEventListener("focus", () => show(g));
       g.addEventListener("blur", hide);
-      g.addEventListener("click", ev => { ev.preventDefault(); ev.stopPropagation(); hide(); openDept(byId[g.dataset.dept]); });
-      g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); ev.stopPropagation(); hide(); openDept(byId[g.dataset.dept]); } });
+      g.addEventListener("click", ev => { ev.preventDefault(); ev.stopPropagation(); hide(); pick(byId[g.dataset.dept]); });
+      g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); ev.stopPropagation(); hide(); pick(byId[g.dataset.dept]); } });
     });
     svg.addEventListener("pointerleave", hide);
     // clicking anywhere on the map opens the register page, like the old site
-    svg.addEventListener("click", () => { if (curHash !== "#register") go("#register"); });
+    svg.addEventListener("click", () => { if (!me) showTownList(null); else if (curHash !== "#register") go("#register"); });
   })();
   async function loadTownCounts() {
     townCounts = {};

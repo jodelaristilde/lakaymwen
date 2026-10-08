@@ -406,6 +406,8 @@
     $("who-label").textContent = L().logged_in_as;
     $("who-name").textContent = nm;
     if (me) $("who-name").setAttribute("href", "#member-" + me.id);
+    // members have no separate Home: "Back" links go to Member search
+    document.querySelectorAll(".back-home").forEach(a => { a.textContent = me ? L().back_search : L().back_home; });
     requestAnimationFrame(placeWho);
   }
 
@@ -1927,7 +1929,7 @@
   }
   async function renderKatye(town, k) {
     const box = $("place-view"), req = ++placeReq;
-    $("place-back").setAttribute("href", "#home"); $("place-back").textContent = L().back_home;
+    $("place-back").setAttribute("href", "#home"); $("place-back").textContent = me ? L().back_search : L().back_home;
     const title = "📍 " + L().katye_in(k, town);
     if (!sb) { box.replaceChildren(el("p", { class: "msg error", text: L().setup })); return; }
     if (!me) { box.replaceChildren(el("h2", { class: "join-h", text: title }), el("div")); membersOnly(box.lastChild); return; }

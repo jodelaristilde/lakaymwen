@@ -1470,7 +1470,6 @@ body.about-mode .side-extra .fact-card{flex:none!important}
   body.logged-in .side-col .side-extra{display:grid;gap:12px}
   body.logged-in .side-extra .qr-svg{width:96px;height:96px}
 }
-body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode):not(.about-mode) .side-extra .fact-card{display:none}
 
 /* ================= Registration, Classmates style: compact form + "why join" panel ================= */
 .join-why{display:none}
@@ -1568,3 +1567,64 @@ body.register-mode:not(.join-mode):not(.logged-in) #home .portal-main>#join-why{
 .ao-form .ao-last{flex:1 1 180px;min-width:0;font:inherit;font-size:1.05rem;padding:12px 16px;border-radius:999px;border:1.5px solid var(--line);background:#fff}
 .ao-form .ao-last:focus{outline:none;border-color:var(--red)}
 .ao-form .btn{flex:none}
+/* Featured members: also under Member search, 6-7 across on a computer, 3 on a phone */
+#featured.featured{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+#featured .member-card{padding:12px 6px;min-width:0}
+#featured .member-card b{font-size:.88rem;overflow-wrap:anywhere}
+#featured .member-card .city{font-size:.74rem}
+@media (max-width:560px){#featured.featured{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}}
+/* search results: cards, 6 across on a computer, 3 on a phone */
+.res-cards{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:6px}
+.res-card{position:relative;min-width:0}
+.res-card .res-link{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;height:100%;padding:14px 6px 12px;text-decoration:none}
+.res-card .avatar.fb-av{width:64px;height:64px;flex:0 0 64px;font-size:1.3rem}
+.res-card .fb-text{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;width:100%}
+.res-card .fb-name{font-size:.9rem;line-height:1.25;overflow-wrap:anywhere}
+.res-card .fb-name .nick{display:block;font-weight:600;color:var(--muted);font-size:.8rem}
+.res-card .fb-sub{font-size:.75rem;color:var(--red);font-weight:700;line-height:1.3}
+.res-card .fb-why{font-size:.72rem}
+.res-card .fb-msg{position:absolute;top:6px;right:6px;width:30px;height:30px;flex:none}
+.res-card .fb-msg svg{width:15px;height:15px}
+@media (max-width:900px){.res-cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:560px){.res-cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.res-card .avatar.fb-av{width:54px;height:54px;flex-basis:54px}}
+.res-card .res-link{min-width:0;overflow:hidden}
+.res-card .fb-text,.res-card .fb-name,.res-card .fb-sub,.res-card .fb-why{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-width:100%;min-width:0}
+.res-card .fb-sub{display:block}
+/* ---------- Visitor home: Example card + old photos (fun, polaroid style) ---------- */
+.land-extra{display:none}
+body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .land-extra{display:grid;grid-template-columns:230px minmax(0,1fr);gap:18px;align-items:start;margin-top:14px;padding-top:14px;border-top:1px solid #e3eee7}
+.ex-card{position:relative;border:2px dashed #c9cfdd;border-radius:18px;padding:18px 14px 12px;text-align:center;background:#fff;transform:rotate(-1.5deg);box-shadow:0 10px 24px rgba(11,21,48,.08);user-select:none}
+.ex-tag{position:absolute;top:10px;left:-10px;background:#ffc94d;color:#5a3d00;font-weight:900;font-size:.72rem;letter-spacing:.14em;padding:5px 11px;border-radius:6px;transform:rotate(-8deg);box-shadow:0 3px 8px rgba(0,0,0,.15)}
+.ex-av{width:66px;height:66px;border-radius:50%;margin:2px auto 8px;display:grid;place-items:center;font-size:1.6rem;background:linear-gradient(135deg,#3fae6a,#178a57)}
+.ex-card b{display:block;font-size:1rem}.ex-card .ex-town{display:block;color:var(--red);font-weight:700;font-size:.8rem;margin-top:2px}
+.ex-card ul{list-style:none;padding:0;margin:10px 0 6px;text-align:left;font-size:.8rem;display:grid;gap:5px;color:var(--ink)}
+.ex-card small{font-size:.7rem;color:var(--muted)}
+.old-h{margin:0 0 10px;font-size:1.15rem;color:#178a57}
+.old-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;padding:6px 4px 4px}
+.old-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.old-tile{display:block;background:#fff;padding:6px 6px 8px;border-radius:6px;box-shadow:0 8px 18px rgba(11,21,48,.16);text-decoration:none;color:var(--ink);transition:transform .2s,box-shadow .2s}
+.old-tile:nth-child(odd){transform:rotate(-2.5deg)}.old-tile:nth-child(even){transform:rotate(2deg)}
+.old-tile:hover{transform:rotate(0) scale(1.07);box-shadow:0 14px 28px rgba(11,21,48,.25);z-index:2;position:relative}
+.old-tile img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:3px;filter:sepia(.25) contrast(1.05)}
+.old-cap{display:block;margin-top:6px;font-size:.72rem;line-height:1.25;text-align:center;color:var(--muted)}
+.old-cap b{color:var(--ink);font-weight:700}
+.old-credit{margin:8px 0 0;font-size:.7rem;color:var(--muted)}
+@media (max-width:760px){
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .land-extra{grid-template-columns:1fr}
+  .ex-card{max-width:250px;margin:0 auto}
+  .old-grid,.old-grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (min-width:761px) and (max-width:1100px){.old-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* ---------- Be the first from a town ---------- */
+.be-first{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:linear-gradient(135deg,#fff8e1,#eafaf0);border:1px solid #f1e3b0;border-radius:18px;padding:20px 22px}
+.be-first .bf-star{font-size:2.6rem;animation:bfspin 3s ease-in-out infinite}
+@keyframes bfspin{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(8deg) scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.be-first .bf-star{animation:none}}
+.be-first .bf-text{flex:1 1 240px}.be-first h3{margin:0 0 4px;font-size:1.2rem}.be-first p{margin:0;color:#5b6378}
+.be-first .share-btn{width:auto!important}
+/* visitor home is taller now: show "Did you know?" too, cards keep natural height */
+@media (min-width:761px){
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .side-extra .qr-card{flex:none}
+  body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .side-extra .fact-card{flex:1}
+}
+body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!important}

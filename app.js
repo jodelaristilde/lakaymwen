@@ -446,10 +446,27 @@
     renderFeatured();
   }
 
+  function drawProgress() {
+    const b = $("side-prog"), p = profile;
+    if (!b) return;
+    if (!me || !p) { b.hidden = true; return; }
+    const steps = [
+      [!!p.hometown, null], [!!p.photo_url, L().prog_photo], [!!p.katye, L().prog_katye],
+      [schoolsOf(p).length > 0, L().prog_school], [!!(p.bio && String(p.bio).trim()), L().prog_bio],
+      [Array.isArray(p.family) ? p.family.length > 0 : !!p.family, L().prog_family]];
+    const done = steps.filter(s => s[0]).length, pct = Math.round(done / steps.length * 100), next = steps.find(s => !s[0]);
+    if (!next) { b.hidden = true; return; }
+    b.hidden = false;
+    b.replaceChildren(el("b", { text: L().prog_n(pct) }),
+      el("span", { class: "bar" }, el("i", { style: "width:" + pct + "%" })),
+      el("span", { class: "next", text: next[1] }));
+  }
+  $("side-prog").addEventListener("click", () => openProfile(false));
   function updateSide() {
     $("side-out").hidden = !!me;
     $("side-in").hidden = !me;
     $("side-welcome").textContent = me ? L().welcome(profile?.display_name || "") : "";
+    drawProgress();
     // "Logged in as First Last" at the top of every page
     const nm = profile ? ([profile.first_name, profile.last_name].filter(Boolean).join(" ") || profile.display_name || "") : "";
     $("who-bar").hidden = !(me && nm);
@@ -961,9 +978,20 @@
   }
   /* After a new member registers: a postcard to share, then the member search */
   const siteLink = () => "https://lakaymwen.co";   // shares always point to the real site
-  function openPostcard() {
+  async function openPostcard() {
+    const t = profile && profile.hometown, line = $("pc-town"), inv = $("pc-town-invite");
+    line.hidden = true; inv.hidden = true;
     openDlg("dlg-welcome");
+    if (!sb || !t) return;
+    try {
+      const { data, error } = await sb.rpc("search_count", { p_key: "", p_town: t });   // how many members are from my hometown
+      if (error || typeof data !== "number") return;
+      line.textContent = data > 1 ? L().pc_town_n(t, data - 1) : L().pc_town_first(t);
+      line.hidden = false;
+      $("pc-town-invite-t").textContent = L().first_btn(t); inv.hidden = false;
+    } catch (e) { /* no number: the plain postcard still works */ }
   }
+  $("pc-town-invite").addEventListener("click", () => { if (profile && profile.hometown) shareSheet(L().inv_town(profile.hometown, siteLink())); });
   $("pc-card").addEventListener("click", e => { e.preventDefault(); shareSheet(L().pc_share, siteLink()); });
   $("pc-share").addEventListener("click", () => shareSheet(L().pc_share, siteLink()));
   // only the member closing the postcard (X or the button) takes them to Member search
@@ -1649,6 +1677,39 @@
       el("h3", { class: "h3", text: L().adm_members_h }),
       el("p", { class: "note", text: L().adm_members_p }), inp, note, list);
   }
+  function backupBox() {
+    const note = el("p", { class: "note" }), msg = el("p", { class: "msg", hidden: "" });
+    const stamp = () => { try { return Number(localStorage.getItem("lkm-backup")) || 0; } catch (e) { return 0; } };
+    const draw = () => {
+      const t = stamp();
+      if (!t) { note.textContent = L().bk_never; note.classList.add("bk-old"); return; }
+      const d = Math.floor((Date.now() - t) / 864e5);
+      note.textContent = d === 0 ? L().bk_today : L().bk_days(d); note.classList.toggle("bk-old", d >= 7);
+    };
+    const btn = el("button", { class: "btn dark", type: "button", text: L().bk_btn, onclick: async () => {
+      btn.disabled = true; msg.hidden = true;
+      try {
+        const rows = [];
+        for (let i = 0; ; i += 1000) {
+          const { data, error } = await sb.from("profiles").select(PROFILE_COLS).order("created_at").range(i, i + 999);
+          if (error) throw error;
+          rows.push(...data); if (data.length < 1000) break;
+        }
+        const cols = PROFILE_COLS.split(",");
+        const cell = v => { if (v === null || v === undefined) return ""; const s = typeof v === "object" ? JSON.stringify(v) : String(v); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+        const csv = "\ufeff" + [cols.join(",")].concat(rows.map(r => cols.map(c => cell(r[c])).join(","))).join("\r\n");
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+        link.download = "lakaymwen-members-" + new Date().toISOString().slice(0, 10) + ".csv";
+        document.body.append(link); link.click(); link.remove();
+        try { localStorage.setItem("lkm-backup", String(Date.now())); } catch (e) {}
+        msg.className = "msg ok"; msg.textContent = L().bk_done(rows.length); msg.hidden = false; draw();
+      } catch (e) { msg.className = "msg error"; msg.textContent = L().bk_err; msg.hidden = false; }
+      btn.disabled = false;
+    } });
+    draw();
+    return el("div", { class: "box-lite adm-backup" }, el("h3", { class: "h3", text: L().bk_h }), el("p", { class: "note", text: L().bk_p }), note, btn, msg);
+  }
   async function renderAdmin() {
     const box = $("admin-view");
     if (!sb || !me || !isAdmin) { box.replaceChildren(el("p", { class: "empty", text: L().admin_only })); return; }
@@ -1689,6 +1750,7 @@
         await sb.from("profiles").update({ suspended: false }).eq("id", p.id); renderAdmin(); loadFeatured(); loadTownCounts(); } }));
     box.replaceChildren(
       el("div", { class: "stats" }, tile(st.members, L().st_members), tile(st.new_this_week, L().st_new), tile(st.open_reports, L().st_reports), tile(st.hidden, L().st_hidden), tile(st.messages, L().st_messages), tile(st.photos, L().st_photos), tile(st.alerts, L().st_alerts), tile(st.family_links, L().st_family)),
+      backupBox(),
       membersAdminBox(),
       phoneResetBox(),
       el("h3", { class: "h3", text: L().open_reports }),
@@ -1958,14 +2020,13 @@
   /* ---------- School directory and pages ---------- */
   var schoolData = null, katyeData = null, schTown = null;
   const schCache = new Map();   // town ("" = all towns) -> { schools, katyes }
-  TOWNS.forEach(t => $("sch-town").add(new Option(t, t)));
+  var schAllS = false, schAllK = false;   // "show all" toggles; the lists start with 4 rows
   async function renderSchools() {
     const box = $("schools-view");
-    $("school-filter").hidden = !me; $("sch-town").closest(".sch-row").hidden = !me;
+    $("school-filter").hidden = !me; $("school-filter").closest(".sch-row").hidden = !me;
     if (!sb) { box.replaceChildren(el("p", { class: "msg error", text: L().setup })); return; }
     if (!me) { membersOnly(box); return; }
-    if (schTown === null) schTown = profile && profile.hometown ? profile.hometown : "";   // start with my hometown
-    $("sch-town").value = schTown;
+    schTown = profile && profile.hometown ? profile.hometown : "";   // always my own hometown
     if (!schoolData) schCache.clear();
     if (!schCache.has(schTown)) {
       box.replaceChildren(el("p", { class: "note", text: "…" }));
@@ -1982,26 +2043,27 @@
     const c = schCache.get(schTown); schoolData = c.schools; katyeData = c.katyes;
     drawSchools();
   }
-  $("sch-town").addEventListener("change", () => { schTown = $("sch-town").value; renderSchools(); });
   function drawSchools() {
     const box = $("schools-view");
     if (!schoolData) return;
     const f = placeKey($("school-filter").value), t = schTown;
-    const mine = profile ? schoolsOf(profile) : [];
     const list = schoolData.filter(s => !f || placeKey(s.school).includes(f));
     const ks = (katyeData || []).filter(o => !f || placeKey(o.katye).includes(f));
+    const LIM = 4;
+    const more = (n, open, flip) => n > LIM && !f ? el("button", { class: "linkbtn show-all", type: "button", text: open ? L().show_less : L().show_all_n(n), onclick: flip }) : null;
+    const sShow = f || schAllS ? list : list.slice(0, LIM), kShow = f || schAllK ? ks : ks.slice(0, LIM);
     box.replaceChildren(
-      mine.length && !f ? el("div", { class: "my-schools" }, el("h3", { class: "h3", text: L().schools_mine }),
-        el("div", { class: "chips" }, ...mine.map(s => el("a", { class: "chip-link", href: schoolHash(s.name), text: "🏫 " + s.name })))) : null,
       el("h3", { class: "h3 sch-h", text: t ? L().sch_in(t) : L().sch_all }),
-      list.length ? el("ul", { class: "school-list" }, ...list.map(s => el("li", {},
+      list.length ? el("ul", { class: "school-list compact" }, ...sShow.map(s => el("li", {},
         el("a", { href: schoolHash(s.school) }, el("span", { text: "🏫 " + s.school }), el("span", { class: "count", text: String(s.members) })))))
         : el("p", { class: "empty", text: f ? L().schools_no_match : t ? L().sch_none_town(t) : L().schools_none }),
+      more(list.length, schAllS, () => { schAllS = !schAllS; drawSchools(); }),
       el("h3", { class: "h3 sch-h", text: t ? L().katye_of(t) : L().katye_all }),
       !t ? el("p", { class: "note", text: L().katye_pick })
-        : ks.length ? el("div", { class: "chips" }, ...ks.map(o => el("a", { class: "chip-link", href: katyeHash(t, o.katye) },
-            "📍 " + o.katye, el("span", { class: "count", text: String(o.members) }))))
-        : el("p", { class: "empty", text: L().katye_none_town(t) }));
+        : ks.length ? el("ul", { class: "school-list compact" }, ...kShow.map(o => el("li", {},
+            el("a", { href: katyeHash(t, o.katye) }, el("span", { text: "📍 " + o.katye }), el("span", { class: "count", text: String(o.members) })))))
+        : el("p", { class: "empty", text: f ? L().schools_no_match : L().katye_none_town(t) }),
+      more(ks.length, schAllK, () => { schAllK = !schAllK; drawSchools(); }));
   }
   $("school-filter").addEventListener("input", drawSchools);
 

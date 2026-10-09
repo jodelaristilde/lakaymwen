@@ -1,6 +1,6 @@
 // Lakaymwen offline helper: keeps the site's own files on the phone so it opens
 // fast on slow connections. Member data always comes fresh from the internet.
-const CACHE = "lakaymwen-v13";
+const CACHE = "lakaymwen-v16";
 const SHELL = ["/", "/index.html", "/styles.css", "/app.js", "/i18n.js", "/towns.js", "/depts.js", "/geo.js", "/config.js",
   "/haiti-map.svg", "/manifest.webmanifest", "/icon-192.png", "/logo-word.png"];
 

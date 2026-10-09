@@ -1559,3 +1559,6 @@ body.register-mode:not(.join-mode):not(.logged-in) #home .portal-main>#join-why{
 /* map click -> A-Z list: the clicked department's towns stand out */
 .letter button.hl{color:var(--blue);font-weight:800;background:#eaf6ee}
 #towns{scroll-margin-top:16px}
+/* own profile: family member not on Lakaymwen yet -> invite */
+.fam-invite .fam-ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#fff;font-size:1.15rem}
+.fam-invite .share-btn{width:auto!important;white-space:nowrap}

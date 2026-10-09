@@ -78,7 +78,7 @@
     if ($("town-filter")) $("town-filter").placeholder = L().town_filter;
     renderTowns();
     renderHaiti();
-    renderFeatured(); updateSide(); renderPwoveb(); renderFact();
+    renderFeatured(); renderOld(); updateSide(); renderPwoveb(); renderFact();
     fillBdaySelects("r"); fillBdaySelects("pr"); applySpecialDay(); renderBirthdays(); grooveUI();
     if (curHash === "#privacy") renderPrivacy();
     if (curHash === "#admin") renderAdmin();
@@ -396,9 +396,40 @@
     box.replaceChildren(...featuredData.filter(notBlocked).map(p => el("a", { class: "member-card", href: "#member-" + p.id },
       avatar(p), el("b", {}, p.display_name, foundingStar(p)), el("span", { class: "city", text: [p.hometown, p.katye].filter(Boolean).join(" · ") }))));
   }
+  /* ---------- Old photos of Haiti (public domain, New York Public Library). Files: photos/old1.jpg … old9.jpg ---------- */
+  const OLD_PHOTOS = [
+    { y: 1910, en: "A street in Port-au-Prince", ht: "Yon lari nan Pòtoprens", fr: "Une rue de Port-au-Prince" },
+    { y: 1921, en: "Grand Rue, Port-au-Prince", ht: "Granri, Pòtoprens", fr: "La Grand-Rue, Port-au-Prince" },
+    { y: 1920, en: "The Citadelle", ht: "Sitadèl la", fr: "La Citadelle" },
+    { y: 1921, en: "Entrance to the market", ht: "Antre mache a", fr: "L'entrée du marché" },
+    { y: 1926, en: "On the way to market", ht: "Sou wout mache", fr: "En route pour le marché" },
+    { y: 1921, en: "A country house near Furcy", ht: "Yon kay nan mòn Fursi", fr: "Une maison de campagne près de Furcy" },
+    { y: 1921, en: "The railway to Léogâne", ht: "Tren pou Leyogàn", fr: "Le chemin de fer de Léogâne" },
+    { y: 1921, en: "The Saint-Marc road after the rain", ht: "Wout Sen Mak apre lapli", fr: "La route de Saint-Marc après la pluie" },
+    { y: 1920, en: "An old sugar mill", ht: "Yon ansyen moulen kann", fr: "Un ancien moulin à canne" }
+  ].map((p, i) => ({ ...p, src: "photos/old" + (i + 1) + ".jpg" }));
+  let oldOrder = null;
+  function renderOld() {
+    if (!oldOrder) oldOrder = OLD_PHOTOS.map((p, i) => i).sort(() => Math.random() - 0.5);
+    const fill = (grid, wrap, n) => {
+      if (!grid) return;
+      const tiles = oldOrder.slice(0, n).map(i => {
+        const p = OLD_PHOTOS[i];
+        const img = el("img", { src: p.src, alt: p[lang] || p.en });
+        const tile = el("a", { class: "old-tile", href: p.src, target: "_blank", rel: "noopener" }, img,
+          el("span", { class: "old-cap" }, el("b", { text: p[lang] || p.en }), " · " + p.y));
+        img.addEventListener("error", () => { tile.remove(); if (!grid.children.length) wrap.hidden = true; });
+        img.addEventListener("load", () => { wrap.hidden = false; });
+        return tile;
+      });
+      grid.replaceChildren(...tiles);
+    };
+    fill($("land-photos"), $("land-old"), 4);
+    fill($("old-photos"), $("old-haiti-box"), 6);
+  }
   async function loadFeatured() {
     if (sb && me) {
-      const { data } = await sb.from("profiles").select(PROFILE_COLS).eq("suspended", false).order("created_at", { ascending: false }).limit(12);
+      const { data } = await sb.from("profiles").select(PROFILE_COLS).eq("suspended", false).order("created_at", { ascending: false }).limit(21);
       featuredData = data || [];
     } else featuredData = null;
     renderFeatured();
@@ -542,16 +573,31 @@
       msgBtn);
   }
 
+  // Search results as cards, 6 across (like Featured Members): photo, name, town · katye
+  function resultCard(p, key) {
+    const row = memberRow(p, key);           // reuse the highlighting / "why" line / message button
+    const link = row.querySelector(".member-link"), msg = row.querySelector(".fb-msg");
+    const card = el("div", { class: "res-card" });
+    link.className = "member-card res-link";
+    card.append(link); if (msg) card.append(msg);
+    return card;
+  }
   async function loadRecent() {}
 
+  // a town with nobody yet: make being first feel special, with an invite button
+  function firstFromTown(t) {
+    return el("div", { class: "be-first" }, el("span", { class: "bf-star", "aria-hidden": "true", text: "🌟" }),
+      el("div", { class: "bf-text" }, el("h3", { text: L().first_h(t) }), el("p", { text: L().first_p(t) })),
+      waBtn(L().first_btn(t), () => L().inv_town(t, siteLink())));
+  }
   /* ---------- Search and results ---------- */
   function renderResults() {
     const r = lastResults;
     $("results").hidden = false;
     $("res-title").textContent = r.title || L().res_title(r.q);
     const found = (r.members || []).filter(notBlocked);
-    $("res-members").replaceChildren(...(found.length ? found.map(p => memberRow(p, clean(r.q)))
-      : [el("p", { class: "empty", text: r.mine ? L().town_first(r.town) : L().search_none })]), ...(r.q ? [alertOffer(r.q, r.town, !found.length)] : []));
+    $("res-members").replaceChildren(...(found.length ? [el("div", { class: "res-cards" }, ...found.map(p => resultCard(p, clean(r.q))))]
+      : [r.town && !r.q ? firstFromTown(r.town) : el("p", { class: "empty", text: L().search_none })]), ...(r.q ? [alertOffer(r.q, r.town, !found.length)] : []));
   }
   /* ---------- Landing page for visitors: search first, then log in or join ---------- */
   var pendingSearch = null;   // what a visitor searched, run for real after they log in

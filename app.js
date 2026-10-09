@@ -407,19 +407,30 @@
     { y: 1921, en: "The railway to Léogâne", ht: "Tren pou Leyogàn", fr: "Le chemin de fer de Léogâne" },
     { y: 1921, en: "The Saint-Marc road after the rain", ht: "Wout Sen Mak apre lapli", fr: "La route de Saint-Marc après la pluie" },
     { y: 1920, en: "An old sugar mill", ht: "Yon ansyen moulen kann", fr: "Un ancien moulin à canne" }
-  ].map((p, i) => ({ ...p, src: "photos/old" + (i + 1) + ".jpg" }));
+  ].map((p, i) => ({ ...p, src: "photos/old" + (i + 1) + ".jpg" })).concat([
+    // public domain photos on Wikimedia Commons (Library of Congress, NYPL, Rijksmuseum), shown straight from Commons
+    { f: "Haiti, Port-au-Prince LCCN2016821760.jpg", en: "Port-au-Prince", ht: "Pòtoprens", fr: "Port-au-Prince" },
+    { f: "Haiti, Port-au-Prince, Market Square LCCN2016821757.tif", en: "The market square, Port-au-Prince", ht: "Plas mache a, Pòtoprens", fr: "La place du marché, Port-au-Prince" },
+    { f: "HAITI. SCENE, PORT AU PRINCE LCCN2016863543.jpg", en: "A day in Port-au-Prince", ht: "Yon jou nan Pòtoprens", fr: "Une journée à Port-au-Prince" },
+    { f: "Scene on the waterfront in Port-au-Prince, Haiti LCCN92522610.jpg", en: "The waterfront, Port-au-Prince", ht: "Bò lanmè Pòtoprens", fr: "Le front de mer, Port-au-Prince" },
+    { f: "Port-Au-Prince (NYPL b13642042-1817743).jpg", en: "Old Port-au-Prince", ht: "Ansyen Pòtoprens", fr: "Le vieux Port-au-Prince" },
+    { f: "Gezicht op de haven van Port-au-Prince op Haïti, RP-F-F01154-AD.jpg", en: "The harbor of Port-au-Prince", ht: "Pò Pòtoprens", fr: "Le port de Port-au-Prince" }
+  ].map(p => ({ ...p, src: "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(p.f.replace(/ /g, "_")) + "?width=480",
+    link: "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(p.f.replace(/ /g, "_")) })));
   let oldOrder = null;
   function renderOld() {
     if (!oldOrder) oldOrder = OLD_PHOTOS.map((p, i) => i).sort(() => Math.random() - 0.5);
+    // try every photo; show the first n that load (photos not uploaded yet just never appear)
     const fill = (grid, wrap, n) => {
       if (!grid) return;
-      const tiles = oldOrder.slice(0, n).map(i => {
-        const p = OLD_PHOTOS[i];
-        const img = el("img", { src: p.src, alt: p[lang] || p.en });
-        const tile = el("a", { class: "old-tile", href: p.src, target: "_blank", rel: "noopener" }, img,
-          el("span", { class: "old-cap" }, el("b", { text: p[lang] || p.en }), " · " + p.y));
-        img.addEventListener("error", () => { tile.remove(); if (!grid.children.length) wrap.hidden = true; });
-        img.addEventListener("load", () => { wrap.hidden = false; });
+      let shown = 0;
+      const tiles = oldOrder.map(i => {
+        const p = OLD_PHOTOS[i], cap = p[lang] || p.en;
+        const img = el("img", { src: p.src, alt: cap, referrerpolicy: "no-referrer" });
+        const tile = el("a", { class: "old-tile", href: p.link || p.src, target: "_blank", rel: "noopener", hidden: "" }, img,
+          el("span", { class: "old-cap" }, el("b", { text: cap }), p.y ? " · " + p.y : ""));
+        img.addEventListener("error", () => tile.remove());
+        img.addEventListener("load", () => { if (shown < n) { shown++; tile.hidden = false; wrap.hidden = false; } else tile.remove(); });
         return tile;
       });
       grid.replaceChildren(...tiles);

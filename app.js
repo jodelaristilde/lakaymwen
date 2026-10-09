@@ -1817,12 +1817,26 @@
     } });
     // only offer an alert for a full first + last name: one word ("Marie") would match far too many people
     const full = /\S{2,}\s+\S{2,}/.test(clean(q).replace(/\s+/g, " ").trim());
-    if (!full) return el("div", { class: "alert-offer" + (none ? " big" : "") },
-      el("p", { class: "ao-text", text: none ? L().alert_offer_one(q) : L().alert_offer_one_found(q) }),
-      el("div", { class: "row-btns" }, waBtn(L().wa_btn, () => L().inv_search(q, siteLink()), "ghost-wa")));
+    if (!full) {   // only one name typed: ask for the last name right here, then "Alert me"
+      const last = el("input", { type: "text", class: "ao-last", maxlength: "40", placeholder: L().ao_last_ph, "aria-label": L().ao_last_ph, autocomplete: "off" });
+      const btn1 = el("button", { class: "btn red", type: "submit", text: L().alert_add });
+      const form = el("form", { class: "ao-form", novalidate: "" }, el("span", { class: "ao-first", text: q.trim() }), last, btn1);
+      form.addEventListener("submit", async ev => {
+        ev.preventDefault();
+        if (clean(last.value).trim().length < 2) { msg.hidden = false; msg.className = "msg error"; msg.textContent = L().ao_last_need; last.focus(); return; }
+        btn1.disabled = true;
+        const full = q.trim() + " " + last.value.trim();
+        const [text, bad] = await createAlert(full, town);
+        msg.hidden = false; msg.textContent = text; msg.className = "msg" + (bad ? " error" : " ok");
+        btn1.disabled = !bad; if (!bad) last.disabled = true;
+      });
+      return el("div", { class: "alert-offer" + (none ? " big" : "") },
+        el("p", { class: "ao-text", text: none ? L().alert_offer_one(q) : L().alert_offer_one_found(q) }),
+        form, msg);
+    }
     return el("div", { class: "alert-offer" + (none ? " big" : "") },
       el("p", { class: "ao-text", text: none ? L().alert_offer_none(q) : L().alert_offer(q) }),
-      el("div", { class: "row-btns" }, btn, waBtn(L().wa_btn, () => L().inv_search(q, siteLink()), "ghost-wa")),
+      el("div", { class: "row-btns" }, btn),
       msg);
   }
   var alertsReq = 0;

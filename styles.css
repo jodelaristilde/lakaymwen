@@ -1562,3 +1562,9 @@ body.register-mode:not(.join-mode):not(.logged-in) #home .portal-main>#join-why{
 /* own profile: family member not on Lakaymwen yet -> invite */
 .fam-invite .fam-ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#fff;font-size:1.15rem}
 .fam-invite .share-btn{width:auto!important;white-space:nowrap}
+/* one name searched: add the last name right in the alert box */
+.ao-form{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:4px 0 12px}
+.ao-first{font-weight:800;font-size:1.05rem;padding:12px 16px;border-radius:999px;background:#fff;border:1px solid var(--line)}
+.ao-form .ao-last{flex:1 1 180px;min-width:0;font:inherit;font-size:1.05rem;padding:12px 16px;border-radius:999px;border:1.5px solid var(--line);background:#fff}
+.ao-form .ao-last:focus{outline:none;border-color:var(--red)}
+.ao-form .btn{flex:none}

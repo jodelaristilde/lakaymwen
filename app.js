@@ -1421,7 +1421,7 @@
     say("profile-msg", photoFailed ? L().photo_err : L().saved, photoFailed);
     showPhotoPreview(profile);
     if (currentMember) renderMemberPage(currentMember);
-    if (wasNew) setTimeout(() => $("dlg-profile").close(), 700);
+    if (!photoFailed) setTimeout(() => go("#search"), 700);   // saved: close this window and go back to the home page (member search)
   });
 
   /* ---------- Town window ---------- */

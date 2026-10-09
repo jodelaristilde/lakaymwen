@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Montserrat:wght@500;600&family=Cormorant+SC:wght@700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261008w">
+<link rel="stylesheet" href="styles.css?v=20261009c">
 </head>
 <body>
 
@@ -352,6 +352,20 @@
             <li><span class="lh-i" aria-hidden="true">📝</span><span data-t="how2"></span></li>
             <li><span class="lh-i" aria-hidden="true">💬</span><span data-t="how3"></span></li>
           </ol>
+          <div class="land-extra">
+            <div class="ex-card" aria-label="Example profile" role="img">
+              <span class="ex-tag" data-t="ex_tag"></span>
+              <div class="ex-av" aria-hidden="true">📷</div>
+              <b data-t="ex_name"></b><span class="ex-town">Jacmel · Bel-Air</span>
+              <ul><li>🏫 <span data-t="ex_l1"></span></li><li>👪 <span data-t="ex_l2"></span></li><li>📍 <span data-t="ex_l3"></span></li><li>🌎 <span data-t="ex_l4"></span></li></ul>
+              <small data-t="ex_note"></small>
+            </div>
+            <div class="old-wrap" id="land-old" hidden>
+              <h2 class="old-h" data-t="old_h"></h2>
+              <div class="old-grid four" id="land-photos"></div>
+              <p class="old-credit" data-t="old_credit"></p>
+            </div>
+          </div>
         </div>
         <div class="box" id="haiti">
           <div class="box-head"><h2 class="flash-h" data-t="cities_h"></h2></div>
@@ -400,7 +414,13 @@
           <p class="box-text" data-t="pymk_p"></p>
           <div class="pymk" id="pymk"></div>
         </div>
-        <div class="box">
+        <div class="box" id="old-haiti-box" hidden>
+          <div class="box-head"><h2 data-t="old_h"></h2></div>
+          <p class="box-text" data-t="old_p"></p>
+          <div class="old-grid" id="old-photos"></div>
+          <p class="old-credit" data-t="old_credit"></p>
+        </div>
+        <div class="box" id="featured-box">
           <div class="box-head"><h2 data-t="featured_h"></h2></div>
           <p class="box-text" data-t="featured_p"></p>
           <div class="featured" id="featured"></div>
@@ -722,12 +742,12 @@ window.addEventListener("error", function (e) {
 <script src="supabase.js?v=2.117.2"></script>
 <script>if (!window.supabase) document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"><\/script>');</script>
 <script>if (!window.supabase) document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"><\/script>');</script>
-<script src="config.js?v=20261008w"></script>
-<script src="towns.js?v=20261008w"></script>
-<script src="depts.js?v=20261008w"></script>
-<script src="facts.js?v=20261008w"></script>
-<script src="geo.js?v=20261008w"></script>
-<script src="i18n.js?v=20261008w"></script>
-<script src="app.js?v=20261008w"></script>
+<script src="config.js?v=20261009c"></script>
+<script src="towns.js?v=20261009c"></script>
+<script src="depts.js?v=20261009c"></script>
+<script src="facts.js?v=20261009c"></script>
+<script src="geo.js?v=20261009c"></script>
+<script src="i18n.js?v=20261009c"></script>
+<script src="app.js?v=20261009c"></script>
 </body>
 </html>

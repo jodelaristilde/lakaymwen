@@ -2020,7 +2020,18 @@
   /* ---------- School directory and pages ---------- */
   var schoolData = null, katyeData = null, schTown = null;
   const schCache = new Map();   // town ("" = all towns) -> { schools, katyes }
-  var schAllS = false, schAllK = false;   // "show all" toggles; the lists start with 4 rows
+  var schNS = 4, schNK = 4;   // rows shown; the lists start with 4 and grow 10 at a time
+  function profileSchools(p) {
+    const all = schoolsOf(p);
+    const row = (o, extra) => el("li", extra ? { hidden: "", class: "more-sch" } : {}, el("span", { class: "ii", text: "🏫" }), el("span", {}, L().studied_at + " ", el("a", { href: schoolHash(o.name) }, el("b", { text: o.name })), o.years ? el("small", { text: " · " + o.years }) : null));
+    const rows = all.map((o, i) => row(o, i >= 2));
+    if (all.length > 2) {
+      const li = el("li", { class: "more-li" }, el("button", { class: "linkbtn", type: "button", text: L().and_more(all.length - 2), onclick: () => {
+        rows.forEach(r => r.hidden = false); li.remove(); } }));
+      rows.splice(2, 0, li);
+    }
+    return rows;
+  }
   async function renderSchools() {
     const box = $("schools-view");
     $("school-filter").hidden = !me; $("school-filter").closest(".sch-row").hidden = !me;
@@ -2050,20 +2061,22 @@
     const list = schoolData.filter(s => !f || placeKey(s.school).includes(f));
     const ks = (katyeData || []).filter(o => !f || placeKey(o.katye).includes(f));
     const LIM = 4;
-    const more = (n, open, flip) => n > LIM && !f ? el("button", { class: "linkbtn show-all", type: "button", text: open ? L().show_less : L().show_all_n(n), onclick: flip }) : null;
-    const sShow = f || schAllS ? list : list.slice(0, LIM), kShow = f || schAllK ? ks : ks.slice(0, LIM);
+    const more = (n, shown, grow, reset) => f || n <= LIM ? null : el("div", { class: "show-row" },
+      shown < n ? el("button", { class: "linkbtn show-all", type: "button", text: L().show_more_n(Math.min(10, n - shown)), onclick: grow }) : null,
+      shown > LIM ? el("button", { class: "linkbtn show-all", type: "button", text: L().show_less, onclick: reset }) : null);
+    const sShow = f ? list : list.slice(0, schNS), kShow = f ? ks : ks.slice(0, schNK);
     box.replaceChildren(
       el("h3", { class: "h3 sch-h", text: t ? L().sch_in(t) : L().sch_all }),
       list.length ? el("ul", { class: "school-list compact" }, ...sShow.map(s => el("li", {},
         el("a", { href: schoolHash(s.school) }, el("span", { text: "🏫 " + s.school }), el("span", { class: "count", text: String(s.members) })))))
         : el("p", { class: "empty", text: f ? L().schools_no_match : t ? L().sch_none_town(t) : L().schools_none }),
-      more(list.length, schAllS, () => { schAllS = !schAllS; drawSchools(); }),
+      more(list.length, schNS, () => { schNS += 10; drawSchools(); }, () => { schNS = LIM; drawSchools(); }),
       el("h3", { class: "h3 sch-h", text: t ? L().katye_of(t) : L().katye_all }),
       !t ? el("p", { class: "note", text: L().katye_pick })
         : ks.length ? el("ul", { class: "school-list compact" }, ...kShow.map(o => el("li", {},
             el("a", { href: katyeHash(t, o.katye) }, el("span", { text: "📍 " + o.katye }), el("span", { class: "count", text: String(o.members) })))))
         : el("p", { class: "empty", text: f ? L().schools_no_match : L().katye_none_town(t) }),
-      more(ks.length, schAllK, () => { schAllK = !schAllK; drawSchools(); }));
+      more(ks.length, schNK, () => { schNK += 10; drawSchools(); }, () => { schNK = LIM; drawSchools(); }));
   }
   $("school-filter").addEventListener("input", drawSchools);
 
@@ -2792,7 +2805,7 @@
             p.founding ? el("li", { class: "founding" }, el("span", { class: "ii", text: "★" }), el("span", {}, L().founding_badge + (p.old_username ? " · " + p.old_username : ""))) : null,
             el("li", {}, el("span", { class: "ii", text: "🏠" }), el("span", {}, L().from + " ", el("b", { text: p.hometown }))),
             p.katye ? el("li", {}, el("span", { class: "ii", text: "📍" }), el("span", {}, L().katye_short + " ", el("a", { href: katyeHash(p.hometown, p.katye) }, el("b", { text: p.katye })))) : null,
-            ...schoolsOf(p).map(o => el("li", {}, el("span", { class: "ii", text: "🏫" }), el("span", {}, L().studied_at + " ", el("a", { href: schoolHash(o.name) }, el("b", { text: o.name })), o.years ? el("small", { text: " · " + o.years }) : null))),
+            ...profileSchools(p),
             p.lives_in || p.country ? el("li", {}, el("span", { class: "ii", text: "🌎" }), el("span", {}, L().lives + " ", el("b", { text: [p.lives_in, p.state, p.country].filter(Boolean).join(", ") }))) : null,
             el("li", {}, el("span", { class: "ii", text: "👥" }), el("span", {}, el("b", { text: L().friend_count(friends.length) }))))),
         el("div", { class: "profile-body" },

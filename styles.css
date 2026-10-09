@@ -1629,3 +1629,11 @@ body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.
 }
 body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!important}
 .old-tile[hidden]{display:none!important}
+/* Schools and neighborhoods: town picker + search on one line */
+.sch-row{display:grid;grid-template-columns:minmax(180px,260px) minmax(0,1fr);gap:10px;align-items:end;margin:14px 0 6px}
+.sch-row[hidden]{display:none}
+.sch-town{display:grid;gap:4px;font-size:.78rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+.sch-town select{font:inherit;font-size:1rem;font-weight:600;text-transform:none;letter-spacing:0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.sch-row .page-filter{margin:0}
+.sch-h{margin-top:18px}
+@media (max-width:560px){.sch-row{grid-template-columns:1fr}}

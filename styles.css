@@ -1652,3 +1652,6 @@ body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!i
 .adm-backup{margin:14px 0}
 .bk-old{color:#d9163a;font-weight:700}
 @media (max-width:560px){.account .btn{padding-inline:12px;font-size:.85rem;line-height:1.15;white-space:normal;text-align:center}}
+.show-row{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 4px}
+.intro-list .more-li .linkbtn{font-weight:700}
+.intro-list li[hidden]{display:none}

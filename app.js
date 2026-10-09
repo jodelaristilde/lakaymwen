@@ -1815,6 +1815,11 @@
       msg.hidden = false; msg.textContent = text; msg.className = "msg" + (bad ? " error" : " ok");
       btn.disabled = !bad;
     } });
+    // only offer an alert for a full first + last name: one word ("Marie") would match far too many people
+    const full = /\S{2,}\s+\S{2,}/.test(clean(q).replace(/\s+/g, " ").trim());
+    if (!full) return el("div", { class: "alert-offer" + (none ? " big" : "") },
+      el("p", { class: "ao-text", text: none ? L().alert_offer_one(q) : L().alert_offer_one_found(q) }),
+      el("div", { class: "row-btns" }, waBtn(L().wa_btn, () => L().inv_search(q, siteLink()), "ghost-wa")));
     return el("div", { class: "alert-offer" + (none ? " big" : "") },
       el("p", { class: "ao-text", text: none ? L().alert_offer_none(q) : L().alert_offer(q) }),
       el("div", { class: "row-btns" }, btn, waBtn(L().wa_btn, () => L().inv_search(q, siteLink()), "ghost-wa")),
@@ -2286,6 +2291,18 @@
 
     // confirmed relatives
     const rels = accepted.map(l => ({ who: byId[otherOf(l, p.id)], rel: relTo(l, p.id), lk: l })).filter(x => x.who && notBlocked(x.who));
+    const famBox = sec.closest(".profile-family");
+    if (rels.length && famBox) {
+      const typed = famBox.querySelector(".family-view");
+      if (typed) {
+        [...typed.children].forEach(li => {
+          const words = norm(li.querySelector("b") ? li.querySelector("b").textContent : "").split(/\s+/).filter(Boolean);
+          if (words.length && rels.some(x => words.every(w => norm((x.who.name_key || "") + " " + x.who.display_name).includes(w)))) li.remove();
+        });
+        if (!typed.children.length) typed.remove();
+      }
+      const none = famBox.querySelector(":scope > p.note"); if (none) none.remove();
+    }
     if (rels.length) parts.push(el("div", { class: "fam-links" }, ...rels.map(({ who, rel }) =>
       el("a", { class: "fam-card", href: "#member-" + who.id }, avatar(who, "sm"),
         el("span", {}, el("small", { text: relName(rel) }), el("b", { text: who.display_name }))))));
@@ -2294,15 +2311,26 @@
     if (self && (p.family || []).length) {
       const linkedKeys = rels.map(x => x.who.name_key || norm(x.who.display_name));
       const pendingOut = links.filter(l => l.status === "pending" && l.requester === me.id).map(l => l.relative);
-      const todo = (p.family || []).filter(f => (f.name || "").trim().split(/\s+/).length >= 2 &&
-        !linkedKeys.some(k => norm(f.name).split(/\s+/).every(w => k.includes(w)))).slice(0, 10);
+      const todo = (p.family || []).filter(f => (f.name || "").trim() &&
+        !linkedKeys.some(k => norm(f.name).split(/\s+/).every(w => k.includes(w)))).slice(0, 30);
+      const myFirst = p.first_name || (p.display_name || "").split(" ")[0];
       for (const f of todo) {
         const words = norm(f.name).split(/\s+/).filter(Boolean);
-        const { data: cands } = await sb.from("profiles").select("id,display_name,name_key,hometown,photo_url").eq("suspended", false)
-          .ilike("name_key", `%${clean(words[words.length - 1])}%`).limit(20);
-        if (req !== memberReq) return;
-        const c = (cands || []).filter(x => x.id !== me.id && notBlocked(x) && words.every(w => (x.name_key || "").includes(w)))[0];
-        if (!c) continue;
+        let c = null;
+        if (words.length >= 2) {
+          const { data: cands } = await sb.from("profiles").select("id,display_name,name_key,hometown,photo_url").eq("suspended", false)
+            .ilike("name_key", `%${clean(words[words.length - 1])}%`).limit(20);
+          if (req !== memberReq) return;
+          c = (cands || []).filter(x => x.id !== me.id && notBlocked(x) && words.every(w => (x.name_key || "").includes(w)))[0];
+        }
+        if (!c) {   // not on Lakaymwen yet: invite them to join
+          const first = f.name.trim().split(/\s+/)[0];
+          parts.push(el("div", { class: "fam-suggest fam-invite" },
+            el("span", { class: "fam-ic", "aria-hidden": "true", text: "✉️" }),
+            el("p", {}, el("b", { text: f.name.trim() }), " ", L().fam_not_here(relName(f.relation))),
+            waBtn(L().fam_invite_btn, () => L().inv_relative(first, myFirst, siteLink()), "small")));
+          continue;
+        }
         const waiting = pendingOut.includes(c.id);
         const rel = LINK_RELS.includes(f.relation) ? f.relation : "other";
         parts.push(el("div", { class: "fam-suggest" }, avatar(c, "sm"),
@@ -2327,7 +2355,13 @@
           msg.hidden = false; msg.className = "msg" + (error ? " error" : " ok"); msg.textContent = error ? L().err : L().fam_sent_long(p.first_name || p.display_name);
           if (!error) form.querySelector("button").disabled = true;
         } }), msg);
-      parts.push(el("button", { class: "btn small ghost", type: "button", text: "👪 " + L().fam_we_are, onclick: ev => { ev.target.hidden = true; form.hidden = false; } }), form);
+      // the button sits with "Send a message" / "Add as friend"; the small form opens in the Family section
+      const weBtn = el("button", { class: "btn ghost", type: "button", text: "👪 " + L().fam_we_are, onclick: () => {
+        weBtn.hidden = true; form.hidden = false; sec.hidden = false; if (famBox) famBox.hidden = false;
+        form.scrollIntoView({ behavior: "smooth", block: "center" }); } });
+      const act = sec.closest(".profile-card") && sec.closest(".profile-card").querySelector(".profile-actions");
+      if (act) act.insertBefore(weBtn, act.querySelector(".safety-links, .safety") || null);
+      parts.push(form);
     }
     if (!self && between && between.status === "pending" && between.requester === me.id)
       parts.push(el("p", { class: "note" }, L().fam_waiting_for(p.first_name || p.display_name), " ",
@@ -2337,10 +2371,10 @@
         el("button", { class: "linkbtn", type: "button", text: L().fam_unlink, onclick: async () => {
           if (!confirm(L().fam_unlink_q)) return; await sb.from("family_links").delete().eq("id", between.id); rerender(); } })));
 
-    sec.hidden = false;
-    sec.replaceChildren(
-      el("div", { class: "fam-head" }, el("h2", { text: L().fam_on_site })),
-      ...(parts.length ? parts : [el("p", { class: "note", text: self ? L().fam_none_self : L().fam_none })]));
+    sec.replaceChildren(...parts);
+    sec.hidden = !parts.some(x => !x.hidden);
+    // someone else's profile with no confirmed family: no empty "Family" box at all
+    if (famBox && !self) famBox.hidden = !rels.length && sec.hidden;
   }
 
   // The tree page: one person in the middle, relatives around, click to walk the tree
@@ -2535,8 +2569,10 @@
     const link = all.find(f => (f.requester === me.id && f.addressee === id) || (f.requester === id && f.addressee === me.id));
 
 
-    const family = (p.family || []).length
-      ? el("ul", { class: "family-view" }, ...(p.family || []).map(f => el("li", {}, el("span", { class: "rel", text: relName(f.relation) }), el("b", { text: f.name }))))
+    // Family shown to OTHER people = only relatives who confirmed (both sides agreed).
+    // The names you typed yourself are only shown to you, with a "waiting" note.
+    const family = self && (p.family || []).length
+      ? el("div", {}, el("p", { class: "note fam-private", text: L().fam_typed_private }))
       : el("p", { class: "note", text: self ? L().family_none_self : L().family_none });
 
     const friendCard = f => el("a", { class: "member-card", href: "#member-" + f.id },
@@ -2612,13 +2648,13 @@
             el("li", {}, el("span", { class: "ii", text: "👥" }), el("span", {}, el("b", { text: L().friend_count(friends.length) }))))),
         el("div", { class: "profile-body" },
           requestsBox,
-          el("section", {}, el("h2", { text: me && p.id === me.id ? L().sec_family : L().fam_h }), family),
-          el("section", { class: "profile-family-links", hidden: "" }),
-          el("section", {}, el("h2", { text: L().friend_list(p.first_name || p.display_name) }), friendsBox),
+          el("section", { class: "profile-family" }, el("h2", { text: me && p.id === me.id ? L().my_fam_h : L().fam_of(p.first_name || p.display_name) }), family,
+            el("div", { class: "profile-family-links", hidden: "" })),
+          el("section", {}, el("h2", { text: me && p.id === me.id ? L().my_friends : L().friend_list(p.first_name || p.display_name) }), friendsBox),
           el("section", { class: "profile-photos", hidden: "" }))))
     );
     const famSec = box.querySelector(".profile-family-links");
-    if (famSec) familySection(p, famSec, req).catch(() => {});
+    if (famSec) familySection(p, famSec, req).catch(e => console.warn("family", e));
     const phs = await memberPhotos(p.id);
     const sec = box.querySelector(".profile-photos");
     if (req !== memberReq || !sec || !phs) return;

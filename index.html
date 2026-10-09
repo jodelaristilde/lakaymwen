@@ -188,7 +188,6 @@
           <h2 class="join-h" data-t="schools_h"></h2>
           <p class="lead" data-t="schools_p"></p>
           <div class="sch-row">
-            <label class="sch-town"><span data-t="sch_town_lbl"></span><select id="sch-town"><option value="" data-t="all_towns"></option></select></label>
             <input id="school-filter" class="page-filter" type="search" autocomplete="off" data-ph="school_filter" aria-label="School">
           </div>
           <div id="schools-view"></div>
@@ -450,6 +449,7 @@
             <a class="side-alerts" id="side-alerts" href="#alerts" hidden></a>
             <a class="side-alerts" id="side-tags" href="#photos/me" hidden></a>
             <a class="side-alerts" id="side-fam" href="#home" hidden></a>
+            <button class="side-prog" id="side-prog" type="button" hidden></button>
             <div class="side-btns">
               <button class="btn dark" type="button" data-action="inbox" data-t="messages"></button>
               <button class="btn ghost" type="button" data-action="profile" data-t="my_account"></button>
@@ -587,6 +587,8 @@
   <div class="dlg-head"><h2 data-t="pc_h"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-body">
     <p class="pc-text" data-t="pc_p"></p>
+    <p class="pc-town" id="pc-town" hidden></p>
+    <button class="btn share-btn big pc-invite" type="button" id="pc-town-invite" hidden><span class="share-ic" aria-hidden="true"></span><span id="pc-town-invite-t"></span></button>
     <a class="postcard" id="pc-card" href="#"><img src="share-preview.png" alt="" width="1200" height="630"></a>
     <button class="btn share-btn big" type="button" id="pc-share"><span class="share-ic" aria-hidden="true"></span><span data-t="share"></span></button>
     <button class="btn dark big pc-go" type="button" data-close data-t="pc_go"></button>

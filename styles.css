@@ -162,7 +162,7 @@ footer{background:#040b20;color:#9aa4c4;font-size:.92rem}
 footer #contact-email{color:#fff;font-weight:600}
 
 /* ---------- Dialogs ---------- */
-dialog{border:0;border-radius:26px;padding:0;width:min(580px,calc(100vw - 24px));max-height:calc(100vh - 40px);background:var(--bg);color:var(--ink);box-shadow:0 40px 100px rgba(4,11,32,.45)}
+dialog{border:0;border-radius:26px;padding:0;width:min(680px,calc(100vw - 24px));max-height:calc(100vh - 32px);background:var(--bg);color:var(--ink);box-shadow:0 40px 100px rgba(4,11,32,.45)}
 dialog[open]{animation:pop .2s ease-out}
 @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
 dialog::backdrop{background:rgba(4,11,32,.55);backdrop-filter:blur(4px)}
@@ -1630,10 +1630,24 @@ body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.
 body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!important}
 .old-tile[hidden]{display:none!important}
 /* Schools and neighborhoods: town picker + search on one line */
-.sch-row{display:grid;grid-template-columns:minmax(180px,260px) minmax(0,1fr);gap:10px;align-items:end;margin:14px 0 6px}
+.sch-row{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:end;margin:14px 0 6px}
 .sch-row[hidden]{display:none}
 .sch-town{display:grid;gap:4px;font-size:.78rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
 .sch-town select{font:inherit;font-size:1rem;font-weight:600;text-transform:none;letter-spacing:0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
 .sch-row .page-filter{margin:0}
 .sch-h{margin-top:18px}
 @media (max-width:560px){.sch-row{grid-template-columns:1fr}}
+.school-list.compact{grid-template-columns:1fr;gap:6px}
+.show-all{margin-top:8px;font-weight:700}
+
+/* ---------- Profile progress ---------- */
+.side-prog{display:grid;gap:6px;width:100%;text-align:left;font:inherit;margin:-4px 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);cursor:pointer}
+.side-prog[hidden]{display:none}
+.side-prog .bar{display:block;height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.side-prog .bar i{display:block;height:100%;background:var(--red,#d9163a);border-radius:999px}
+.side-prog .next{font-size:.88rem;color:var(--muted)}
+.pc-town{margin:0 0 12px;font-weight:700;line-height:1.4;color:var(--ink)}
+.pc-town[hidden],.pc-invite[hidden]{display:none}
+.pc-invite{margin-bottom:10px}
+.adm-backup{margin:14px 0}
+.bk-old{color:#d9163a;font-weight:700}

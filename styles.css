@@ -1628,3 +1628,4 @@ body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.
   body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .side-extra .fact-card{flex:1}
 }
 body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!important}
+.old-tile[hidden]{display:none!important}

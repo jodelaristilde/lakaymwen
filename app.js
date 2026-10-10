@@ -171,7 +171,7 @@
     const url = sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;
     return /^(data|blob):/.test(url) ? url : url + "?v=" + Date.now();
   }
-  const PROFILE_COLS = "id,username,display_name,name_key,first_name,last_name,nickname,hometown,katye,country,state,lives_in,schools,school_list,family,family_key,photo_url,bio,founding,old_username,created_at";
+  const PROFILE_COLS = "id,username,display_name,name_key,first_name,last_name,nickname,gender,hometown,katye,country,state,lives_in,schools,school_list,family,family_key,photo_url,bio,founding,old_username,created_at";
 
   /* ---------- Old-site profile questions: shared by Register and Edit profile ---------- */
   const COUNTRIES = window.LAKAYMWEN_COUNTRIES || [];
@@ -312,10 +312,11 @@
       relation: r.querySelector("select").value, name: r.querySelector("input").value.trim()
     })).filter(f => f.name.length >= 2).slice(0, 30);
   }
+  function genderTag(p) { return p && (p.gender === "M" || p.gender === "F") ? el("span", { class: "gtag", text: p.gender, title: p.gender === "F" ? L().gender_f : L().gender_m }) : null; }
   function readAbout(p) {
     const first = $(p + "-first").value.trim(), last = $(p + "-last").value.trim();
     return {
-      first_name: first, last_name: last, display_name: (first + " " + last).trim(),
+      first_name: first, last_name: last, display_name: (first + " " + last).trim(), gender: $(p + "-gender").value || null,
       nickname: $(p + "-nick").value.trim() || null, hometown: $(p + "-town").value,
       katye: $(p + "-katye").value.trim() || null,
       country: $(p + "-country").value || null,
@@ -328,7 +329,7 @@
   function fillAbout(p, pr) {
     let first = pr?.first_name || "", last = pr?.last_name || "";
     if (pr && !first && !last && pr.display_name) { const parts = pr.display_name.split(" "); first = parts.shift(); last = parts.join(" "); }
-    $(p + "-first").value = first; $(p + "-last").value = last;
+    $(p + "-first").value = first; $(p + "-last").value = last; $(p + "-gender").value = pr?.gender || "";
     $(p + "-nick").value = pr?.nickname || "";
     $(p + "-town").value = pr?.hometown || store.get("lkm-town") || "";
     $(p + "-katye").value = pr?.katye || "";
@@ -346,6 +347,7 @@
   function aboutProblem(p) {
     if ($(p + "-first").value.trim().length < 1) return [L().first_req, p + "-first"];
     if ($(p + "-last").value.trim().length < 1) return [L().last_req, p + "-last"];
+    if (!$(p + "-gender").value) return [L().gender_req, p + "-gender"];
     if (!$(p + "-town").value) return [L().town_req, p + "-town"];
     return null;
   }
@@ -451,7 +453,7 @@
     if (!b) return;
     if (!me || !p) { b.hidden = true; return; }
     const steps = [
-      [!!p.hometown, null], [!!p.photo_url, L().prog_photo], [!!p.katye, L().prog_katye],
+      [!!p.hometown, null], [!!p.gender, L().prog_gender], [!!p.photo_url, L().prog_photo], [!!p.katye, L().prog_katye],
       [schoolsOf(p).length > 0, L().prog_school], [!!(p.bio && String(p.bio).trim()), L().prog_bio],
       [Array.isArray(p.family) ? p.family.length > 0 : !!p.family, L().prog_family]];
     const done = steps.filter(s => s[0]).length, pct = Math.round(done / steps.length * 100), next = steps.find(s => !s[0]);
@@ -595,7 +597,7 @@
     return el("div", { class: "member fb-row" },
       el("a", { class: "member-link", href: "#member-" + p.id }, avatar(p, "fb-av"),
         el("span", { class: "fb-text" },
-          el("b", { class: "fb-name" }, mark(full), p.nickname ? el("span", { class: "nick" }, " “", mark(p.nickname), "”") : null, foundingStar(p)),
+          el("b", { class: "fb-name" }, mark(full), genderTag(p), p.nickname ? el("span", { class: "nick" }, " “", mark(p.nickname), "”") : null, foundingStar(p)),
           place ? el("span", { class: "fb-sub" }, mark(place)) : null,
           why)),
       msgBtn);
@@ -1821,14 +1823,14 @@
       fLine.replaceChildren(el("span", { class: "hc-ic", text: "👥" }), el("span", { text: bits.join(" · ") }));
       if (!self) {
         const l = f.link; let b;
-        if (!l) b = el("button", { class: "btn small ghost", type: "button", text: L().add_friend, onclick: async () => {
+        if (!l) b = el("button", { class: "btn small green", type: "button", text: L().add_friend, onclick: async () => {
           b.disabled = true; const { error } = await sb.from("friendships").insert({ addressee: id });
           if (!error) { myLinks = null; b.textContent = L().request_sent; } else b.disabled = false; } });
         else if (l.status === "accepted") b = el("span", { class: "chip-item friends-yes", text: "✓ " + L().friends_yes });
         else if (l.requester === me.id) b = el("span", { class: "chip-item", text: L().request_sent });
-        else b = el("button", { class: "btn small dark", type: "button", text: L().accept, onclick: async () => {
+        else b = el("button", { class: "btn small green", type: "button", text: L().accept, onclick: async () => {
           b.disabled = true; await sb.from("friendships").update({ status: "accepted" }).eq("requester", id).eq("addressee", me.id);
-          myLinks = null; b.replaceWith(el("span", { class: "chip-item friends-yes", text: "✓ " + L().friends_yes })); } });
+          myLinks = null; refreshAlerts(); b.replaceWith(el("span", { class: "chip-item friends-yes", text: "✓ " + L().friends_yes })); } });
         fBtn.replaceWith(b);
       }
     } catch (e) { fLine.remove(); }
@@ -1910,6 +1912,10 @@
     if (sb && me) { const { data: fr } = await sb.from("family_links").select("id").eq("relative", me.id).eq("status", "pending").limit(100); famReqs = (fr || []).length; }
     $("side-fam").hidden = !famReqs; $("side-fam").textContent = L().fam_badge_side(famReqs);
     if (me) $("side-fam").setAttribute("href", "#member-" + me.id);
+    let frReq = 0;
+    if (sb && me) { const { data: fq } = await sb.from("friendships").select("requester").eq("addressee", me.id).eq("status", "pending").limit(100); frReq = (fq || []).length; }
+    $("side-friends").hidden = !frReq; $("side-friends").textContent = L().friend_badge_side(frReq);
+    if (me) $("side-friends").setAttribute("href", "#member-" + me.id);
   }
   async function createAlert(q, town) {
     if (!sb || !me) { openAuth(null, "login"); return [L().search_login, true]; }
@@ -2172,7 +2178,7 @@
     $("pymk").replaceChildren(...list.slice(0, 8).map(({ p, reasons }) => {
       const strong = reasons.filter(r => r.k !== "town");
       const why = (strong.length ? strong : reasons).slice(0, 2).map(reasonText);
-      const add = el("button", { class: "btn small dark", type: "button", text: L().add_friend, onclick: async () => {
+      const add = el("button", { class: "btn small green", type: "button", text: L().add_friend, onclick: async () => {
         add.disabled = true;
         const { error } = await sb.from("friendships").insert({ addressee: p.id });
         add.textContent = error ? L().err : "✓ " + L().request_sent;
@@ -2419,7 +2425,7 @@
     const sel = relSelect(GUESS_BACK[lk.relation] || "", true);
     const msg = el("p", { class: "msg error", hidden: "" });
     return el("div", { class: "fam-request" },
-      el("p", {}, el("a", { href: "#member-" + from.id, text: from.display_name }), " " + L().fam_says_you(relName(lk.relation))),
+      el("p", {}, el("a", { href: "#member-" + from.id, text: from.display_name }), " " + L().fam_says_you(relName(lk.relation), from.gender)),
       el("label", { class: "inline" }, el("span", { text: L().fam_what_is(from.first_name || from.display_name) }), sel),
       el("div", { class: "row-btns" },
         el("button", { class: "btn small dark", type: "button", text: L().fam_confirm, onclick: async () => {
@@ -2761,18 +2767,18 @@
       const msgBtn = el("button", { class: "btn red", type: "button", text: L().contact_member,
         onclick: () => openThread({ noticeId: null, other: p.id, title: p.display_name }) });
       let fBtn;
-      if (!link) fBtn = el("button", { class: "btn ghost", type: "button", text: L().add_friend, onclick: async ev => {
+      if (!link) fBtn = el("button", { class: "btn green", type: "button", text: L().add_friend, onclick: async ev => {
         ev.target.disabled = true;
         const { error } = await sb.from("friendships").insert({ addressee: p.id });
         if (error) { ev.target.disabled = false; return; }
         renderMemberPage(id);
       } });
       else if (link.status === "accepted") fBtn = el("span", { class: "chip-item friends-yes", text: "✓ " + L().friends_yes });
-      else if (link.requester === me.id) fBtn = el("button", { class: "btn ghost", type: "button", text: L().request_sent, title: L().cancel_request, onclick: async () => {
+      else if (link.requester === me.id) fBtn = el("button", { class: "btn green", type: "button", text: L().request_sent, title: L().cancel_request, onclick: async () => {
         await sb.from("friendships").delete().eq("requester", me.id).eq("addressee", p.id); renderMemberPage(id);
       } });
-      else fBtn = el("button", { class: "btn dark", type: "button", text: L().accept_request, onclick: async () => {
-        await sb.from("friendships").update({ status: "accepted" }).eq("requester", p.id).eq("addressee", me.id); renderMemberPage(id);
+      else fBtn = el("button", { class: "btn green", type: "button", text: L().accept_request, onclick: async () => {
+        await sb.from("friendships").update({ status: "accepted" }).eq("requester", p.id).eq("addressee", me.id); refreshAlerts(); renderMemberPage(id);
       } });
       actions = [msgBtn, fBtn];
     }
@@ -2794,7 +2800,7 @@
       el("div", { class: "profile-top" },
         avatar(p, "xl"),
         el("div", { class: "profile-id" },
-          el("h1", { text: p.display_name }),
+          el("h1", { text: p.display_name + " " }, genderTag(p)),
           el("p", { class: "handle", text: [p.username ? "@" + p.username : "", p.nickname ? "“" + p.nickname + "”" : ""].filter(Boolean).join(" · ") })),
         el("div", { class: "profile-actions" }, ...actions, safety)),
       el("div", { class: "profile-main" },

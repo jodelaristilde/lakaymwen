@@ -524,8 +524,9 @@
 
 <!-- Profile -->
 <dialog id="dlg-profile">
-  <div class="dlg-head"><h2 data-t="profile_h"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-head"><h2 data-t="profile_h" id="pr-title"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-body">
+    <p class="pr-who" id="pr-who" hidden><span id="pr-who-t"></span> <button type="button" class="linkbtn" id="pr-signout" data-t="not_you_signout"></button></p>
     <form id="profile-form" novalidate>
       <div class="photo-edit">
         <div id="pr-photo-preview"></div>

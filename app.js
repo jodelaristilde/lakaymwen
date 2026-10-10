@@ -312,6 +312,8 @@
       relation: r.querySelector("select").value, name: r.querySelector("input").value.trim()
     })).filter(f => f.name.length >= 2).slice(0, 30);
   }
+  function syncGender(p) { const v = $(p + "-gender").value; document.querySelectorAll('input[name="' + p + '-gender-radio"]').forEach(r => { r.checked = r.value === v; }); }
+  document.addEventListener("change", e => { const r = e.target; if (r && r.name && r.name.endsWith("-gender-radio")) $(r.name.replace("-gender-radio", "-gender")).value = r.value; });
   function genderTag(p) { return p && (p.gender === "M" || p.gender === "F") ? el("span", { class: "gtag", text: p.gender, title: p.gender === "F" ? L().gender_f : L().gender_m }) : null; }
   function readAbout(p) {
     const first = $(p + "-first").value.trim(), last = $(p + "-last").value.trim();
@@ -329,7 +331,7 @@
   function fillAbout(p, pr) {
     let first = pr?.first_name || "", last = pr?.last_name || "";
     if (pr && !first && !last && pr.display_name) { const parts = pr.display_name.split(" "); first = parts.shift(); last = parts.join(" "); }
-    $(p + "-first").value = first; $(p + "-last").value = last; $(p + "-gender").value = pr?.gender || "";
+    $(p + "-first").value = first; $(p + "-last").value = last; $(p + "-gender").value = pr?.gender || ""; syncGender(p);
     $(p + "-nick").value = pr?.nickname || "";
     $(p + "-town").value = pr?.hometown || store.get("lkm-town") || "";
     $(p + "-katye").value = pr?.katye || "";
@@ -347,7 +349,7 @@
   function aboutProblem(p) {
     if ($(p + "-first").value.trim().length < 1) return [L().first_req, p + "-first"];
     if ($(p + "-last").value.trim().length < 1) return [L().last_req, p + "-last"];
-    if (!$(p + "-gender").value) return [L().gender_req, p + "-gender"];
+    if (!$(p + "-gender").value) return [L().gender_req, p + "-gender-box"];
     if (!$(p + "-town").value) return [L().town_req, p + "-town"];
     return null;
   }

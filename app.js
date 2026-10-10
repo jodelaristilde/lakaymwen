@@ -1195,9 +1195,10 @@
     updateAccount(); loadSchoolOpts();
     myLinks = null; hideHC();
     if (!me) { if ($("push-box")) $("push-box").hidden = true; lastResults = null; $("results").hidden = true; profile = null; blockedIds = new Set(); isAdmin = false; schoolData = null; document.body.classList.remove("is-admin"); $("unread").hidden = true; $("unread-side").hidden = true; showMsgAlert(0); pymkData = null; renderPymk(); bdayData = null; myBday = null; renderBirthdays(); updateSide(); loadFeatured(); loadTownCounts(); refreshAlerts(); if (curHash === "#join" || pageFor(curHash)) route(); if (currentMember) renderMemberPage(currentMember); return; }
-    const { data } = await sb.from("profiles").select("*").eq("id", me.id).maybeSingle();
+    const { data, error: profErr } = await sb.from("profiles").select("*").eq("id", me.id).maybeSingle();
     profile = data || null; schoolData = null;
-    say("search-msg", "");
+    say("search-msg", profErr ? L().err : "", !!profErr);   // if the profile could not be loaded (network, paused project), do NOT treat the member as new
+
     const [{ data: bl }, { data: adm }] = await Promise.all([sb.from("blocks").select("blocked"), sb.rpc("is_admin")]);
     blockedIds = new Set((bl || []).map(b => b.blocked));
     isAdmin = adm === true; document.body.classList.toggle("is-admin", isAdmin);
@@ -1206,8 +1207,8 @@
     runPendingSearch();
     if (curHash === "#admin") renderAdmin();
     if (currentMember) renderMemberPage(currentMember);
-    if (!profile && !registering && me.user_metadata && me.user_metadata.profile) { finishRegistration(me); return; }
-    if (!profile && !registering) openProfile(true);
+    if (!profile && !profErr && !registering && me.user_metadata && me.user_metadata.profile) { finishRegistration(me); return; }
+    if (!profile && !profErr && !registering) openProfile(true);
     refreshUnread(); refreshAlerts(); syncLangMeta(); loadPymk(); loadBirthdays();
     renderPushBox(); savePushSub();
     if (me && lastFactUser !== me.id) { lastFactUser = me.id; pickFact(); }

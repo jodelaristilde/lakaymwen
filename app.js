@@ -1411,6 +1411,7 @@
       if (error) alert(L().err);
     });
   });
+  $("pr-signout").addEventListener("click", () => { $("dlg-profile").close(); $("btn-signout").click(); });
   async function openProfile(isNew) {
     if (!me) { openAuth(); return; }
     fillAbout("pr", profile);
@@ -1420,6 +1421,10 @@
       if (first && !$("pr-first").value) $("pr-first").value = first;
       if (last && !$("pr-last").value) $("pr-last").value = last;
     }
+    { const fresh = !profile, m = (me && me.user_metadata) || {};   // brand-new member: say so, and show who is signed in with a way out
+      $("pr-title").textContent = fresh ? L().pr_new_title : L().profile_h;
+      $("pr-who").hidden = !fresh;
+      if (fresh) $("pr-who-t").textContent = L().pr_signed_as(m.full_name || m.name || me.email || ""); }
     setBday("pr", myBday);
     if (sb) sb.from("birthdays").select("month,day").eq("user_id", me.id).maybeSingle().then(({ data }) => { myBday = data || null; setBday("pr", myBday); });
     $("pr-listed").checked = profile ? profile.listed : true;

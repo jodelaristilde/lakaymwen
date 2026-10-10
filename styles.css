@@ -1723,3 +1723,23 @@ body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!i
 #profile-form label.is-off>span:first-child,#reg-form label.is-off>span:first-child{color:var(--off-ink)}
 #profile-form label.is-off>span:first-child::before,#reg-form label.is-off>span:first-child::before{background:var(--off-line)}
 #profile-form input:disabled,#profile-form select:disabled,#reg-form input:disabled,#reg-form select:disabled{background:var(--off-bg)!important;border-color:var(--off-line)!important;color:var(--off-ink)!important;cursor:not-allowed}
+
+.pc-alerts{display:grid;gap:8px;background:var(--a-bg);border:1.5px solid var(--a-line);border-radius:14px;padding:14px;margin:0 0 12px;color:var(--ink)}
+.pc-alerts b{font-size:1.05rem;color:var(--q)}
+.pc-alerts[hidden]{display:none}
+.pc-alerts .btn{width:100%}
+
+/* ---------- Admin numbers, and the in-app browser notice ---------- */
+.adm-stats{margin:14px 0}
+.adm-stats .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin:8px 0}
+.adm-stats .tile{background:var(--a-bg);border:1.5px solid var(--a-line);border-radius:12px;padding:10px 6px;text-align:center}
+.adm-stats .tile b{display:block;font-size:1.35rem;color:var(--q);line-height:1.2}
+.adm-stats .tile span{font-size:.78rem;color:var(--muted)}
+.adm-stats .bars{display:flex;align-items:flex-end;gap:4px;min-height:96px;margin:4px 0 8px}
+.adm-stats .bars>div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px}
+.adm-stats .bars small{font-size:.66rem;color:var(--muted);line-height:1}
+.adm-stats .bars i{display:block;width:100%;background:linear-gradient(#3fae6a,#0f8f86);border-radius:4px 4px 0 0}
+.adm-stats .stat-row{display:flex;justify-content:space-between;width:100%}
+.inapp-note{display:grid;gap:8px;background:#fff4e5;border:1.5px solid #f5cfa6;color:#6b4208;border-radius:12px;padding:12px}
+.inapp-note[hidden]{display:none}
+.inapp-note b{font-size:1rem}

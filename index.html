@@ -235,11 +235,11 @@
             <p class="reg-steps"><span class="rs on">1</span><span class="rs-l" data-t="step1_l"></span><span class="rs-line"></span><span class="rs">2</span><span class="rs-l" data-t="step2_l"></span></p>
             <p class="note req-note" data-t="req_note"></p>
             <label><span class="req" data-t="username"></span><input id="r-user" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"><small class="note" data-t="user_rule"></small></label>
-            <div class="two">
+            <div class="two name-row">
               <label><span class="req" data-t="first_name"></span><input id="r-first" type="text" maxlength="40" autocomplete="given-name"></label>
               <label><span class="req" data-t="last_name"></span><input id="r-last" type="text" maxlength="40" autocomplete="family-name"></label>
-            </div>
-            <div class="gender-field" id="r-gender-box" tabindex="-1"><span class="req" data-t="gender_label"></span><div class="gender-pick" role="radiogroup"><label><input type="radio" name="r-gender-radio" value="M"><span data-t="gender_m"></span></label><label><input type="radio" name="r-gender-radio" value="F"><span data-t="gender_f"></span></label></div><input type="hidden" id="r-gender"></div>
+            <div class="gender-field" id="r-gender-box" tabindex="-1"><span class="req" data-t="gender_label"></span><div class="gender-pick" role="radiogroup"><label><span data-t="gm_s"></span><input type="radio" name="r-gender-radio" value="M"></label><label><span data-t="gf_s"></span><input type="radio" name="r-gender-radio" value="F"></label></div><input type="hidden" id="r-gender"></div>
+          </div>
             <label id="r-town-wrap"><span class="req" data-t="hometown_req"></span><select id="r-town"><option value="" data-t="pick_town"></option></select></label>
             <label id="r-email-wrap"><span class="req" data-t="email_or_phone"></span><input id="r-email" type="text" maxlength="120" autocomplete="email" autocapitalize="none" spellcheck="false" data-ph="email_or_phone_ph"><small class="note" id="r-id-note" data-t="id_note"></small></label>
             <div id="r-phone-wrap" class="phone-wrap" hidden>
@@ -532,11 +532,11 @@
           <p class="note" data-t="photo_note"></p>
         </div>
       </div>
-      <div class="two">
+      <div class="two name-row">
         <label><span class="req" data-t="first_name"></span><input id="pr-first" type="text" maxlength="40" autocomplete="given-name"></label>
         <label><span class="req" data-t="last_name"></span><input id="pr-last" type="text" maxlength="40" autocomplete="family-name"></label>
-      </div>
-      <div class="gender-field" id="pr-gender-box" tabindex="-1"><span class="req" data-t="gender_label"></span><div class="gender-pick" role="radiogroup"><label><input type="radio" name="pr-gender-radio" value="M"><span data-t="gender_m"></span></label><label><input type="radio" name="pr-gender-radio" value="F"><span data-t="gender_f"></span></label></div><input type="hidden" id="pr-gender"></div>
+            <div class="gender-field" id="pr-gender-box" tabindex="-1"><span class="req" data-t="gender_label"></span><div class="gender-pick" role="radiogroup"><label><span data-t="gm_s"></span><input type="radio" name="pr-gender-radio" value="M"></label><label><span data-t="gf_s"></span><input type="radio" name="pr-gender-radio" value="F"></label></div><input type="hidden" id="pr-gender"></div>
+          </div>
       <label><span data-t="nickname"></span><input id="pr-nick" type="text" maxlength="40" placeholder="Ti Djo, Gége…"></label>
       <div class="bday-field" role="group" aria-labelledby="pr-bday-l"><span id="pr-bday-l" class="field-l" data-t="bday_label"></span>
         <div class="two"><select id="pr-bmonth" data-t-aria="bday_month"></select><select id="pr-bday" data-t-aria="bday_day"></select></div>

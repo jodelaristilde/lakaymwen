@@ -1661,3 +1661,9 @@ body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!i
 .btn.green:hover{background:#15803d;box-shadow:0 8px 22px rgba(22,163,74,.3)}
 .side-alerts.green{background:#dcfce7;color:#14532d}
 .gtag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--chip);color:var(--ink);font-size:.7em;font-weight:800;vertical-align:middle}
+.gender-field{margin:10px 0}
+.gender-field>span{display:block;font-weight:600;margin-bottom:6px}
+.gender-pick{display:flex;gap:10px}
+.gender-pick label{display:flex;align-items:center;gap:8px;margin:0;padding:10px 18px;border:1.5px solid var(--line);border-radius:999px;cursor:pointer;font-weight:700}
+.gender-pick label:has(input:checked){border-color:#16a34a;background:#dcfce7;color:#14532d}
+.gender-pick input{width:auto;margin:0;accent-color:#16a34a}

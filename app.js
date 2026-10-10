@@ -995,6 +995,7 @@
     $("reg-form").reset(); $("r-family").replaceChildren(); $("r-schools").replaceChildren(); ensureSchoolRow("r"); showRegForm();
     go("#member-" + user.id);
     afterAuth();
+    autoAskAlerts();
     openPostcard();
   }
   /* After a new member registers: a postcard to share, then the member search */
@@ -1003,6 +1004,7 @@
     const t = profile && profile.hometown, line = $("pc-town"), inv = $("pc-town-invite");
     line.hidden = true; inv.hidden = true;
     openDlg("dlg-welcome");
+    renderPcAlerts();
     if (!sb || !t) return;
     try {
       const { data, error } = await sb.rpc("search_count", { p_key: "", p_town: t });   // how many members are from my hometown
@@ -1151,6 +1153,28 @@
     } });
     box.replaceChildren(el("span", { class: "push-ic", text: "🔔" }), el("div", { class: "push-txt" }, el("b", { text: L().push_h }), el("span", { text: L().push_p }), msg), go, x);
     box.hidden = false;
+  }
+  // Right after sign-up: ask for phone alerts straight away (the browser shows its Allow box), and offer one big button as a back-up.
+  function renderPcAlerts() {
+    const box = $("pc-alerts"); if (!box) return;
+    box.replaceChildren(); box.hidden = true;
+    if (!me) return;
+    if (isIOS && !pushStandalone) { box.append(el("b", { text: L().push_h }), el("span", { text: L().push_ios })); box.hidden = false; return; }
+    if (!pushOK || Notification.permission === "denied") return;
+    if (Notification.permission === "granted") { savePushSub(); return; }
+    const msg = el("small", { class: "push-msg", hidden: "" });
+    const goBtn = el("button", { class: "btn green big", type: "button", text: L().pc_alerts_btn, onclick: async () => {
+      goBtn.disabled = true;
+      let perm = "default"; try { perm = await Notification.requestPermission(); } catch (e) {}
+      if (perm === "granted" && await savePushSub()) { box.replaceChildren(el("b", { text: "✅ " + L().push_on })); setTimeout(() => { box.hidden = true; }, 2500); renderPushBox(); }
+      else { goBtn.disabled = false; msg.hidden = false; msg.textContent = perm === "denied" ? L().push_denied : L().push_fail; }
+    } });
+    box.append(el("b", { text: L().pc_alerts_h }), el("span", { text: L().pc_alerts_p }), goBtn, msg); box.hidden = false;
+  }
+  async function autoAskAlerts() {
+    if (!pushOK || !me || Notification.permission !== "default" || (isIOS && !pushStandalone)) return;
+    try { const perm = await Notification.requestPermission(); if (perm === "granted") await savePushSub(); } catch (e) {}
+    renderPcAlerts(); renderPushBox();
   }
   /* ---------- 🇭🇹 "Did you know?": a different Haiti fact each time someone logs in (or opens the site) ---------- */
   const DIDYOU = window.LAKAYMWEN_DIDYOU || [];
@@ -1317,7 +1341,7 @@
       try {
         await audio.play();
         if ("mediaSession" in navigator && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({ title: "Groove FM Radio", artist: "Live · Lakaymwen.co",
-          artwork: [{ src: new URL("sponsor-groovefm.png", location.href).href, sizes: "600x269", type: "image/png" }] });
+          artwork: [{ src: new URL("sponsor-groovefm.png", location.href).href, sizes: "560x251", type: "image/png" }] });
       } catch (e) { grooveFail(); }
     });
     audio.addEventListener("playing", () => { grooveState = "playing"; grooveUI(); });
@@ -1368,8 +1392,18 @@
   /* ---------- Profile / my account ---------- */
   // "Continue with Google": switch on GOOGLE_ON after Google is enabled in Supabase (Authentication, Providers).
   const GOOGLE_ON = true;
+  const inAppBrowser = /FBAN|FBAV|FB_IAB|Instagram|Messenger|Snapchat|TikTok|musical_ly|Twitter|Line\/|; wv\)/i.test(navigator.userAgent);   // Google blocks sign-in inside these
   document.querySelectorAll("[data-google-box]").forEach(bx => {
     bx.hidden = !GOOGLE_ON;
+    const note = bx.querySelector(".inapp-note");
+    if (note && inAppBrowser) {
+      bx.querySelector(".google-btn").hidden = true; note.hidden = false;
+      const cb = note.querySelector(".inapp-copy"), cl = cb.querySelector("span");
+      cb.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText("https://lakaymwen.co"); } catch (e) {}
+        cl.textContent = L().inapp_copied; setTimeout(() => { cl.textContent = L().inapp_copy; }, 2500);
+      });
+    }
     bx.querySelector(".google-btn").addEventListener("click", async () => {
       if (!sb) return;
       const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + "/" } });
@@ -1458,7 +1492,8 @@
     say("profile-msg", photoFailed ? L().photo_err : L().saved, photoFailed);
     showPhotoPreview(profile);
     if (currentMember) renderMemberPage(currentMember);
-    if (!photoFailed) setTimeout(() => go("#search"), 700);   // saved: close this window and go back to the home page (member search)
+    if (wasNew && !photoFailed) autoAskAlerts();   // first time saved: ask for phone alerts right away
+    if (!photoFailed) setTimeout(() => { go("#search"); if (wasNew) openPostcard(); }, 700);   // saved: close this window and go back to the home page (member search)
   });
 
   /* ---------- Town window ---------- */
@@ -1714,6 +1749,42 @@
       el("h3", { class: "h3", text: L().adm_members_h }),
       el("p", { class: "note", text: L().adm_members_p }), inp, note, list);
   }
+  function statsBox() {
+    const body = el("p", { class: "note", text: L().st_loading });
+    const box = el("div", { class: "box-lite adm-stats" }, el("h3", { class: "h3", text: L().st_h }), body);
+    (async () => {
+      try {
+        const rows = [];
+        for (let i = 0; ; i += 1000) {
+          const { data, error } = await sb.from("profiles").select("created_at,hometown,photo_url,school_list,schools").order("created_at").range(i, i + 999);
+          if (error) throw error;
+          rows.push(...data); if (data.length < 1000 || rows.length >= 20000) break;
+        }
+        const day0 = new Date(); day0.setHours(0, 0, 0, 0);
+        const ago = n => new Date(day0.getTime() - n * 864e5);
+        const when = r => new Date(r.created_at);
+        const hasSchool = r => { const v = r.school_list || r.schools; return Array.isArray(v) ? v.length > 0 : !!(v && String(v).replace(/[\[\]{}",\s]/g, "").length); };
+        const total = rows.length, today = rows.filter(r => when(r) >= day0).length;
+        const d7 = rows.filter(r => when(r) >= ago(6)).length, d30 = rows.filter(r => when(r) >= ago(29)).length;
+        const ph = rows.filter(r => r.photo_url).length, sc = rows.filter(hasSchool).length;
+        const pct = n => total ? " (" + Math.round(n / total * 100) + "%)" : "";
+        const tile = (n, label) => el("div", { class: "tile" }, el("b", { text: String(n) }), el("span", { text: label }));
+        const days = [];
+        for (let k = 13; k >= 0; k--) { const a = ago(k), b = new Date(a.getTime() + 864e5); days.push([a, rows.filter(r => when(r) >= a && when(r) < b).length]); }
+        const mx = Math.max(1, ...days.map(d => d[1]));
+        const bars = el("div", { class: "bars" }, ...days.map(([a, n]) => el("div", { title: a.toLocaleDateString() + ": " + n },
+          el("small", { text: n ? String(n) : "" }), el("i", { style: "height:" + Math.max(3, Math.round(n / mx * 64)) + "px" }), el("small", { text: String(a.getDate()) }))));
+        const towns = {}; rows.forEach(r => { if (r.hometown) towns[r.hometown] = (towns[r.hometown] || 0) + 1; });
+        const top = Object.entries(towns).sort((x, y) => y[1] - x[1]).slice(0, 8);
+        body.replaceWith(
+          el("div", { class: "tiles" }, tile(total, L().st_total), tile(today, L().st_today), tile(d7, L().st_7), tile(d30, L().st_30), tile(ph + pct(ph), L().st_photo), tile(sc + pct(sc), L().st_school)),
+          el("p", { class: "note", text: L().st_days }), bars,
+          el("p", { class: "note", text: L().st_towns }),
+          el("ul", { class: "school-list compact" }, ...top.map(([n, c]) => el("li", {}, el("span", { class: "stat-row" }, el("span", { text: "📍 " + n }), el("span", { class: "count", text: String(c) }))))));
+      } catch (e) { body.textContent = L().st_err; }
+    })();
+    return box;
+  }
   function backupBox() {
     const note = el("p", { class: "note" }), msg = el("p", { class: "msg", hidden: "" });
     const stamp = () => { try { return Number(localStorage.getItem("lkm-backup")) || 0; } catch (e) { return 0; } };
@@ -1787,6 +1858,7 @@
         await sb.from("profiles").update({ suspended: false }).eq("id", p.id); renderAdmin(); loadFeatured(); loadTownCounts(); } }));
     box.replaceChildren(
       el("div", { class: "stats" }, tile(st.members, L().st_members), tile(st.new_this_week, L().st_new), tile(st.open_reports, L().st_reports), tile(st.hidden, L().st_hidden), tile(st.messages, L().st_messages), tile(st.photos, L().st_photos), tile(st.alerts, L().st_alerts), tile(st.family_links, L().st_family)),
+      statsBox(),
       backupBox(),
       membersAdminBox(),
       phoneResetBox(),

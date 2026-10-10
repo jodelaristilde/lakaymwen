@@ -194,10 +194,27 @@
     const c = $(p + "-country").value, inp = $(p + "-lives");
     let dl = $(p + "-lives-list"); if (!dl) { dl = el("datalist", { id: p + "-lives-list" }); inp.after(dl); inp.setAttribute("list", dl.id); }
     inp.disabled = !c;
+    { const lab = inp.closest("label"); if (lab) lab.classList.toggle("is-off", !c); }   // grey out the city until a country is chosen
     inp.placeholder = !c ? L().city_pick_country : isHaiti(c) ? L().city_pick_ht : "";
     dl.replaceChildren(...(isHaiti(c) ? haitiTownsFor($(p + "-state").value) : []).map(t => el("option", { value: t })));
     if (!c) inp.value = "";
   }
+  // Examples go under the question as a small faded line; the answer box stays empty.
+  function moveHints(form) {
+    form.querySelectorAll("label input[placeholder], label textarea[placeholder]").forEach(inp => {
+      const lab = inp.closest("label"), txt = inp.getAttribute("placeholder");
+      if (!lab || lab.classList.contains("check") || lab.classList.contains("sb-field")) return;
+      let h = lab.querySelector(":scope > .ex");
+      if (txt) { if (!h) { h = document.createElement("small"); h.className = "ex"; lab.insertBefore(h, inp); } h.textContent = txt; }
+      else if (h) h.remove();
+      inp.removeAttribute("placeholder");
+    });
+  }
+  ["profile-form", "reg-form"].forEach(id => {
+    const f = $(id); if (!f) return;
+    moveHints(f);
+    new MutationObserver(() => moveHints(f)).observe(f, { subtree: true, attributes: true, attributeFilter: ["placeholder"] });
+  });
   function livesProblem(p) {
     const c = $(p + "-country").value, v = $(p + "-lives").value.trim();
     if (!v || !isHaiti(c)) return null;
@@ -230,7 +247,7 @@
     const box = $(p + "-schools");
     if (box.children.length >= 15) return;
     const v = schoolObj(value);
-    const inp = el("input", { type: "text", class: "school-name", maxlength: "80", autocomplete: "off", role: "combobox", "aria-expanded": "false", placeholder: L().school_ph, "aria-label": L().schools });
+    const inp = el("input", { type: "text", class: "school-name", maxlength: "80", autocomplete: "off", role: "combobox", "aria-expanded": "false", placeholder: "", "aria-label": L().schools });
     const yrs = el("input", { type: "text", class: "school-years", maxlength: "15", inputmode: "numeric", placeholder: L().school_years_ph, "aria-label": L().school_years });
     inp.value = v.name; yrs.value = v.years;
     const menu = el("ul", { class: "school-menu", role: "listbox", hidden: "" });

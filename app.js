@@ -203,14 +203,14 @@
   function moveHints(form) {
     form.querySelectorAll("label input[placeholder], label textarea[placeholder]").forEach(inp => {
       const lab = inp.closest("label"), txt = inp.getAttribute("placeholder");
-      if (!lab || lab.classList.contains("check") || lab.classList.contains("sb-field")) return;
+      if (!lab || lab.classList.contains("check")) return;
       let h = lab.querySelector(":scope > .ex");
-      if (txt) { if (!h) { h = document.createElement("small"); h.className = "ex"; lab.insertBefore(h, inp); } h.textContent = txt; }
+      if (txt) { if (!h) { h = document.createElement("small"); h.className = "ex"; if (lab.classList.contains("sb-field")) lab.appendChild(h); else lab.insertBefore(h, inp); } h.textContent = txt; }
       else if (h) h.remove();
       inp.removeAttribute("placeholder");
     });
   }
-  ["profile-form", "reg-form"].forEach(id => {
+  ["profile-form", "reg-form", "search-form", "land-form"].forEach(id => {
     const f = $(id); if (!f) return;
     moveHints(f);
     new MutationObserver(() => moveHints(f)).observe(f, { subtree: true, attributes: true, attributeFilter: ["placeholder"] });

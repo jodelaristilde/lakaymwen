@@ -1743,3 +1743,19 @@ body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!i
 .inapp-note{display:grid;gap:8px;background:#fff4e5;border:1.5px solid #f5cfa6;color:#6b4208;border-radius:12px;padding:12px}
 .inapp-note[hidden]{display:none}
 .inapp-note b{font-size:1rem}
+
+/* ---------- Search boxes: example under the question, box left blank ---------- */
+.sb-field .ex{display:block;margin:1px 0 0;font-size:.78rem;font-weight:500;letter-spacing:0;text-transform:none;color:var(--muted);opacity:.9;line-height:1.25}
+
+/* ---------- Small polish: no dots on (M)/(F), same size for the Birthday label ---------- */
+#profile-form .gender-pick label:not(.check)>span:first-child::before,#reg-form .gender-pick label:not(.check)>span:first-child::before{display:none}
+#profile-form .field-l,#reg-form .field-l{font-size:1.02rem}
+
+/* ---------- Compact search bar: example in small letters at the bottom, shorter box ---------- */
+.searchbar{padding:4px}
+.searchbar .sb-field,.searchbar.light .sb-field{padding:3px 16px;align-content:center;gap:0}
+.searchbar .sb-field>span{line-height:1.15}
+.searchbar .sb-field input,.searchbar .sb-field select{padding:0;line-height:1.25;font-size:.95rem;min-height:0}
+.searchbar .sb-field .ex{margin:0;font-size:.7rem;line-height:1.1}
+@media (max-width:720px){.searchbar .sb-go{padding:9px}.searchbar .sb-field,.searchbar.light .sb-field{padding:4px 14px}}
+#profile-form .two:has(>label[hidden])>label:not([hidden]),#reg-form .two:has(>label[hidden])>label:not([hidden]){grid-column:1/-1}

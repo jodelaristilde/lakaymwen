@@ -999,7 +999,7 @@
     openPostcard();
   }
   /* After a new member registers: a postcard to share, then the member search */
-  const siteLink = () => "https://lakaymwen.co";   // shares always point to the real site
+  const siteLink = () => "https://www.lakaymwen.co";   // shares always point to the real site
   async function openPostcard() {
     const t = profile && profile.hometown, line = $("pc-town"), inv = $("pc-town-invite");
     line.hidden = true; inv.hidden = true;
@@ -1400,7 +1400,7 @@
       bx.querySelector(".google-btn").hidden = true; note.hidden = false;
       const cb = note.querySelector(".inapp-copy"), cl = cb.querySelector("span");
       cb.addEventListener("click", async () => {
-        try { await navigator.clipboard.writeText("https://lakaymwen.co"); } catch (e) {}
+        try { await navigator.clipboard.writeText("https://www.lakaymwen.co"); } catch (e) {}
         cl.textContent = L().inapp_copied; setTimeout(() => { cl.textContent = L().inapp_copy; }, 2500);
       });
     }

@@ -1715,3 +1715,11 @@ body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!i
 #profile-form .form-h,#reg-form .form-h{background:linear-gradient(90deg,color-mix(in srgb,#0f8f86 16%,transparent),transparent);border:0;border-left:5px solid #0f8f86;border-radius:8px;padding:8px 12px;margin-top:14px;color:var(--q)}
 #profile-form .form-h:first-child,#reg-form .form-h:first-child{padding-top:8px;margin-top:0}
 #dlg-profile h2{color:var(--q)}
+
+/* ---------- Examples under the question, and greyed-out city ---------- */
+:root{--off-bg:#eceeed;--off-line:#d8dcda;--off-ink:#9aa0a6}
+@media (prefers-color-scheme:dark){:root{--off-bg:#141c2b;--off-line:#243049;--off-ink:#6b7690}}
+#profile-form .ex,#reg-form .ex{font-size:.82rem;font-weight:500;color:var(--muted);opacity:.9;line-height:1.3}
+#profile-form label.is-off>span:first-child,#reg-form label.is-off>span:first-child{color:var(--off-ink)}
+#profile-form label.is-off>span:first-child::before,#reg-form label.is-off>span:first-child::before{background:var(--off-line)}
+#profile-form input:disabled,#profile-form select:disabled,#reg-form input:disabled,#reg-form select:disabled{background:var(--off-bg)!important;border-color:var(--off-line)!important;color:var(--off-ink)!important;cursor:not-allowed}

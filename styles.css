@@ -1700,3 +1700,18 @@ body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!i
 #reg-form .name-row .gender-pick label,#profile-form .name-row .gender-pick label,#reg-form .name-row .gender-pick label:has(input:checked),#profile-form .name-row .gender-pick label:has(input:checked){font-size:1.02rem}
 #reg-form input,#reg-form select,#profile-form input,#profile-form select{font-size:1.05rem}
 #reg-form small.note,#reg-form .note{font-size:.95rem}
+
+/* ---------- Color: questions in teal, answers in soft mint boxes ---------- */
+:root{--q:#0d6e66;--a-bg:#effaf4;--a-line:#b7e3cd;--a-glow:rgba(15,143,134,.2);--n:#8a5a12}
+@media (prefers-color-scheme:dark){:root{--q:#6fd6c9;--a-bg:#0e2a2b;--a-line:#1f5c55;--n:#f0c27a}}
+#profile-form label:not(.check),#reg-form label:not(.check),#profile-form .field-l,#reg-form .field-l,#profile-form .gender-field>span,#reg-form .gender-field>span{color:var(--q);font-weight:700}
+#profile-form label:not(.check)>span:first-child::before,#reg-form label:not(.check)>span:first-child::before,#profile-form .field-l::before,#reg-form .field-l::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:1px;background:linear-gradient(135deg,#3fae6a,#f29a3b)}
+#profile-form input:not([type=radio]):not([type=checkbox]):not([type=file]):not([type=hidden]),#profile-form select,#profile-form textarea,
+#reg-form input:not([type=radio]):not([type=checkbox]):not([type=file]):not([type=hidden]),#reg-form select,#reg-form textarea{background:var(--a-bg);border:1.5px solid var(--a-line);color:var(--ink)}
+#profile-form input:not([type=radio]):not([type=checkbox]):not([type=file]):focus,#profile-form select:focus,#profile-form textarea:focus,
+#reg-form input:not([type=radio]):not([type=checkbox]):not([type=file]):focus,#reg-form select:focus,#reg-form textarea:focus{background:var(--bg);border-color:#0f8f86;box-shadow:0 0 0 4px var(--a-glow)}
+#profile-form ::placeholder,#reg-form ::placeholder{color:#7fa393;opacity:1}
+#profile-form small.note,#profile-form .note,#reg-form small.note{color:var(--n);font-weight:500}
+#profile-form .form-h,#reg-form .form-h{background:linear-gradient(90deg,color-mix(in srgb,#0f8f86 16%,transparent),transparent);border:0;border-left:5px solid #0f8f86;border-radius:8px;padding:8px 12px;margin-top:14px;color:var(--q)}
+#profile-form .form-h:first-child,#reg-form .form-h:first-child{padding-top:8px;margin-top:0}
+#dlg-profile h2{color:var(--q)}

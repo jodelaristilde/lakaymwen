@@ -1376,7 +1376,7 @@
     $("del-confirm").hidden = true; $("del-start").hidden = !profile; $("del-word").value = ""; say("del-msg", "");
     pendingPhoto = null; removePhoto = false; $("pr-photo").value = "";
     showPhotoPreview(profile);
-    say("profile-msg", isNew ? L().welcome : "");
+    say("profile-msg", isNew ? L().welcome_new : "");
     openDlg("dlg-profile");
     if ($("my-notices-wrap")) $("my-notices-wrap").hidden = true;
     return;

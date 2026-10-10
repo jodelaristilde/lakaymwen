@@ -1655,3 +1655,9 @@ body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!i
 .show-row{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 4px}
 .intro-list .more-li .linkbtn{font-weight:700}
 .intro-list li[hidden]{display:none}
+
+/* ---------- Green friend buttons and alert, M/F tag ---------- */
+.btn.green{background:#16a34a;color:#fff}
+.btn.green:hover{background:#15803d;box-shadow:0 8px 22px rgba(22,163,74,.3)}
+.side-alerts.green{background:#dcfce7;color:#14532d}
+.gtag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--chip);color:var(--ink);font-size:.7em;font-weight:800;vertical-align:middle}

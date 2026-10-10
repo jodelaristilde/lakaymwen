@@ -1104,8 +1104,17 @@
     $("reset-form").hidden = true; say("forgot-msg", L().pass_changed);
     setTimeout(() => $("dlg-forgot").close(), 1400);
   });
-  $("btn-signout").addEventListener("click", async () => { if (sb) { await forgetPushSub(); await sb.auth.signOut(); } });
-  $("join-logout").addEventListener("click", async () => { if (sb) await sb.auth.signOut(); });
+  // Sign out that always sticks: stop phone alerts (max 1.5 s), end the session on this device, wipe the saved login, start clean
+  async function hardSignOut() {
+    if (!sb) return;
+    try { await Promise.race([forgetPushSub(), new Promise(r => setTimeout(r, 1500))]); } catch (e) {}
+    try { await sb.auth.signOut({ scope: "local" }); } catch (e) {}
+    try { Object.keys(localStorage).filter(k => /^sb-.*-auth-token/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+    try { Object.keys(sessionStorage).filter(k => /^sb-.*-auth-token/.test(k)).forEach(k => sessionStorage.removeItem(k)); } catch (e) {}
+    location.href = location.pathname;   // fresh start on the home page
+  }
+  $("btn-signout").addEventListener("click", hardSignOut);
+  $("join-logout").addEventListener("click", hardSignOut);
 
   function updateAccount() {
     $("acct-out").hidden = !!me;

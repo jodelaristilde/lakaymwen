@@ -1349,9 +1349,25 @@
   }
 
   /* ---------- Profile / my account ---------- */
+  // "Continue with Google": switch on GOOGLE_ON after Google is enabled in Supabase (Authentication, Providers).
+  const GOOGLE_ON = true;
+  document.querySelectorAll("[data-google-box]").forEach(bx => {
+    bx.hidden = !GOOGLE_ON;
+    bx.querySelector(".google-btn").addEventListener("click", async () => {
+      if (!sb) return;
+      const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + "/" } });
+      if (error) alert(L().err);
+    });
+  });
   async function openProfile(isNew) {
     if (!me) { openAuth(); return; }
     fillAbout("pr", profile);
+    if (!profile && me && me.user_metadata) {   // signed in with Google: fill in the name they already have
+      const m = me.user_metadata, full = String(m.full_name || m.name || "").trim();
+      const first = m.given_name || full.split(" ")[0] || "", last = m.family_name || full.split(" ").slice(1).join(" ") || "";
+      if (first && !$("pr-first").value) $("pr-first").value = first;
+      if (last && !$("pr-last").value) $("pr-last").value = last;
+    }
     setBday("pr", myBday);
     if (sb) sb.from("birthdays").select("month,day").eq("user_id", me.id).maybeSingle().then(({ data }) => { myBday = data || null; setBday("pr", myBday); });
     $("pr-listed").checked = profile ? profile.listed : true;

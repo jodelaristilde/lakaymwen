@@ -1693,3 +1693,10 @@ body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!i
 .two.name-row>label:nth-child(2){grid-column:1;grid-row:2}
 .two.name-row>.gender-field{grid-column:2;grid-row:1 / span 2;align-self:center}
 #join .join-town{display:none!important}
+
+/* ---------- Registration: no step bar or star note, bigger text ---------- */
+#reg-form .reg-steps,#reg-form .req-note{display:none}
+#reg-form label,#profile-form label,#reg-form .gender-field,#profile-form .gender-field{font-size:1.02rem}
+#reg-form .name-row .gender-pick label,#profile-form .name-row .gender-pick label,#reg-form .name-row .gender-pick label:has(input:checked),#profile-form .name-row .gender-pick label:has(input:checked){font-size:1.02rem}
+#reg-form input,#reg-form select,#profile-form input,#profile-form select{font-size:1.05rem}
+#reg-form small.note,#reg-form .note{font-size:.95rem}

@@ -1670,8 +1670,15 @@ body.search-mode #home .portal-main>#old-haiti-box:not([hidden]){display:block!i
 .gender-pick input{width:auto;margin:0;accent-color:#16a34a}
 .two.name-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:start}
 .name-row input{min-width:0}
-.name-row .gender-field{margin:0}
-.name-row .gender-field>span{font-size:.85rem;margin-bottom:6px}
-.name-row .gender-pick{flex-direction:column;gap:8px}
-.name-row .gender-pick label,.name-row .gender-pick label:has(input:checked){padding:0;border:0;background:none;gap:6px;font-weight:700;color:inherit}
-.name-row .gender-pick input{width:20px;height:20px}
+.name-row .gender-field{margin:0;display:grid;gap:6px;font-size:.88rem;font-weight:600;color:var(--ink-2)}
+.name-row .gender-field>span{margin:0;font-size:inherit;font-weight:inherit}
+.name-row .gender-pick{flex-direction:column;gap:4px;justify-content:center;min-height:46px}
+.name-row .gender-pick label,.name-row .gender-pick label:has(input:checked){padding:0;border:0;background:none;gap:6px;font-size:.88rem;font-weight:600;line-height:20px;color:var(--ink-2)}
+.name-row .gender-pick input{width:18px;height:18px}
+.google-box{margin:0 0 14px}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#fff;color:#1f1f1f;border:1px solid #dadce0;font-weight:700}
+.google-btn:hover{background:#f6f8fa}
+.google-btn .g-ic{font-weight:800;color:#4285f4}
+.google-box .or-line{display:flex;align-items:center;gap:10px;margin:12px 0 0;color:var(--muted);font-size:.85rem}
+.google-box .or-line::before,.google-box .or-line::after{content:"";flex:1;height:1px;background:var(--line)}
+.google-box[hidden]{display:none}

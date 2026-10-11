@@ -2782,17 +2782,8 @@
     }
     route(true);
   }
-  // Computers: put "👤 Logged in as …" on the same line as "← Back to home", on the right
-  const whoHome = $("who-bar").parentNode, whoNext = $("who-bar").nextSibling;
-  function placeWho() {
-    const bar = $("who-bar"); if (!bar) return;
-    if (window.matchMedia("(max-width:760px)").matches || bar.hidden) { if (bar.parentNode !== whoHome) whoHome.insertBefore(bar, whoNext); bar.classList.remove("inline"); return; }
-    const main = document.querySelector("#home .portal-main");
-    const box = main && [...main.children].find(c => c !== bar && c.offsetParent !== null && c.getBoundingClientRect().height > 0);
-    if (!box) { if (bar.parentNode !== whoHome) whoHome.insertBefore(bar, whoNext); bar.classList.remove("inline"); return; }
-    if (bar.parentNode !== box || box.firstElementChild !== bar) box.insertBefore(bar, box.firstChild);
-    bar.classList.add("inline");
-  }
+  // "👤 Logged in as …" now sits in its own line under the banner (right side); it is no longer moved into other boxes.
+  function placeWho() { const bar = $("who-bar"); if (bar) bar.classList.remove("inline"); }
   window.addEventListener("resize", () => requestAnimationFrame(placeWho));
   // "About us" shows inside the white panel (next to the menu, proverb and sponsors), not as a full-width black band
   const aboutHome = $("about").parentNode, aboutNext = $("about").nextSibling;

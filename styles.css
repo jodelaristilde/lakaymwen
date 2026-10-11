@@ -1780,3 +1780,8 @@ label.is-off>.ex{opacity:.7}
 /* ---------- Language buttons: far right ---------- */
 .hb-lang{right:10px;bottom:10px}
 .foot-row .foot-lang{margin-left:auto}
+
+/* ---------- "Logged in as" under the banner, on the right (computers) ---------- */
+@media (min-width:761px){
+  .who-bar{justify-content:flex-end;margin:10px 8px 0;max-width:none}
+}

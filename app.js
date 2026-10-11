@@ -1,6 +1,9 @@
 // Lakaymwen.co — site logic. Talks to Supabase for sign-in, notices and messages.
 (() => {
-  const C = window.LAKAYMWEN_CONFIG || {};
+  // The site's own connection settings are built in (they are public by design), so a missing or broken config.js can never switch the whole site off.
+  const C = { SUPABASE_URL: "https://vyvgcnxmcyclcykpyhlk.supabase.co", SUPABASE_ANON_KEY: "sb_publishable_zqyS9xtaG78d0ouAt4m_Lw_W8pfM7ZQ",
+    CONTACT_EMAIL: "info@lakaymwen.co", GROOVE_STREAM_URL: "https://cast5.asurahosting.com/proxy/jodel/stream" };
+  { const W = window.LAKAYMWEN_CONFIG || {}; Object.keys(W).forEach(k => { const v = W[k]; if (typeof v === "string" && v.trim() && !/PASTE|YOUR/i.test(v)) C[k] = v; }); }
   const TOWNS = window.LAKAYMWEN_TOWNS || [];
   const TEXT = window.LAKAYMWEN_TEXT;
   const $ = id => document.getElementById(id);
@@ -11,6 +14,17 @@
   const configured = typeof C.SUPABASE_URL === "string" && C.SUPABASE_URL.startsWith("https://") &&
     typeof C.SUPABASE_ANON_KEY === "string" && !C.SUPABASE_ANON_KEY.includes("PASTE");
   const sb = configured && window.supabase ? window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY) : null;
+  // Self-repair: if the site cannot start, clear the saved copies on this phone once and try again.
+  if (!sb) { try {
+    if (!sessionStorage.getItem("lkm-heal")) {
+      sessionStorage.setItem("lkm-heal", "1");
+      (async () => {
+        try { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); } catch (e) {}
+        try { const keys = await caches.keys(); await Promise.all(keys.map(k => caches.delete(k))); } catch (e) {}
+        location.reload();
+      })();
+    }
+  } catch (e) {} }
 
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },

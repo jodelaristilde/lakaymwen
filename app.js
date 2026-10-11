@@ -2405,7 +2405,7 @@
       $("dlg-photo").close();
       go("#photo/" + ph.id);
     } catch (err) {
-      say("photo-msg", /too many/i.test(err.message || "") ? L().photo_max : L().photo_err, true);
+      say("photo-msg", /too many/i.test(err.message || "") ? L().photo_max : L().photo_share_err, true);
     } finally { btn.disabled = false; }
   });
 

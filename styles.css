@@ -1771,3 +1771,12 @@ label.is-off>.ex{opacity:.7}
 .google-box.google-bottom{display:none;margin:18px 0 4px}
 .google-bottom .or-line{margin:0 0 12px}
 @media (max-width:760px){.google-box.google-bottom:not([hidden]){display:block}}
+
+/* ---------- Phone menu: Sign out always reachable ---------- */
+@media (max-width:760px){
+  body.menu-open .side-menu,body.menu-open.register-mode .side-menu{max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:0}
+  body.menu-open .side-menu [data-action="signout"]{position:sticky;bottom:0;z-index:2;margin-top:4px;background:linear-gradient(135deg,#1b2a52,#0b1530);box-shadow:0 -12px 12px var(--card,#fff)}
+}
+/* ---------- Language buttons: far right ---------- */
+.hb-lang{right:10px;bottom:10px}
+.foot-row .foot-lang{margin-left:auto}

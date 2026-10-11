@@ -1560,6 +1560,7 @@
     $("unread-side").textContent = count || "";
     $("unread-side").hidden = !count;
     showMsgAlert(count || 0);
+    setToastCount("msg", count || 0);
   }
   // The flashing alert goes away as soon as the member opens their messages,
   // and only comes back when a NEW message arrives.
@@ -1569,7 +1570,7 @@
     unreadNow = n;
     if (n < msgAck) msgAck = n;
     if ($("dlg-inbox") && $("dlg-inbox").open) msgAck = n;
-    b.hidden = !n || n <= msgAck;
+    b.hidden = true;   // the red message alert is now one of the colored pop-ups (see renderToasts)
     $("msg-alert-n").textContent = n ? String(n) : "";
     $("msg-alert-txt").textContent = n ? L().msg_new(n) : "";
     b.setAttribute("aria-label", n ? L().msg_new(n) : "");
@@ -2039,6 +2040,30 @@
 
   /* ---------- Name alerts ---------- */
   var unseenMatches = 0;
+  /* ---------- Login alerts: red = messages, blue = friend/family requests, yellow = name alerts ---------- */
+  const TOAST_KEY = "lkm-toast-ack";
+  const toastCounts = { msg: 0, friend: 0, fam: 0, name: 0 };
+  const toastAck = () => { try { return JSON.parse(sessionStorage.getItem(TOAST_KEY) || "{}"); } catch (e) { return {}; } };
+  function toastSetAck(k, n) { const a = toastAck(); a[k] = n; try { sessionStorage.setItem(TOAST_KEY, JSON.stringify(a)); } catch (e) {} }
+  function setToastCount(k, n) {
+    toastCounts[k] = n;
+    if ((toastAck()[k] || 0) > n) toastSetAck(k, n);   // fewer than before (read or answered): forget the old "seen" mark
+    renderToasts();
+  }
+  function renderToasts() {
+    const box = $("toasts"); if (!box) return;
+    const ack = toastAck();
+    const defs = [
+      ["msg", "red", "✉️", L().tn_msg, () => openInbox()],
+      ["friend", "blue", "👋", L().tn_friend, () => go("#member-" + me.id)],
+      ["fam", "blue", "👨‍👩‍👧", L().tn_fam, () => go("#member-" + me.id)],
+      ["name", "yellow", "🔔", L().tn_name, () => go("#alerts")]];
+    box.replaceChildren(...defs.filter(([k]) => me && toastCounts[k] > (ack[k] || 0)).map(([k, color, icon, text, open]) =>
+      el("div", { class: "toast " + color, role: "status" },
+        el("button", { class: "toast-main", type: "button", onclick: () => { toastSetAck(k, toastCounts[k]); renderToasts(); open(); } },
+          el("span", { class: "toast-ic", text: icon, "aria-hidden": "true" }), el("span", { class: "toast-tx", text: text(toastCounts[k]) })),
+        el("button", { class: "toast-x", type: "button", "aria-label": L().close || "Close", text: "×", onclick: () => { toastSetAck(k, toastCounts[k]); renderToasts(); } }))));
+  }
   async function refreshAlerts() {
     if (!sb || !me) { unseenMatches = 0; }
     else {
@@ -2059,6 +2084,7 @@
     if (sb && me) { const { data: fq } = await sb.from("friendships").select("requester").eq("addressee", me.id).eq("status", "pending").limit(100); frReq = (fq || []).length; }
     $("side-friends").hidden = !frReq; $("side-friends").textContent = L().friend_badge_side(frReq);
     if (me) $("side-friends").setAttribute("href", "#member-" + me.id);
+    setToastCount("name", unseenMatches); setToastCount("fam", famReqs); setToastCount("friend", frReq);
   }
   async function createAlert(q, town) {
     if (!sb || !me) { openAuth(null, "login"); return [L().search_login, true]; }

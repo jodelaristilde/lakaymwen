@@ -1795,3 +1795,19 @@ label.is-off>.ex{opacity:.7}
 .searchbar .sb-field:has(>.ex)>span{grid-column:1;grid-row:1}
 .searchbar .sb-field:has(>.ex)>.ex{grid-column:2;grid-row:1;justify-self:start;align-self:baseline;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.78rem;line-height:1.2}
 .searchbar .sb-field:has(>.ex)>input{grid-column:1/-1;grid-row:2}
+
+/* ---------- Pop-up alerts at login: red messages, blue requests, yellow name alerts ---------- */
+.toasts{position:fixed;top:14px;right:16px;z-index:70;display:grid;gap:8px;width:min(360px,calc(100vw - 24px));pointer-events:none}
+.toast{pointer-events:auto;display:flex;align-items:stretch;border-radius:14px;overflow:hidden;box-shadow:0 12px 30px rgba(7,19,48,.28);animation:toast-in .4s ease-out}
+.toast-main{flex:1;display:flex;align-items:center;gap:10px;padding:13px 14px;border:0;background:transparent;font:inherit;font-weight:800;font-size:.98rem;text-align:left;color:inherit;cursor:pointer}
+.toast-ic{font-size:1.3rem;line-height:1}
+.toast-x{border:0;background:rgba(0,0,0,.14);color:inherit;width:40px;font-size:1.4rem;line-height:1;cursor:pointer}
+.toast.red{background:#e8193c;color:#fff}
+.toast.blue{background:#1d4ed8;color:#fff}
+.toast.yellow{background:#facc15;color:#422006}
+.toast.yellow .toast-x{background:rgba(66,32,6,.12)}
+@keyframes toast-in{from{opacity:0;transform:translateY(-14px) scale(.97)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}
+@media (max-width:760px){.toasts{top:62px;left:12px;right:12px;width:auto}}
+.side-alerts.blue{background:#dbeafe;color:#1e3a8a}
+.side-alerts.yellow{background:#fef3c7;color:#78350f}

@@ -214,21 +214,28 @@
     if (!c) inp.value = "";
   }
   // Examples go under the question as a small faded line; the answer box stays empty.
-  function moveHints(form) {
-    form.querySelectorAll("label input[placeholder], label textarea[placeholder]").forEach(inp => {
+  function moveHints(root) {
+    root.querySelectorAll("label input[placeholder], label textarea[placeholder]").forEach(inp => {
       const lab = inp.closest("label"), txt = inp.getAttribute("placeholder");
-      if (!lab || lab.classList.contains("check")) return;
-      let h = lab.querySelector(":scope > .ex");
-      if (txt) { if (!h) { h = document.createElement("small"); h.className = "ex"; if (lab.classList.contains("sb-field")) lab.appendChild(h); else lab.insertBefore(h, inp); } h.textContent = txt; }
-      else if (h) h.remove();
+      if (!lab || lab.classList.contains("check") || lab.classList.contains("sr-only")) return;
+      if (!lab.querySelector(":scope > span")) return;   // only fields that have a question above them
+      try {
+        let h = lab.querySelector(":scope > .ex");
+        if (txt) {
+          if (!h) {
+            h = document.createElement("small"); h.className = "ex";
+            let anchor = inp; while (anchor.parentElement && anchor.parentElement !== lab) anchor = anchor.parentElement;   // the input may sit inside a wrapper (password eye, etc.)
+            if (lab.classList.contains("sb-field") || anchor.parentElement !== lab) lab.appendChild(h); else lab.insertBefore(h, anchor);
+          }
+          h.textContent = txt;
+        } else if (h) h.remove();
+      } catch (e) {}
       inp.removeAttribute("placeholder");
     });
   }
-  ["profile-form", "reg-form", "search-form", "land-form"].forEach(id => {
-    const f = $(id); if (!f) return;
-    moveHints(f);
-    new MutationObserver(() => moveHints(f)).observe(f, { subtree: true, attributes: true, attributeFilter: ["placeholder"] });
-  });
+  moveHints(document);
+  { let queued = 0; new MutationObserver(() => { if (queued) return; queued = requestAnimationFrame(() => { queued = 0; moveHints(document); }); })
+      .observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["placeholder"] }); }
   function livesProblem(p) {
     const c = $(p + "-country").value, v = $(p + "-lives").value.trim();
     if (!v || !isHaiti(c)) return null;

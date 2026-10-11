@@ -235,10 +235,10 @@
             <div id="reg-step1" class="reg-step">
             <p class="reg-steps"><span class="rs on">1</span><span class="rs-l" data-t="step1_l"></span><span class="rs-line"></span><span class="rs">2</span><span class="rs-l" data-t="step2_l"></span></p>
             <p class="note req-note" data-t="req_note"></p>
-            <label><span class="req" data-t="username"></span><input id="r-user" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"><small class="note" data-t="user_rule"></small></label>
+            <label><span class="req" data-t="username"></span><input id="r-user" placeholder="marie.joseph" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"><small class="note" data-t="user_rule"></small></label>
             <div class="two name-row">
-              <label><span class="req" data-t="first_name"></span><input id="r-first" type="text" maxlength="40" autocomplete="given-name"></label>
-              <label><span class="req" data-t="last_name"></span><input id="r-last" type="text" maxlength="40" autocomplete="family-name"></label>
+              <label><span class="req" data-t="first_name"></span><input id="r-first" placeholder="Marie" type="text" maxlength="40" autocomplete="given-name"></label>
+              <label><span class="req" data-t="last_name"></span><input id="r-last" placeholder="Joseph" type="text" maxlength="40" autocomplete="family-name"></label>
             <div class="gender-field" id="r-gender-box" tabindex="-1"><span class="req" data-t="gender_label"></span><div class="gender-pick" role="radiogroup"><label><span data-t="gm_s"></span><input type="radio" name="r-gender-radio" value="M"></label><label><span data-t="gf_s"></span><input type="radio" name="r-gender-radio" value="F"></label></div><input type="hidden" id="r-gender"></div>
           </div>
             <label id="r-town-wrap"><span class="req" data-t="hometown_req"></span><select id="r-town"><option value="" data-t="pick_town"></option></select></label>
@@ -249,8 +249,8 @@
               <label><span class="req" data-t="secret_a"></span><input id="r-seca" type="text" maxlength="60" autocomplete="off" autocapitalize="none" spellcheck="false"><small class="note" data-t="secret_note"></small></label>
             </div>
             <div class="two">
-              <label><span class="req" data-t="password"></span><input id="r-pass" type="password" autocomplete="new-password"></label>
-              <label><span class="req" data-t="password2"></span><input id="r-pass2" type="password" autocomplete="new-password"></label>
+              <label><span class="req" data-t="password"></span><input id="r-pass" data-ph="ex_pass" type="password" autocomplete="new-password"></label>
+              <label><span class="req" data-t="password2"></span><input id="r-pass2" data-ph="ex_pass2" type="password" autocomplete="new-password"></label>
             </div>
             <button class="btn red big reg-next" type="submit" data-t="next_step"></button>
             </div>
@@ -285,7 +285,7 @@
             <div class="list-rows" id="r-schools"></div>
             <button class="btn ghost small add-fam" type="button" data-add-school="r" data-t="add_school"></button>
 
-            <label><span data-t="describe"></span><textarea id="r-bio" maxlength="600"></textarea></label>
+            <label><span data-t="describe"></span><textarea id="r-bio" maxlength="600" data-ph="ex_bio"></textarea></label>
 
             <h3 class="form-h"><span data-t="sec_family"></span> <small data-t="optional"></small></h3>
             <p class="note" data-t="family_note"></p>
@@ -303,7 +303,7 @@
             <h3 class="form-h" data-t="verify_h"></h3>
             <p id="verify-text"></p>
             <form id="verify-form" novalidate>
-              <label><span data-t="code_from_email"></span><input id="v-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10"></label>
+              <label><span data-t="code_from_email"></span><input id="v-code" placeholder="123456" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10"></label>
               <button class="btn red big" type="submit" data-t="verify_btn"></button>
             </form>
             <p class="note"><button class="linkbtn" type="button" id="v-resend" data-t="resend_code"></button> · <button class="linkbtn" type="button" id="v-change" data-t="change_email"></button></p>
@@ -336,6 +336,7 @@
       </div>
       <nav class="az" id="az" aria-label="Letters"></nav>
       <div class="towns" id="town-list"></div>
+      <div class="google-box google-bottom" data-google-box hidden><p class="or-line"><span data-t="google_or"></span></p><button class="btn google-btn" type="button"><span class="g-ic" aria-hidden="true">G</span><span data-t="google_btn"></span></button><div class="inapp-note" hidden><b data-t="inapp_h"></b><span data-t="inapp_p"></span><button class="btn small inapp-copy" type="button"><span data-t="inapp_copy"></span></button></div></div>
         </div>
 
 
@@ -437,7 +438,7 @@
           <div class="box-head"><h2 data-t="login_h"></h2></div>
           <div id="side-out">
             <form id="side-login-form" novalidate>
-              <label><span data-t="email_or_phone"></span><input id="side-email" type="text" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
+              <label><span data-t="email_or_phone"></span><input id="side-email" data-ph="email_or_phone_ph" type="text" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
               <label><span data-t="password"></span><input id="side-pass" type="password" required autocomplete="current-password"></label>
               <button class="btn dark big" type="submit" data-t="login_btn"></button>
             </form>
@@ -512,7 +513,7 @@
   <div class="dlg-body">
     <div class="google-box" data-google-box hidden><button class="btn google-btn" type="button"><span class="g-ic" aria-hidden="true">G</span><span data-t="google_btn"></span></button><div class="inapp-note" hidden><b data-t="inapp_h"></b><span data-t="inapp_p"></span><button class="btn small inapp-copy" type="button"><span data-t="inapp_copy"></span></button></div><p class="or-line"><span data-t="google_or"></span></p></div>
     <form id="login-form" novalidate>
-      <label><span data-t="email_or_phone"></span><input id="l-email" type="text" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
+      <label><span data-t="email_or_phone"></span><input id="l-email" data-ph="email_or_phone_ph" type="text" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
       <label><span data-t="password"></span><input id="l-pass" type="password" required autocomplete="current-password"></label>
       <button class="btn dark big" type="submit" data-t="login_btn"></button>
       <button class="linkbtn" type="button" data-forgot data-t="forgot"></button>
@@ -537,8 +538,8 @@
         </div>
       </div>
       <div class="two name-row">
-        <label><span class="req" data-t="first_name"></span><input id="pr-first" type="text" maxlength="40" autocomplete="given-name"></label>
-        <label><span class="req" data-t="last_name"></span><input id="pr-last" type="text" maxlength="40" autocomplete="family-name"></label>
+        <label><span class="req" data-t="first_name"></span><input id="pr-first" placeholder="Marie" type="text" maxlength="40" autocomplete="given-name"></label>
+        <label><span class="req" data-t="last_name"></span><input id="pr-last" placeholder="Joseph" type="text" maxlength="40" autocomplete="family-name"></label>
             <div class="gender-field" id="pr-gender-box" tabindex="-1"><span class="req" data-t="gender_label"></span><div class="gender-pick" role="radiogroup"><label><span data-t="gm_s"></span><input type="radio" name="pr-gender-radio" value="M"></label><label><span data-t="gf_s"></span><input type="radio" name="pr-gender-radio" value="F"></label></div><input type="hidden" id="pr-gender"></div>
           </div>
       <label><span data-t="nickname"></span><input id="pr-nick" type="text" maxlength="40" placeholder="Ti Djo, Gége…"></label>
@@ -558,7 +559,7 @@
       <div class="list-rows" id="pr-schools"></div>
       <button class="btn ghost small add-fam" type="button" data-add-school="pr" data-t="add_school"></button>
 
-      <label><span data-t="describe"></span><textarea id="pr-bio" maxlength="600"></textarea></label>
+      <label><span data-t="describe"></span><textarea id="pr-bio" maxlength="600" data-ph="ex_bio"></textarea></label>
 
       <h3 class="form-h"><span data-t="sec_family"></span> <small data-t="optional"></small></h3>
       <p class="note" data-t="family_note"></p>
@@ -566,7 +567,7 @@
       <button class="btn ghost small add-fam" type="button" data-add-family="pr" data-t="add_family"></button>
       <label class="check"><input id="pr-listed" type="checkbox" checked><span data-t="listed"></span></label>
       <label class="check"><input id="pr-founding" type="checkbox"><span data-t="founding_q"></span></label>
-      <label id="pr-old-wrap" hidden><span data-t="old_username"></span><input id="pr-old" type="text" maxlength="40"></label>
+      <label id="pr-old-wrap" hidden><span data-t="old_username"></span><input id="pr-old" type="text" maxlength="40" placeholder="BETHSAIDA, JODEL…"></label>
       <button class="btn dark big" type="submit" data-t="save"></button>
     </form>
     <p class="msg" id="profile-msg" hidden></p>
@@ -574,7 +575,7 @@
       <button class="linkbtn danger-link" type="button" id="del-start" data-t="delete_account"></button>
       <div id="del-confirm" hidden>
         <p data-t="delete_warn"></p>
-        <label><span data-t="delete_type"></span><input id="del-word" type="text" autocomplete="off" autocapitalize="characters"></label>
+        <label><span data-t="delete_type"></span><input id="del-word" data-ph="ex_delete" type="text" autocomplete="off" autocapitalize="characters"></label>
         <div class="row-btns">
           <button class="btn red" type="button" id="del-go" data-t="delete_forever"></button>
           <button class="btn ghost" type="button" id="del-cancel" data-t="cancel"></button>
@@ -621,15 +622,15 @@
   <div class="dlg-body">
     <form id="forgot-form" novalidate>
       <p class="note" data-t="forgot_p"></p>
-      <label><span data-t="email_or_phone"></span><input id="f-email" type="text" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false"></label>
+      <label><span data-t="email_or_phone"></span><input id="f-email" data-ph="email_or_phone_ph" type="text" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false"></label>
       <button class="btn dark big" type="submit" data-t="send_code"></button>
     </form>
     <form id="reset-form" novalidate hidden>
       <p id="reset-text"></p>
-      <label id="f-code-wrap"><span data-t="code_if_any"></span><input id="f-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10"></label>
+      <label id="f-code-wrap"><span data-t="code_if_any"></span><input id="f-code" placeholder="123456" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10"></label>
       <div class="two">
-        <label><span data-t="new_pass"></span><input id="f-pass" type="password" autocomplete="new-password"></label>
-        <label><span data-t="password2"></span><input id="f-pass2" type="password" autocomplete="new-password"></label>
+        <label><span data-t="new_pass"></span><input id="f-pass" data-ph="ex_pass" type="password" autocomplete="new-password"></label>
+        <label><span data-t="password2"></span><input id="f-pass2" data-ph="ex_pass2" type="password" autocomplete="new-password"></label>
       </div>
       <button class="btn red big" type="submit" data-t="set_pass"></button>
     </form>
@@ -638,8 +639,8 @@
       <p class="ps-q" id="ps-q"></p>
       <label><span data-t="secret_a"></span><input id="ps-a" type="text" maxlength="60" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
       <div class="two">
-        <label><span data-t="new_pass"></span><input id="ps-pass" type="password" autocomplete="new-password"></label>
-        <label><span data-t="password2"></span><input id="ps-pass2" type="password" autocomplete="new-password"></label>
+        <label><span data-t="new_pass"></span><input id="ps-pass" data-ph="ex_pass" type="password" autocomplete="new-password"></label>
+        <label><span data-t="password2"></span><input id="ps-pass2" data-ph="ex_pass2" type="password" autocomplete="new-password"></label>
       </div>
       <button class="btn red big" type="submit" data-t="set_pass"></button>
     </form>
@@ -726,7 +727,7 @@
         <option value="minor" data-t="rr_minor"></option>
         <option value="other" data-t="rr_other"></option>
       </select></label>
-      <label><span data-t="report_details"></span><textarea id="rep-details" maxlength="1000"></textarea></label>
+      <label><span data-t="report_details"></span><textarea id="rep-details" maxlength="1000" data-ph="ex_report"></textarea></label>
       <label class="check"><input id="rep-block" type="checkbox" checked><span data-t="report_also_block"></span></label>
       <button class="btn red big" type="submit" data-t="report_send"></button>
       <p class="note" data-t="report_note"></p>

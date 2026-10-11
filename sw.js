@@ -1,6 +1,6 @@
 // Lakaymwen offline helper: keeps the site's own files on the phone so it opens
 // fast on slow connections. Member data always comes fresh from the internet.
-const CACHE = "lakaymwen-v20";
+const CACHE = "lakaymwen-v21";
 const SHELL = ["/", "/index.html", "/styles.css", "/app.js", "/i18n.js", "/towns.js", "/depts.js", "/geo.js", "/config.js",
   "/haiti-map.svg", "/manifest.webmanifest", "/icon-192.png", "/logo-word.png"];
 
@@ -20,7 +20,7 @@ self.addEventListener("fetch", e => {
   e.respondWith(fetch(req).then(res => {
     if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
     return res;
-  }).catch(() => caches.match(req).then(r => r || caches.match("/index.html"))));
+  }).catch(() => caches.match(req).then(r => r || (req.mode === "navigate" ? caches.match("/index.html") : Response.error()))));
 });
 
 // 🔔 Phone notifications: show the alert, and open Lakaymwen when it's tapped

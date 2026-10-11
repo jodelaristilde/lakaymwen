@@ -1785,3 +1785,13 @@ label.is-off>.ex{opacity:.7}
 @media (min-width:761px){
   .who-bar{justify-content:flex-end;margin:10px 8px 0;max-width:none}
 }
+
+/* ---------- Language buttons: the dark box fits the three buttons, far right ---------- */
+@media (min-width:761px){
+  .hb-lang{left:auto;right:10px;bottom:10px;width:max-content;max-width:none;justify-content:flex-end;-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(7,19,48,.5)}
+}
+/* ---------- Member search: the example sits right next to the question, on the same line ---------- */
+.searchbar .sb-field:has(>.ex){grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:10px;align-items:baseline}
+.searchbar .sb-field:has(>.ex)>span{grid-column:1;grid-row:1}
+.searchbar .sb-field:has(>.ex)>.ex{grid-column:2;grid-row:1;justify-self:start;align-self:baseline;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.78rem;line-height:1.2}
+.searchbar .sb-field:has(>.ex)>input{grid-column:1/-1;grid-row:2}

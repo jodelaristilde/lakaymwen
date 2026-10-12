@@ -352,7 +352,7 @@
   }
   function syncGender(p) { const v = $(p + "-gender").value; document.querySelectorAll('input[name="' + p + '-gender-radio"]').forEach(r => { r.checked = r.value === v; }); }
   document.addEventListener("change", e => { const r = e.target; if (r && r.name && r.name.endsWith("-gender-radio")) $(r.name.replace("-gender-radio", "-gender")).value = r.value; });
-  function genderTag(p) { return p && (p.gender === "M" || p.gender === "F") ? el("span", { class: "gtag", text: p.gender, title: p.gender === "F" ? L().gender_f : L().gender_m }) : null; }
+  function genderTag(p) { return null; }   // M or F is still saved (it is used for "his" / "her") but it is no longer shown next to names
   function readAbout(p) {
     const first = $(p + "-first").value.trim(), last = $(p + "-last").value.trim();
     return {

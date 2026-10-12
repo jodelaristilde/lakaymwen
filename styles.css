@@ -1811,3 +1811,11 @@ label.is-off>.ex{opacity:.7}
 @media (max-width:760px){.toasts{top:62px;left:12px;right:12px;width:auto}}
 .side-alerts.blue{background:#dbeafe;color:#1e3a8a}
 .side-alerts.yellow{background:#fef3c7;color:#78350f}
+
+/* ---------- Wrong password: clear red alert ---------- */
+.msg.bad-login{background:#fde8ec;color:#9b1030;border:1.5px solid #f3a3b4;font-weight:700}
+@media (prefers-color-scheme:dark){.msg.bad-login{background:#3a1220;color:#ffc0cd;border-color:#8a2a44}}
+input.bad{border-color:#e8193c!important;box-shadow:0 0 0 3px rgba(232,25,60,.18)!important}
+.shake{animation:lkm-shake .4s}
+@keyframes lkm-shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}

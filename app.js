@@ -62,6 +62,7 @@
   }
   function say(id, text, isError) {
     const m = $(id);
+    m.classList.remove("bad-login");
     m.textContent = text || "";
     m.classList.toggle("error", !!isError);
     m.hidden = !text;
@@ -810,11 +811,19 @@
         verifyPass = pass; showVerify(email, true);
         return;
       }
-      say(msgId, /invalid/i.test(error.message) ? L().bad_login : L().err + " (" + error.message + ")", true);
+      const bad = /invalid/i.test(error.message);
+      say(msgId, bad ? L().bad_login : L().err + " (" + error.message + ")", true);
+      if (bad) {   // wrong password: red alert, shake the form, mark the password box and put the cursor back in it
+        $(msgId).classList.add("bad-login");
+        const pw = msgId === "auth-msg" ? $("l-pass") : $("side-pass"), form = pw.closest("form");
+        form.classList.remove("shake"); void form.offsetWidth; form.classList.add("shake");
+        pw.classList.add("bad"); pw.focus(); pw.select();
+      }
       return;
     }
     if ($("dlg-auth").open) $("dlg-auth").close();
   }
+  ["l-pass", "side-pass"].forEach(id => $(id).addEventListener("input", e => e.target.classList.remove("bad")));
   $("login-form").addEventListener("submit", e => { e.preventDefault(); doLogin($("l-email").value, $("l-pass").value, "auth-msg", e.submitter); });
   $("side-login-form").addEventListener("submit", e => { e.preventDefault(); doLogin($("side-email").value, $("side-pass").value, "side-auth-msg", e.submitter); });
 

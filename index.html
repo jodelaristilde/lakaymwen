@@ -509,6 +509,13 @@
 </footer>
 
 <!-- Log in / register -->
+<dialog id="dlg-photo" class="dlg-photo">
+  <button class="dlg-close pv-close" type="button" data-close aria-label="Close">×</button>
+  <figure class="pv"><img id="pv-img" alt=""><figcaption><b id="pv-cap"></b><span id="pv-meta"></span></figcaption></figure>
+  <button class="pv-nav pv-prev" type="button" id="pv-prev" aria-label="Previous photo">‹</button>
+  <button class="pv-nav pv-next" type="button" id="pv-next" aria-label="Next photo">›</button>
+  <p class="pv-credit" id="pv-credit" hidden></p>
+</dialog>
 <dialog id="dlg-auth">
   <div class="dlg-head"><h2 id="auth-title"></h2><button class="dlg-close" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-body">

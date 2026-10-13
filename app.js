@@ -460,6 +460,31 @@
     { f: "Gezicht op de haven van Port-au-Prince op Haïti, RP-F-F01154-AD.jpg", en: "The harbor of Port-au-Prince", ht: "Pò Pòtoprens", fr: "Le port de Port-au-Prince" }
   ].map(p => ({ ...p, src: "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(p.f.replace(/ /g, "_")) + "?width=480",
     link: "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(p.f.replace(/ /g, "_")) })));
+  /* ---------- Old photos: bigger view right here on the site (no other web page) ---------- */
+  let pvTiles = [], pvIndex = 0;
+  function pvShow(k) {
+    pvIndex = (k + pvTiles.length) % pvTiles.length;
+    const p = pvTiles[pvIndex]._p, cap = p[lang] || p.en, img = $("pv-img");
+    $("pv-cap").textContent = cap; $("pv-meta").textContent = p.y ? " · " + p.y : "";
+    img.alt = cap; img.classList.add("loading"); img.src = p.src;   // small picture first, so something shows at once
+    const big = p.src.replace("width=480", "width=1400");
+    if (big !== p.src) { const pre = new Image(); pre.onload = () => { if (pvTiles[pvIndex] && pvTiles[pvIndex]._p === p) { img.src = big; img.classList.remove("loading"); } }; pre.onerror = () => img.classList.remove("loading"); pre.src = big; }
+    else img.onload = () => img.classList.remove("loading");
+    const cr = $("pv-credit"); cr.hidden = !p.link; cr.textContent = p.link ? L().photo_pd + " " : "";
+    if (p.link) cr.append(el("a", { href: p.link, target: "_blank", rel: "noopener", text: L().photo_source }));
+    $("pv-prev").hidden = $("pv-next").hidden = pvTiles.length < 2;
+  }
+  function openPhotoViewer(tile, grid) {
+    pvTiles = [...grid.querySelectorAll(".old-tile")].filter(x => !x.hidden); pvIndex = pvTiles.indexOf(tile);
+    if (pvIndex < 0) return;
+    pvShow(pvIndex); openDlg("dlg-photo");
+  }
+  $("pv-prev").addEventListener("click", () => pvShow(pvIndex - 1));
+  $("pv-next").addEventListener("click", () => pvShow(pvIndex + 1));
+  $("dlg-photo").addEventListener("keydown", e => { if (e.key === "ArrowLeft") pvShow(pvIndex - 1); else if (e.key === "ArrowRight") pvShow(pvIndex + 1); });
+  { let x0 = null; const d = $("dlg-photo");   // swipe on a phone
+    d.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
+    d.addEventListener("touchend", e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) pvShow(pvIndex + (dx < 0 ? 1 : -1)); }, { passive: true }); }
   let oldOrder = null;
   function renderOld() {
     if (!oldOrder) oldOrder = OLD_PHOTOS.map((p, i) => i).sort(() => Math.random() - 0.5);
@@ -470,8 +495,10 @@
       const tiles = oldOrder.map(i => {
         const p = OLD_PHOTOS[i], cap = p[lang] || p.en;
         const img = el("img", { src: p.src, alt: cap, referrerpolicy: "no-referrer" });
-        const tile = el("a", { class: "old-tile", href: p.link || p.src, target: "_blank", rel: "noopener", hidden: "" }, img,
+        const tile = el("a", { class: "old-tile", href: "#", hidden: "", role: "button" }, img,
           el("span", { class: "old-cap" }, el("b", { text: cap }), p.y ? " · " + p.y : ""));
+        tile._p = p;
+        tile.addEventListener("click", e => { e.preventDefault(); openPhotoViewer(tile, grid); });
         img.addEventListener("error", () => tile.remove());
         img.addEventListener("load", () => { if (shown < n) { shown++; tile.hidden = false; wrap.hidden = false; } else tile.remove(); });
         return tile;

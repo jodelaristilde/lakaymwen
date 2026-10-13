@@ -1819,3 +1819,18 @@ input.bad{border-color:#e8193c!important;box-shadow:0 0 0 3px rgba(232,25,60,.18
 .shake{animation:lkm-shake .4s}
 @keyframes lkm-shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 @media (prefers-reduced-motion:reduce){.shake{animation:none}}
+
+/* ---------- Photo viewer (old photos of Haiti) ---------- */
+.dlg-photo{width:min(980px,96vw);max-height:94vh;background:#0b1530;color:#fff;overflow:hidden;position:relative}
+.dlg-photo::backdrop{background:rgba(3,8,22,.82)}
+.dlg-photo .pv{margin:0;display:grid;justify-items:center}
+.dlg-photo .pv img{display:block;max-width:100%;max-height:76vh;width:auto;height:auto;object-fit:contain;background:#111;transition:opacity .2s}
+.dlg-photo .pv img.loading{opacity:.55}
+.dlg-photo figcaption{padding:12px 64px 6px;text-align:center;font-size:1.02rem;line-height:1.3}
+.dlg-photo .pv-credit{margin:0;padding:0 16px 14px;text-align:center;font-size:.8rem;color:#9fb3d6}
+.dlg-photo .pv-credit a{color:#bcd3ff;text-decoration:underline}
+.dlg-photo .pv-close{position:absolute;top:10px;right:10px;z-index:3;background:rgba(255,255,255,.92);color:#0b1530}
+.pv-nav{position:absolute;top:44%;transform:translateY(-50%);z-index:2;width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#0b1530;font-size:2rem;line-height:1;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.pv-prev{left:10px}.pv-next{right:10px}
+.pv-nav[hidden]{display:none}
+@media (max-width:520px){.dlg-photo figcaption{padding:10px 14px 4px}.pv-nav{width:40px;height:40px;top:38%}}

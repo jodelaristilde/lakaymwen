@@ -490,8 +490,9 @@
     const zi = document.createElement("img"); zi.alt = ""; zp.append(zi); document.body.append(zp);
     if (!zp.showPopover) zp.style.display = "none";
     const canHover = window.matchMedia && matchMedia("(hover: hover)").matches;
-    let timer = 0, cur = null;
-    const hide = () => { clearTimeout(timer); cur = null; try { if (zp.hidePopover && zp.matches(":popover-open")) zp.hidePopover(); else if (!zp.showPopover) zp.style.display = "none"; } catch (e) {} };
+    let timer = 0, autoT = 0, cur = null;
+    const ZOOM_SECONDS = 3;   // how long the big picture stays on screen before it disappears by itself
+    const hide = keep => { clearTimeout(timer); clearTimeout(autoT); if (keep !== true) cur = null; try { if (zp.hidePopover && zp.matches(":popover-open")) zp.hidePopover(); else if (!zp.showPopover) zp.style.display = "none"; } catch (e) {} };
     const place = img => {
       const r = img.getBoundingClientRect(), s = Math.min(320, innerWidth * 0.8) + 12;
       let x = r.right + 14; if (x + s > innerWidth - 8) x = r.left - s - 14;
@@ -504,7 +505,7 @@
       const img = e.target.closest && e.target.closest("img.avatar.photo");
       if (!img || img === cur) return;
       cur = img; clearTimeout(timer);
-      timer = setTimeout(() => { if (cur !== img) return; zi.src = img.currentSrc || img.src; place(img); try { if (zp.showPopover) { if (!zp.matches(":popover-open")) zp.showPopover(); } else zp.style.display = "block"; } catch (e) {} }, 140);
+      timer = setTimeout(() => { if (cur !== img) return; zi.src = img.currentSrc || img.src; place(img); try { if (zp.showPopover) { if (!zp.matches(":popover-open")) zp.showPopover(); } else zp.style.display = "block"; } catch (e) {} clearTimeout(autoT); autoT = setTimeout(() => hide(true), ZOOM_SECONDS * 1000); }, 140);
     });
     document.addEventListener("mouseout", e => { const img = e.target.closest && e.target.closest("img.avatar.photo"); if (img && img === cur) hide(); });
     window.addEventListener("scroll", hide, true);

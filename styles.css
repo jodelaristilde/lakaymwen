@@ -1840,3 +1840,20 @@ input.bad{border-color:#e8193c!important;box-shadow:0 0 0 3px rgba(232,25,60,.18
 #zoom-pic img{display:block;width:min(320px,80vw);height:min(320px,80vw);object-fit:cover;border-radius:22px;border:6px solid #fff;background:#fff;box-shadow:0 18px 50px rgba(7,19,48,.5)}
 img.avatar.photo.xl,img.avatar.photo.lg{cursor:zoom-in}
 @media (hover:hover){img.avatar.photo{cursor:zoom-in}}
+
+/* ---------- Roll over "N friends": pictures of their friends ---------- */
+.hc-friends.hc-hasfriends{cursor:zoom-in}
+.hc-friends.hc-hasfriends span:last-child{text-decoration:underline dotted;text-underline-offset:3px}
+.friends-pop{position:fixed;inset:auto;margin:0;border:0;padding:14px;border-radius:20px;background:#fff;color:#0b1530;box-shadow:0 18px 50px rgba(7,19,48,.45);display:grid;grid-template-columns:repeat(3,100px);gap:12px;pointer-events:none;z-index:2147483000}
+.friends-pop figure{margin:0;text-align:center}
+.friends-pop .avatar{width:100px;height:100px;border-radius:16px;font-size:2rem;object-fit:cover}
+.friends-pop figcaption{margin-top:6px;font-weight:800;font-size:.9rem;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:520px){.friends-pop{grid-template-columns:repeat(3,80px)}.friends-pop .avatar{width:80px;height:80px}}
+
+/* ---------- Member hover card: big square photo with the info on the right ---------- */
+.hovercard{width:min(580px,calc(100vw - 16px))}
+.hc-top{grid-template-columns:230px minmax(0,1fr);gap:20px}
+.hovercard .avatar.hc-av{width:230px;height:230px;border-radius:18px;font-size:4rem}
+.hovercard .hc-name{font-size:1.5rem}
+.hovercard .hc-nick{font-size:1rem}
+.hovercard .hc-line{font-size:1rem;grid-template-columns:26px minmax(0,1fr)}

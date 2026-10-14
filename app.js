@@ -502,12 +502,12 @@
     };
     document.addEventListener("mouseover", e => {
       if (!canHover) return;
-      const img = e.target.closest && e.target.closest("img.avatar.photo");
+      const img = e.target.closest && e.target.closest("img.avatar.photo:not(.hc-av)");
       if (!img || img === cur) return;
       cur = img; clearTimeout(timer);
       timer = setTimeout(() => { if (cur !== img) return; zi.src = img.currentSrc || img.src; place(img); try { if (zp.showPopover) { if (!zp.matches(":popover-open")) zp.showPopover(); } else zp.style.display = "block"; } catch (e) {} clearTimeout(autoT); autoT = setTimeout(() => hide(true), ZOOM_SECONDS * 1000); }, 140);
     });
-    document.addEventListener("mouseout", e => { const img = e.target.closest && e.target.closest("img.avatar.photo"); if (img && img === cur) hide(); });
+    document.addEventListener("mouseout", e => { const img = e.target.closest && e.target.closest("img.avatar.photo:not(.hc-av)"); if (img && img === cur) hide(); });
     window.addEventListener("scroll", hide, true);
     document.addEventListener("click", e => {   // big profile pictures (profile page / card): tap to open the viewer
       const img = e.target.closest && e.target.closest("img.avatar.photo.xl, img.avatar.photo.lg");
@@ -1977,7 +1977,25 @@
   var myLinks = null;   // my friendships, loaded once
   const hoverOK = window.matchMedia && matchMedia("(hover: hover) and (pointer: fine)").matches;
   let hcCard = null, hcFor = null, hcShowT = null, hcHideT = null;
-  function hideHC() { if (hcCard) hcCard.remove(); hcCard = null; hcFor = null; }
+  function hideHC() { hideFP(); if (hcCard) hcCard.remove(); hcCard = null; hcFor = null; }
+  let fpEl = null, fpT = 0;
+  function hideFP() { clearTimeout(fpT); if (fpEl) { try { if (fpEl.matches && fpEl.matches(":popover-open")) fpEl.hidePopover(); } catch (e) {} fpEl.remove(); fpEl = null; } }
+  async function showFriendsPop(anchor, ids) {   // roll over "N friends": their friends' pictures pop up for a few seconds
+    hideFP(); if (!ids || !ids.length) return;
+    const need = ids.filter(x => !memberCache.has(x) || memberCache.get(x).photo_url === undefined);
+    if (need.length && sb) { const { data } = await sb.from("profiles").select("id,display_name,photo_url").in("id", need); (data || []).forEach(q => memberCache.set(q.id, Object.assign(memberCache.get(q.id) || {}, q))); }
+    if (!hcFor && !anchor.isConnected) return;
+    const box = el("div", { class: "friends-pop" }, ...ids.slice(0, 6).map(x => { const q = memberCache.get(x) || {};
+      const av = avatar({ id: null, display_name: q.display_name || "?", photo_url: q.photo_url || null }, "fp-av"); if (av.tagName === "IMG") av.loading = "eager";   // show at once, no lazy loading
+      return el("figure", {}, av, el("figcaption", { text: String(q.display_name || "").split(" ")[0] })); }));
+    box.setAttribute("popover", "manual"); document.body.append(box); fpEl = box;
+    const ar = (hcCard || anchor).getBoundingClientRect(), r = anchor.getBoundingClientRect(), w = box.offsetWidth || 340, h = box.offsetHeight || 220;
+    let left = ar.right + 12; if (left + w > innerWidth - 8) left = Math.max(8, ar.left - w - 12);
+    const top = Math.max(8, Math.min(innerHeight - h - 8, r.top + r.height / 2 - h / 2));
+    box.style.left = left + "px"; box.style.top = top + "px";
+    try { if (box.showPopover) box.showPopover(); } catch (e) {}
+    fpT = setTimeout(hideFP, 4000);
+  }
   async function hcFriends(id) {
     if (!myLinks) { const { data } = await sb.from("friendships").select("requester,addressee,status").or(`requester.eq.${me.id},addressee.eq.${me.id}`).limit(2000); myLinks = data || []; }
     const { data } = await sb.from("friendships").select("requester,addressee").eq("status", "accepted").or(`requester.eq.${id},addressee.eq.${id}`).limit(2000);
@@ -1989,7 +2007,8 @@
     if (need.length) { const { data: ps } = await sb.from("profiles").select("id,display_name").in("id", need); (ps || []).forEach(q => memberCache.set(q.id, Object.assign(memberCache.get(q.id) || {}, q))); }
     mutual.slice(0, 2).forEach(x => { const q = memberCache.get(x); if (q && q.display_name) names.push(q.display_name); });
     const link = myLinks.find(f => f.requester === id || f.addressee === id);
-    return { count: theirs.size, mutual: mutual.length, names, link };
+    const list = [...mutual, ...[...theirs].filter(x => !mutual.includes(x))].filter(x => x !== me.id).slice(0, 6);   // mutual friends first
+    return { count: theirs.size, mutual: mutual.length, names, link, list };
   }
   async function showHC(t) {
     const id = t.dataset.hc, p = memberCache.get(id);
@@ -2032,6 +2051,7 @@
       const bits = [L().friend_count(f.count)];
       if (!self && f.mutual) bits.push(L().hc_mutual(f.mutual, f.names));
       fLine.replaceChildren(el("span", { class: "hc-ic", text: "👥" }), el("span", { text: bits.join(" · ") }));
+      if (f.list && f.list.length) { fLine.classList.add("hc-hasfriends"); fLine.addEventListener("mouseenter", () => showFriendsPop(fLine, f.list)); fLine.addEventListener("mouseleave", hideFP); }
       if (!self) {
         const l = f.link; let b;
         if (!l) b = el("button", { class: "btn small green", type: "button", text: L().add_friend, onclick: async () => {

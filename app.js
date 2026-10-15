@@ -490,7 +490,7 @@
   }
   setTimeout(loadLatestMember, 0);
   function samplePic(s) {
-    const img = el("img", { class: "avatar photo", src: s.photo || s.face, alt: "", width: 72, height: 72, loading: "lazy", referrerpolicy: "no-referrer" });
+    const img = el("img", { class: "avatar photo", src: s.photo || s.face, alt: "", width: 72, height: 72, referrerpolicy: "no-referrer" });
     if (s.photo) img.addEventListener("error", () => { img.src = s.face; }, { once: true });   // if a photo cannot load, show the drawn face
     return img;
   }
@@ -572,10 +572,26 @@
     const box = $("featured");
     if (!sb || !me) { const lf = $("land-featured"); if (lf) renderSamples(lf); box.replaceChildren(); return; }
     if (!featuredData) return;
-    if (!featuredData.length) { box.replaceChildren(el("p", { class: "empty", text: L().featured_none })); return; }
-    box.replaceChildren(...featuredData.filter(notBlocked).map(p => el("a", { class: "member-card", href: "#member-" + p.id },
-      avatar(p), el("b", {}, p.display_name, foundingStar(p)), el("span", { class: "city", text: [p.hometown, p.katye].filter(Boolean).join(" · ") }))));
+    /* signed-in members see the real members plus sample profiles, 21 in all, scattered in a new order on every visit.
+       Real members open their real profile; samples open a sample profile where Message / Add friend say it is private. */
+    if (!sampleData) sampleData = makeSamples();
+    const real = featuredData.filter(notBlocked).slice(0, 21);
+    // the page redraws this often while a member's account loads: reuse the same cards so the photos do not restart loading
+    const key = lang + "|" + real.map(p => p.id + (p.photo_url || "")).join(",");
+    if (featuredKey === key && box.children.length && box.firstElementChild.classList.contains("member-card")) return;
+    featuredKey = key;
+    const cards = real.map(p => el("a", { class: "member-card", href: "#member-" + p.id },
+      avatar(p), el("b", {}, p.display_name, foundingStar(p)), el("span", { class: "city", text: [p.hometown, p.katye].filter(Boolean).join(" · ") })))
+      .concat(sampleData.slice(0, 21 - real.length).map(s => el("a", { class: "member-card sample", href: "#sample-" + s.id },
+        samplePic(s), el("b", { text: s.name }), el("span", { class: "city", text: s.town }))));
+    if (!featuredOrder || featuredOrder.length !== cards.length) {
+      featuredOrder = cards.map((_, i) => i);
+      for (let i = featuredOrder.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [featuredOrder[i], featuredOrder[j]] = [featuredOrder[j], featuredOrder[i]]; }
+    }
+    box.replaceChildren(...featuredOrder.map(i => cards[i]));
   }
+  let featuredKey = null;
+  let featuredOrder = null;   // made once per page load, so a language switch does not reshuffle the cards
   /* ---------- Old photos of Haiti (public domain, New York Public Library). Files: photos/old1.jpg … old9.jpg ---------- */
   const OLD_PHOTOS = [
     { y: 1910, en: "A street in Port-au-Prince", ht: "Yon lari nan Pòtoprens", fr: "Une rue de Port-au-Prince" },

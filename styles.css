@@ -1898,3 +1898,6 @@ img.avatar.photo.xl,img.avatar.photo.lg{cursor:zoom-in}
   #land-featured .member-card{padding:8px 6px 10px}
   #land-featured .member-card b{font-size:.85rem}
   #land-featured .member-card .city{font-size:.74rem}}
+
+/* ---------- Featured Members for signed-in members: same big photos ---------- */
+#featured .member-card img.avatar,#featured .member-card .avatar,#featured .member-card.sample img.avatar{width:100%;max-width:110px;height:auto;aspect-ratio:1/1;border-radius:50%;font-size:2rem}

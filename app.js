@@ -472,7 +472,7 @@
   function makeSamples() {
     const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
     const pick = (female, photos) => shuffle(SAMPLE_POOL.filter(p => !!p[2] === female)).slice(0, photos.length)
-      .map(([name, town], i) => ({ name, town, face: sampleFace(female), photo: photos[i] + ".jpg" }));
+      .map(([name, town], i) => ({ id: photos[i], name, town, female, face: sampleFace(female), photo: photos[i] + ".jpg" }));
     return shuffle(pick(true, shuffle(SAMPLE_FACES.women.slice())).concat(pick(false, shuffle(SAMPLE_FACES.men.slice()))));
   }
   /* The newest REAL members (first name + last initial, town, photo) come from the database function latest_members()
@@ -484,7 +484,7 @@
     try {
       let { data, error } = await sb.rpc("latest_members", { p_limit: 21 });
       if (error) ({ data, error } = await sb.rpc("latest_member"));
-      const rows = (Array.isArray(data) ? data : data ? [data] : []).filter(r => r && r.first_name);
+      const rows = (Array.isArray(data) ? data : data ? [data] : []).filter(r => r && r.first_name && r.photo_url);   // only members with a photo
       if (!error && rows.length) { realMembers = rows.slice(0, 21); if (!me) renderFeatured(); }
     } catch (e) { /* not set up yet: just show the samples */ }
   }
@@ -505,18 +505,18 @@
       return el("a", { class: "member-card sample" + (newest ? " newest" : ""), href: "#register", role: "button", onclick: goJoin },
         av, el("b", { text: nm }), el("span", { class: "city", text: m.hometown || "" }), newest ? el("span", { class: "newest-tag", text: L().newest_member }) : null);
     };
-    const sampleCard = s => el("a", { class: "member-card sample", href: "#", role: "button", onclick: ev => { ev.preventDefault(); showPrivateSample(s); } },
+    const sampleCard = s => el("a", { class: "member-card sample", href: "#sample-" + s.id },
       samplePic(s), el("b", { text: s.name }), el("span", { class: "city", text: s.town }));
-    /* the newest real member is always first; everyone else (real members and samples) is mixed in a new order on every visit */
+    /* real members (with photos) and samples are all scattered in a new order on every visit; the newest real member keeps its tag */
     const real = realMembers.slice(0, 21);
-    const rest = real.slice(1).map(m => realCard(m, false)).concat(sampleData.slice(0, 21 - real.length).map(sampleCard));
+    const rest = real.map((m, i) => realCard(m, i === 0)).concat(sampleData.slice(0, 21 - real.length).map(sampleCard));
     if (!mixedOrder || mixedOrder.length !== rest.length) { mixedOrder = rest.map((_, i) => i); for (let i = mixedOrder.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [mixedOrder[i], mixedOrder[j]] = [mixedOrder[j], mixedOrder[i]]; } }
-    const cards = (real.length ? [realCard(real[0], true)] : []).concat(mixedOrder.map(i => rest[i]));
+    const cards = mixedOrder.map(i => rest[i]);
     const allReal = real.length >= 21;
     box.replaceChildren(...(allReal ? [] : [el("p", { class: "empty sample-note", text: real.length ? (L().sample_note_mixed || L().sample_note) : L().sample_note })]), ...cards);
   }
-  /* Tapping a sample profile: show it as a private member (no friend requests, no messages) instead of forcing a sign-in */
-  function showPrivateSample(s) {
+  /* Sample (AI) profiles open like a real profile page (#sample-NN). Pressing Message or Add friend shows that the member is private. */
+  function showPrivateNotice(s) {
     let d = $("dlg-private");
     if (!d) {
       d = el("dialog", { id: "dlg-private", class: "dlg-private" });
@@ -524,20 +524,49 @@
       document.body.appendChild(d);
     }
     const t = L();
-    const close = el("button", { class: "dlg-close", type: "button", "aria-label": "Close", text: "×", onclick: () => d.close() });
-    const join = el("button", { class: "btn red", type: "button", text: t.private_join || "Join free", onclick: () => { d.close(); openAuth(null, "register"); } });
     d.replaceChildren(
-      el("div", { class: "dlg-head" }, el("h2", { text: t.private_title || "Private profile" }), close),
+      el("div", { class: "dlg-head" }, el("h2", { text: t.private_title }), el("button", { class: "dlg-close", type: "button", "aria-label": "Close", text: "×", onclick: () => d.close() })),
       el("div", { class: "dlg-body private-body" },
-        el("img", { class: "avatar photo private-av", src: s.photo || s.face, alt: "", width: 112, height: 112 }),
-        el("b", { class: "private-name", text: s.name }),
-        el("span", { class: "city", text: s.town }),
-        el("p", { class: "private-lock", text: "🔒 " + (t.private_msg || "This member's profile is private. They are not accepting friend requests or messages.") }),
+        el("p", { class: "private-lock", text: "🔒 " + t.private_msg(s.name.split(" ")[0]) }),
         el("div", { class: "private-btns" },
-          el("button", { class: "btn ghost", type: "button", text: t.private_disabled_friend || "Add friend", disabled: true }),
-          el("button", { class: "btn ghost", type: "button", text: t.private_disabled_msg || "Message", disabled: true })),
-        join));
+          el("button", { class: "btn dark", type: "button", text: "OK", onclick: () => d.close() }))));
     if (!d.open) d.showModal();
+  }
+  const SAMPLE_LIVES = ["Spring Valley, NY", "Brooklyn, NY", "Miami, FL", "North Miami, FL", "Boston, MA", "Montréal, QC", "Orlando, FL",
+    "Newark, NJ", "Elizabeth, NJ", "Atlanta, GA", "Port-au-Prince", "Fort Lauderdale, FL", "Nyack, NY", "Philadelphia, PA"];
+  function sampleSeed(str) { let h = 7; for (const c of str) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
+  function renderSamplePage(id) {
+    const box = $("member-view");
+    if (!sampleData) sampleData = makeSamples();
+    const s = sampleData.find(x => x.id === id);
+    if (!s) { box.replaceChildren(el("p", { class: "empty", text: L().profile_missing })); return; }
+    const t = L(), seed = sampleSeed(s.name), first = s.name.split(" ")[0];
+    const user = "@" + s.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]+/g, "") + (seed % 90 + 10);
+    const bios = t.sample_bios || [];
+    const lives = SAMPLE_LIVES[seed % SAMPLE_LIVES.length];
+    const nFriends = 24 + seed % 160;
+    const notice = () => showPrivateNotice(s);
+    box.replaceChildren(el("article", { class: "profile-card sample-profile" },
+      el("div", { class: "profile-cover" }),
+      el("div", { class: "profile-top" },
+        el("img", { class: "avatar photo xl", src: s.photo, alt: "", width: 156, height: 156, onerror: function () { this.src = s.face; } }),
+        el("div", { class: "profile-id" },
+          el("h1", { text: s.name }),
+          el("p", { class: "handle", text: user })),
+        el("div", { class: "profile-actions" },
+          el("button", { class: "btn red", type: "button", text: t.contact_member, onclick: notice }),
+          el("button", { class: "btn green", type: "button", text: t.add_friend, onclick: notice }))),
+      el("div", { class: "profile-main" },
+        el("aside", { class: "profile-intro" },
+          el("h2", { text: t.intro_h }),
+          bios.length ? el("p", { class: "intro-bio", text: bios[seed % bios.length] }) : null,
+          el("ul", { class: "intro-list" },
+            el("li", {}, el("span", { class: "ii", text: "🏠" }), el("span", {}, t.from + " ", el("b", { text: s.town }))),
+            el("li", {}, el("span", { class: "ii", text: "🌎" }), el("span", {}, t.lives + " ", el("b", { text: lives }))),
+            el("li", {}, el("span", { class: "ii", text: "👥" }), el("span", {}, el("b", { text: t.friend_count(nFriends) }))))),
+        el("div", { class: "profile-body" },
+          el("section", { class: "profile-family" }, el("h2", { text: t.fam_of(first) }), el("p", { class: "note", text: "🔒 " + t.private_section })),
+          el("section", {}, el("h2", { text: t.friend_list(first) }), el("p", { class: "note", text: "🔒 " + t.private_section }))))));
   }
   let mixedOrder = null;   // made once per page load, so a language switch does not reshuffle the cards
   function renderFeatured() {
@@ -3021,13 +3050,14 @@
     document.querySelectorAll(".page-box.page-on").forEach(b => b.classList.remove("page-on"));
     if (pg) { $(pg.box).classList.add("page-on"); window.scrollTo(0, 0); pg.render(); }
     const reg = curHash === "#register" || curHash === "#towns" || join;
-    const m = curHash.match(/^#member-([0-9a-f-]{36})$/i);
+    const m = curHash.match(/^#member-([0-9a-f-]{36})$/i), sm = curHash.match(/^#sample-(\d{2})$/);
     const wasMode = document.body.classList.contains("register-mode") || document.body.classList.contains("member-mode");
     document.body.classList.toggle("register-mode", reg);
-    document.body.classList.toggle("member-mode", !!m);
+    document.body.classList.toggle("member-mode", !!(m || sm));
+    if (sm) { window.scrollTo(0, 0); currentMember = null; renderSamplePage(sm[1]); }
     if (m) { if (currentMember !== m[1]) window.scrollTo(0, 0); currentMember = m[1]; renderMemberPage(currentMember); }
     else currentMember = null;
-    if (reg || m) { if (scroll || !wasMode) window.scrollTo(0, 0); return; }
+    if (reg || m || sm) { if (scroll || !wasMode) window.scrollTo(0, 0); return; }
     if (pg) return;
     if (!scroll) return;
     const target = h === "#home" ? null : document.getElementById(h.slice(1));

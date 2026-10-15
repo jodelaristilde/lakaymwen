@@ -485,37 +485,15 @@
   { let x0 = null; const d = $("dlg-photo");   // swipe on a phone
     d.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
     d.addEventListener("touchend", e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) pvShow(pvIndex + (dx < 0 ? 1 : -1)); }, { passive: true }); }
-  /* ---------- Profile pictures: roll over a picture to see it big; tap a big profile picture to open it ---------- */
-  { const zp = document.createElement("div"); zp.id = "zoom-pic"; zp.setAttribute("popover", "manual");
-    const zi = document.createElement("img"); zi.alt = ""; zp.append(zi); document.body.append(zp);
-    if (!zp.showPopover) zp.style.display = "none";
-    const canHover = window.matchMedia && matchMedia("(hover: hover)").matches;
-    let timer = 0, autoT = 0, cur = null;
-    const ZOOM_SECONDS = 3;   // how long the big picture stays on screen before it disappears by itself
-    const hide = keep => { clearTimeout(timer); clearTimeout(autoT); if (keep !== true) cur = null; try { if (zp.hidePopover && zp.matches(":popover-open")) zp.hidePopover(); else if (!zp.showPopover) zp.style.display = "none"; } catch (e) {} };
-    const place = img => {
-      const r = img.getBoundingClientRect(), s = Math.min(320, innerWidth * 0.8) + 12;
-      let x = r.right + 14; if (x + s > innerWidth - 8) x = r.left - s - 14;
-      if (x < 8) x = Math.max(8, Math.min(innerWidth - s - 8, r.left + r.width / 2 - s / 2));
-      const y = Math.max(8, Math.min(innerHeight - s - 8, r.top + r.height / 2 - s / 2));
-      zp.style.left = x + "px"; zp.style.top = y + "px";
-    };
-    document.addEventListener("mouseover", e => {
-      if (!canHover) return;
-      const img = e.target.closest && e.target.closest("img.avatar.photo:not(.hc-av)");
-      if (!img || img === cur) return;
-      cur = img; clearTimeout(timer);
-      timer = setTimeout(() => { if (cur !== img) return; zi.src = img.currentSrc || img.src; place(img); try { if (zp.showPopover) { if (!zp.matches(":popover-open")) zp.showPopover(); } else zp.style.display = "block"; } catch (e) {} clearTimeout(autoT); autoT = setTimeout(() => hide(true), ZOOM_SECONDS * 1000); }, 140);
-    });
-    document.addEventListener("mouseout", e => { const img = e.target.closest && e.target.closest("img.avatar.photo:not(.hc-av)"); if (img && img === cur) hide(); });
-    window.addEventListener("scroll", hide, true);
-    document.addEventListener("click", e => {   // big profile pictures (profile page / card): tap to open the viewer
-      const img = e.target.closest && e.target.closest("img.avatar.photo.xl, img.avatar.photo.lg");
-      if (!img) return;
-      e.preventDefault(); hide();
-      pvTiles = [{ _p: { src: img.currentSrc || img.src, en: "", ht: "", fr: "", y: "" } }]; pvIndex = 0; pvShow(0); openDlg("dlg-photo");
-    });
-  }
+  /* ---------- Profile pictures: click a big picture (profile page or the member card) to see it large; everything behind it is hidden ---------- */
+  document.addEventListener("click", e => {
+    const img = e.target.closest && e.target.closest("img.avatar.photo.xl, img.avatar.photo.lg, img.avatar.photo.hc-av");
+    if (!img) return;
+    e.preventDefault();
+    const card = img.closest(".hovercard"), nameEl = card && card.querySelector(".hc-name"), cap = nameEl ? nameEl.textContent : "";
+    if (card) hideHC();
+    pvTiles = [{ _p: { src: img.currentSrc || img.src, en: cap, ht: cap, fr: cap, y: "" } }]; pvIndex = 0; pvShow(0); openDlg("dlg-photo");
+  });
   let oldOrder = null;
   function renderOld() {
     if (!oldOrder) oldOrder = OLD_PHOTOS.map((p, i) => i).sort(() => Math.random() - 0.5);

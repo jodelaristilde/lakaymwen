@@ -1857,3 +1857,8 @@ img.avatar.photo.xl,img.avatar.photo.lg{cursor:zoom-in}
 .hovercard .hc-nick{font-size:1rem}
 .hovercard .hc-line{font-size:1rem;grid-template-columns:26px minmax(0,1fr)}
 .hovercard img.avatar.hc-av{cursor:zoom-in}
+
+/* sample members shown to visitors who are not signed in */
+.sample-note{font-size:.85rem;font-weight:700;color:var(--muted,#5b6478);text-align:center;margin:0 0 4px}
+#featured .member-card.sample{cursor:pointer}
+#featured .member-card.sample img.avatar{width:72px;height:72px;border-radius:50%}

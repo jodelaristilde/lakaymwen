@@ -431,9 +431,61 @@
   let blockedIds = new Set(), isAdmin = false;
   const notBlocked = p => !blockedIds.has(p.id);
   const foundingStar = p => p.founding ? el("span", { class: "founding-dot", title: L().founding_badge, text: "★" }) : null;
+  /* ---------- Sample members for visitors who are not signed in: 12 cartoon faces, different on every visit ---------- */
+  const SAMPLE_POOL = [
+    ["Marie Joseph", "Port-au-Prince", 1], ["Nadège Pierre", "Cap-Haïtien", 1], ["Fabiola Jean-Baptiste", "Les Cayes", 1],
+    ["Rose-Marie Louis", "Jacmel", 1], ["Widline Charles", "Gonaïves", 1], ["Esther Désir", "Jérémie", 1],
+    ["Carline Saint-Fleur", "Brooklyn, NY", 1], ["Mimose Étienne", "Miami, FL", 1], ["Yolande Augustin", "Montréal, QC", 1],
+    ["Gisèle Toussaint", "Boston, MA", 1], ["Ketlie Noël", "Hinche", 1], ["Marlène Pierre-Louis", "Port-de-Paix", 1],
+    ["Jean-Robert Fils-Aimé", "Port-au-Prince", 0], ["Wilner Dorcéus", "Cap-Haïtien", 0], ["Fritz Michel", "Les Cayes", 0],
+    ["Patrick Delva", "Léogâne", 0], ["Jonel Baptiste", "Saint-Marc", 0], ["Emmanuel Pierre", "Jacmel", 0],
+    ["Stanley Joseph", "Orlando, FL", 0], ["Kervens Louis", "Queens, NY", 0], ["Mackenson Jean", "Paris, France", 0],
+    ["Roosevelt Alexis", "Chicago, IL", 0], ["Gérard Célestin", "Petit-Goâve", 0], ["Daniel Moïse", "Miragoâne", 0]
+  ];
+  const pickOne = a => a[Math.floor(Math.random() * a.length)];
+  function sampleFace(female) {
+    const skin = pickOne(["#5a3a22", "#7a4a2a", "#8d5524", "#a46a3a", "#c68642", "#e0ac69"]);
+    const hair = pickOne(["#17110d", "#241711", "#33211a", "#0e0b0a"]);
+    const bg = pickOne(["#dbe4ff", "#ffe3d6", "#d9f2ee", "#fff0c2", "#f0dcff", "#e0f0d4"]);
+    const shirt = pickOne(["#1f3fd1", "#e8193c", "#0f8f86", "#f2a000", "#5b2ad6", "#0d2a6b", "#2f7d4f"]);
+    const style = female ? pickOne(["long", "afro", "twists", "wrap", "short"]) : pickOne(["short", "afro", "bald", "twists", "short"]);
+    const back = style === "afro" ? `<circle cx="50" cy="38" r="27" fill="${hair}"/>`
+      : style === "long" ? `<path d="M24 44Q24 16 50 16Q76 16 76 44L80 86L20 86Z" fill="${hair}"/>`
+      : style === "twists" ? [28, 39, 50, 61, 72].map((x, i) => `<circle cx="${x}" cy="${i % 2 ? 24 : 28}" r="9" fill="${hair}"/>`).join("") : "";
+    const wrapC = shirt === "#e8193c" ? "#f2a000" : "#e8193c";
+    const front = style === "short" ? `<path d="M31 44Q29 21 50 21Q71 21 69 44Q62 33 50 33Q38 33 31 44Z" fill="${hair}"/>`
+      : style === "long" ? `<path d="M30 42Q32 24 50 24Q68 24 70 42Q60 34 50 34Q40 34 30 42Z" fill="${hair}"/>`
+      : style === "wrap" ? `<path d="M29 42Q28 17 50 17Q72 17 71 42Q60 30 50 30Q40 30 29 42Z" fill="${wrapC}"/><rect x="29" y="34" width="42" height="6" rx="3" fill="#fff" opacity=".35"/>` : "";
+    const glasses = Math.random() < 0.25 ? `<g fill="none" stroke="#222" stroke-width="2"><circle cx="42" cy="50" r="6.5"/><circle cx="58" cy="50" r="6.5"/><path d="M48.5 50h3"/></g>` : "";
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="${bg}"/>${back}`
+      + `<path d="M12 100Q14 76 50 74Q86 76 88 100Z" fill="${shirt}"/><rect x="43" y="62" width="14" height="16" rx="6" fill="${skin}"/>`
+      + `<ellipse cx="50" cy="48" rx="20" ry="23" fill="${skin}"/>${front}<circle cx="42" cy="50" r="2.4" fill="#1a1110"/><circle cx="58" cy="50" r="2.4" fill="#1a1110"/>${glasses}`
+      + `<path d="M42 59Q50 66 58 59" fill="none" stroke="#1a1110" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+  let sampleData = null;   // made once per page load, so a language switch does not reshuffle the faces
+  function makeSamples() {
+    const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const nums = { 1: shuffle(Array.from({ length: 100 }, (_, i) => i)), 0: shuffle(Array.from({ length: 100 }, (_, i) => i)) };   // different face numbers every visit, no repeats
+    return shuffle(SAMPLE_POOL.slice()).slice(0, 12).map(([name, town, female]) => ({
+      name, town, face: sampleFace(!!female),   // cartoon face, only used if the photo cannot load
+      photo: `https://randomuser.me/api/portraits/${female ? "women" : "men"}/${nums[female].pop()}.jpg`
+    }));
+  }
+  function renderSamples(box) {
+    if (!sampleData) sampleData = makeSamples();
+    box.replaceChildren(
+      el("p", { class: "empty sample-note", text: L().sample_note }),
+      ...sampleData.map(s => {
+        const img = el("img", { class: "avatar photo", src: s.photo, alt: "", width: 72, height: 72, loading: "lazy", referrerpolicy: "no-referrer" });
+        img.addEventListener("error", () => { img.src = s.face; }, { once: true });
+        return el("a", { class: "member-card sample", href: "#register", role: "button", onclick: ev => { ev.preventDefault(); openAuth(null, "register"); } },
+          img, el("b", { text: s.name }), el("span", { class: "city", text: s.town }));
+      }));
+  }
   function renderFeatured() {
     const box = $("featured");
-    if (!sb || !me) { box.replaceChildren(el("p", { class: "empty", text: L().featured_signin })); return; }
+    if (!sb || !me) { renderSamples(box); return; }
     if (!featuredData) return;
     if (!featuredData.length) { box.replaceChildren(el("p", { class: "empty", text: L().featured_none })); return; }
     box.replaceChildren(...featuredData.filter(notBlocked).map(p => el("a", { class: "member-card", href: "#member-" + p.id },

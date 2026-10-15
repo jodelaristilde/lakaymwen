@@ -1871,3 +1871,11 @@ img.avatar.photo.xl,img.avatar.photo.lg{cursor:zoom-in}
 #land-featured .member-card .city{font-size:.74rem}
 #land-featured .member-card img.avatar{width:72px;height:72px;border-radius:50%}
 @media (max-width:560px){#land-featured.featured{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}}
+.newest-tag{font-size:.66rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--red,#e8193c);border-radius:999px;padding:2px 8px}
+#land-featured .member-card.newest{border-color:var(--red,#e8193c)}
+/* 21 sample members: 3 rows of 7 on computers and tablets, 3 across on phones */
+@media (min-width:561px){#land-featured.featured{grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+  #land-featured .member-card{padding:10px 4px}
+  #land-featured .member-card img.avatar,#land-featured .member-card .avatar{width:60px;height:60px}
+  #land-featured .member-card b{font-size:.8rem}
+  #land-featured .member-card .city{font-size:.7rem}}

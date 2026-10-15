@@ -433,18 +433,19 @@
   const foundingStar = p => p.founding ? el("span", { class: "founding-dot", title: L().founding_badge, text: "★" }) : null;
   /* ---------- Sample members for visitors who are not signed in: 12 cartoon faces, different on every visit ---------- */
   const SAMPLE_POOL = [
-    ["Marie Joseph", "Port-au-Prince", 1], ["Nadège Pierre", "Cap-Haïtien", 1], ["Fabiola Jean-Baptiste", "Les Cayes", 1],
+    ["Marie Joseph", "Pétion-Ville", 1], ["Nadège Pierre", "Cap-Haïtien", 1], ["Fabiola Jean-Baptiste", "Les Cayes", 1],
     ["Rose-Marie Louis", "Jacmel", 1], ["Widline Charles", "Gonaïves", 1], ["Esther Désir", "Jérémie", 1],
-    ["Carline Saint-Fleur", "Brooklyn, NY", 1], ["Mimose Étienne", "Miami, FL", 1], ["Yolande Augustin", "Montréal, QC", 1],
-    ["Gisèle Toussaint", "Boston, MA", 1], ["Ketlie Noël", "Hinche", 1], ["Marlène Pierre-Louis", "Port-de-Paix", 1],
-    ["Jean-Robert Fils-Aimé", "Port-au-Prince", 0], ["Wilner Dorcéus", "Cap-Haïtien", 0], ["Fritz Michel", "Les Cayes", 0],
-    ["Patrick Delva", "Léogâne", 0], ["Jonel Baptiste", "Saint-Marc", 0], ["Emmanuel Pierre", "Jacmel", 0],
-    ["Stanley Joseph", "Orlando, FL", 0], ["Kervens Louis", "Queens, NY", 0], ["Mackenson Jean", "Paris, France", 0],
-    ["Roosevelt Alexis", "Chicago, IL", 0], ["Gérard Célestin", "Petit-Goâve", 0], ["Daniel Moïse", "Miragoâne", 0]
+    ["Carline Saint-Fleur", "Delmas", 1], ["Mimose Étienne", "Léogâne", 1], ["Yolande Augustin", "Port-de-Paix", 1],
+    ["Gisèle Toussaint", "Mirebalais", 1], ["Ketlie Noël", "Hinche", 1], ["Marlène Pierre-Louis", "Saint-Marc", 1],
+    ["Jean-Robert Fils-Aimé", "Carrefour", 0], ["Wilner Dorcéus", "Cap-Haïtien", 0], ["Fritz Michel", "Les Cayes", 0],
+    ["Patrick Delva", "Petit-Goâve", 0], ["Jonel Baptiste", "Saint-Marc", 0], ["Emmanuel Pierre", "Jacmel", 0],
+    ["Stanley Joseph", "Fort-Liberté", 0], ["Kervens Louis", "Ouanaminthe", 0], ["Mackenson Jean", "Aquin", 0],
+    ["Roosevelt Alexis", "Tabarre", 0], ["Gérard Célestin", "Jean-Rabel", 0], ["Daniel Moïse", "Miragoâne", 0]
   ];
   const pickOne = a => a[Math.floor(Math.random() * a.length)];
   function sampleFace(female) {
-    const skin = pickOne(["#5a3a22", "#7a4a2a", "#8d5524", "#a46a3a", "#c68642", "#e0ac69"]);
+    const skin = pickOne(["#3b2417", "#4a2c17", "#5a3a22", "#6f4427", "#8d5524", "#a46a3a", "#b9814a"]);   // Black skin tones, dark to light brown
+    const mouth = ["#3b2417", "#4a2c17", "#5a3a22"].includes(skin) ? "#f1d3bd" : "#2a1208";
     const hair = pickOne(["#17110d", "#241711", "#33211a", "#0e0b0a"]);
     const bg = pickOne(["#dbe4ff", "#ffe3d6", "#d9f2ee", "#fff0c2", "#f0dcff", "#e0f0d4"]);
     const shirt = pickOne(["#1f3fd1", "#e8193c", "#0f8f86", "#f2a000", "#5b2ad6", "#0d2a6b", "#2f7d4f"]);
@@ -459,29 +460,55 @@
     const glasses = Math.random() < 0.25 ? `<g fill="none" stroke="#222" stroke-width="2"><circle cx="42" cy="50" r="6.5"/><circle cx="58" cy="50" r="6.5"/><path d="M48.5 50h3"/></g>` : "";
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="${bg}"/>${back}`
       + `<path d="M12 100Q14 76 50 74Q86 76 88 100Z" fill="${shirt}"/><rect x="43" y="62" width="14" height="16" rx="6" fill="${skin}"/>`
-      + `<ellipse cx="50" cy="48" rx="20" ry="23" fill="${skin}"/>${front}<circle cx="42" cy="50" r="2.4" fill="#1a1110"/><circle cx="58" cy="50" r="2.4" fill="#1a1110"/>${glasses}`
-      + `<path d="M42 59Q50 66 58 59" fill="none" stroke="#1a1110" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+      + `<ellipse cx="50" cy="48" rx="20" ry="23" fill="${skin}"/>${front}<ellipse cx="42" cy="50" rx="3.8" ry="3.2" fill="#fbf4ea"/><ellipse cx="58" cy="50" rx="3.8" ry="3.2" fill="#fbf4ea"/><circle cx="42" cy="50.2" r="2" fill="#1a1110"/><circle cx="58" cy="50.2" r="2" fill="#1a1110"/>${glasses}`
+      + `<path d="M42 59Q50 66 58 59" fill="none" stroke="${mouth}" stroke-width="2.4" stroke-linecap="round"/></svg>`;
     return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
   let sampleData = null;   // made once per page load, so a language switch does not reshuffle the faces
+  /* Real portraits from randomuser.me. Leave the lists empty to use any of the 100 men / 100 women portraits at random,
+     or put the numbers of the pictures you picked (with pick-faces.html), for example: { men: [3, 12, 40], women: [5, 9, 77] } */
+  const SAMPLE_FACE_IDS = { men: [], women: [] };
   function makeSamples() {
     const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-    const nums = { 1: shuffle(Array.from({ length: 100 }, (_, i) => i)), 0: shuffle(Array.from({ length: 100 }, (_, i) => i)) };   // different face numbers every visit, no repeats
-    return shuffle(SAMPLE_POOL.slice()).slice(0, 12).map(([name, town, female]) => ({
-      name, town, face: sampleFace(!!female),   // cartoon face, only used if the photo cannot load
-      photo: `https://randomuser.me/api/portraits/${female ? "women" : "men"}/${nums[female].pop()}.jpg`
-    }));
+    const all = Array.from({ length: 100 }, (_, i) => i);
+    const ids = { 1: shuffle((SAMPLE_FACE_IDS.women.length ? SAMPLE_FACE_IDS.women : all).slice()), 0: shuffle((SAMPLE_FACE_IDS.men.length ? SAMPLE_FACE_IDS.men : all).slice()) };   // no picture repeats on a page
+    return shuffle(SAMPLE_POOL.slice()).slice(0, 21).map(([name, town, female]) => {
+      const n = ids[female].pop();
+      return { name, town, face: sampleFace(!!female), photo: n == null ? "" : `https://randomuser.me/api/portraits/${female ? "women" : "men"}/${n}.jpg` };
+    });
+  }
+  /* The newest REAL member (first name + last initial, town, photo) comes from the database function latest_member()
+     (see latest-member.sql). If that function is not set up, or nobody has joined with a photo yet, all 12 are samples. */
+  let latestMember = null;
+  async function loadLatestMember() {
+    if (!sb) return;
+    try {
+      const { data, error } = await sb.rpc("latest_member");
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!error && row && row.first_name) { latestMember = row; if (!me) renderFeatured(); }
+    } catch (e) { /* not set up yet: just show the samples */ }
+  }
+  setTimeout(loadLatestMember, 0);
+  function samplePic(s) {
+    const img = el("img", { class: "avatar photo", src: s.photo || s.face, alt: "", width: 72, height: 72, loading: "lazy", referrerpolicy: "no-referrer" });
+    if (s.photo) img.addEventListener("error", () => { img.src = s.face; }, { once: true });   // if a photo cannot load, show the drawn face
+    return img;
   }
   function renderSamples(box) {
     if (!sampleData) sampleData = makeSamples();
-    box.replaceChildren(
-      el("p", { class: "empty sample-note", text: L().sample_note }),
-      ...sampleData.map(s => {
-        const img = el("img", { class: "avatar photo", src: s.photo, alt: "", width: 72, height: 72, loading: "lazy", referrerpolicy: "no-referrer" });
-        img.addEventListener("error", () => { img.src = s.face; }, { once: true });
-        return el("a", { class: "member-card sample", href: "#register", role: "button", onclick: ev => { ev.preventDefault(); openAuth(null, "register"); } },
-          img, el("b", { text: s.name }), el("span", { class: "city", text: s.town }));
-      }));
+    const goJoin = ev => { ev.preventDefault(); openAuth(null, "register"); };
+    const cards = [];
+    if (latestMember) {
+      const m = latestMember, nm = m.first_name + (m.last_initial ? " " + String(m.last_initial).charAt(0).toUpperCase() + "." : "");
+      const initial = el("div", { class: "avatar", "aria-hidden": "true", text: initialsOf(nm) });
+      let av = initial;
+      if (m.photo_url) { av = el("img", { class: "avatar photo", src: m.photo_url, alt: "", width: 72, height: 72, referrerpolicy: "no-referrer" }); av.addEventListener("error", () => av.replaceWith(initial), { once: true }); }
+      cards.push(el("a", { class: "member-card sample newest", href: "#register", role: "button", onclick: goJoin },
+        av, el("b", { text: nm }), el("span", { class: "city", text: m.hometown || "" }), el("span", { class: "newest-tag", text: L().newest_member })));
+    }
+    sampleData.slice(0, latestMember ? 20 : 21).forEach(s => cards.push(el("a", { class: "member-card sample", href: "#register", role: "button", onclick: goJoin },
+      samplePic(s), el("b", { text: s.name }), el("span", { class: "city", text: s.town }))));
+    box.replaceChildren(el("p", { class: "empty sample-note", text: L().sample_note }), ...cards);
   }
   function renderFeatured() {
     const box = $("featured");

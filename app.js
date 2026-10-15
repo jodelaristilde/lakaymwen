@@ -485,7 +485,7 @@
   }
   function renderFeatured() {
     const box = $("featured");
-    if (!sb || !me) { renderSamples(box); return; }
+    if (!sb || !me) { const lf = $("land-featured"); if (lf) renderSamples(lf); box.replaceChildren(); return; }
     if (!featuredData) return;
     if (!featuredData.length) { box.replaceChildren(el("p", { class: "empty", text: L().featured_none })); return; }
     box.replaceChildren(...featuredData.filter(notBlocked).map(p => el("a", { class: "member-card", href: "#member-" + p.id },

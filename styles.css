@@ -1862,3 +1862,12 @@ img.avatar.photo.xl,img.avatar.photo.lg{cursor:zoom-in}
 .sample-note{font-size:.85rem;font-weight:700;color:var(--muted,#5b6478);text-align:center;margin:0 0 4px}
 #featured .member-card.sample{cursor:pointer}
 #featured .member-card.sample img.avatar{width:72px;height:72px;border-radius:50%}
+
+/* sample members inside the visitor landing box */
+.land-members{display:grid;gap:8px;margin-top:6px}
+#land-featured.featured{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+#land-featured .member-card{padding:12px 6px;min-width:0}
+#land-featured .member-card b{font-size:.88rem;overflow-wrap:anywhere}
+#land-featured .member-card .city{font-size:.74rem}
+#land-featured .member-card img.avatar{width:72px;height:72px;border-radius:50%}
+@media (max-width:560px){#land-featured.featured{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}}

@@ -512,8 +512,7 @@
     const rest = real.map((m, i) => realCard(m, i === 0)).concat(sampleData.slice(0, 21 - real.length).map(sampleCard));
     if (!mixedOrder || mixedOrder.length !== rest.length) { mixedOrder = rest.map((_, i) => i); for (let i = mixedOrder.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [mixedOrder[i], mixedOrder[j]] = [mixedOrder[j], mixedOrder[i]]; } }
     const cards = mixedOrder.map(i => rest[i]);
-    const allReal = real.length >= 21;
-    box.replaceChildren(...(allReal ? [] : [el("p", { class: "empty sample-note", text: real.length ? (L().sample_note_mixed || L().sample_note) : L().sample_note })]), ...cards);
+    box.replaceChildren(...cards);   // no "sample profiles" note
   }
   /* Sample (AI) profiles open like a real profile page (#sample-NN). Pressing Message or Add friend shows that the member is private. */
   function showPrivateNotice(s) {

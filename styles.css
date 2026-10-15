@@ -1886,3 +1886,15 @@ img.avatar.photo.xl,img.avatar.photo.lg{cursor:zoom-in}
 .private-lock{margin:4px 0 0;padding:12px 14px;border-radius:14px;background:var(--chip);font-size:.95rem;line-height:1.4}
 .private-btns{display:flex;gap:8px;width:100%}
 .private-btns .btn{flex:1}
+
+/* ---------- Featured Members on the home page: bigger cards and photos ---------- */
+#land-featured.featured{grid-template-columns:repeat(7,minmax(0,1fr));gap:12px}
+#land-featured .member-card{padding:10px 8px 12px;gap:6px;border-radius:20px}
+#land-featured .member-card img.avatar,#land-featured .member-card .avatar{width:100%;max-width:120px;height:auto;aspect-ratio:1/1;border-radius:50%;font-size:2rem}
+#land-featured .member-card b{font-size:.95rem;line-height:1.2}
+#land-featured .member-card .city{font-size:.8rem}
+@media (max-width:900px){#land-featured.featured{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:560px){#land-featured.featured{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  #land-featured .member-card{padding:8px 6px 10px}
+  #land-featured .member-card b{font-size:.85rem}
+  #land-featured .member-card .city{font-size:.74rem}}

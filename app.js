@@ -431,7 +431,7 @@
   let blockedIds = new Set(), isAdmin = false;
   const notBlocked = p => !blockedIds.has(p.id);
   const foundingStar = p => p.founding ? el("span", { class: "founding-dot", title: L().founding_badge, text: "★" }) : null;
-  /* ---------- Sample members for visitors who are not signed in: 12 cartoon faces, different on every visit ---------- */
+  /* ---------- Sample members for visitors who are not signed in: 21 photos from faces/, shuffled on every visit ---------- */
   const SAMPLE_POOL = [
     ["Marie Joseph", "Pétion-Ville", 1], ["Nadège Pierre", "Cap-Haïtien", 1], ["Fabiola Jean-Baptiste", "Les Cayes", 1],
     ["Rose-Marie Louis", "Jacmel", 1], ["Widline Charles", "Gonaïves", 1], ["Esther Désir", "Jérémie", 1],
@@ -465,17 +465,15 @@
     return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
   let sampleData = null;   // made once per page load, so a language switch does not reshuffle the faces
-  /* Real portraits from randomuser.me. Leave the lists empty to use any of the 100 men / 100 women portraits at random,
-     or put the numbers of the pictures you picked (with pick-faces.html), for example: { men: [3, 12, 40], women: [5, 9, 77] } */
-  const SAMPLE_FACE_IDS = { men: [], women: [] };
+  /* The 21 photos of Black Haitian men and women in the faces/ folder (10 women, 11 men).
+     Only these pictures are used: no outside photo service. Each visit shuffles them and gives each a name of the same gender. */
+  const SAMPLE_FACES = { women: ["02", "04", "06", "08", "10", "12", "14", "16", "18", "20"],
+                         men: ["01", "03", "05", "07", "09", "11", "13", "15", "17", "19", "21"] };
   function makeSamples() {
     const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-    const all = Array.from({ length: 100 }, (_, i) => i);
-    const ids = { 1: shuffle((SAMPLE_FACE_IDS.women.length ? SAMPLE_FACE_IDS.women : all).slice()), 0: shuffle((SAMPLE_FACE_IDS.men.length ? SAMPLE_FACE_IDS.men : all).slice()) };   // no picture repeats on a page
-    return shuffle(SAMPLE_POOL.slice()).slice(0, 21).map(([name, town, female]) => {
-      const n = ids[female].pop();
-      return { name, town, face: sampleFace(!!female), photo: n == null ? "" : `https://randomuser.me/api/portraits/${female ? "women" : "men"}/${n}.jpg` };
-    });
+    const pick = (female, photos) => shuffle(SAMPLE_POOL.filter(p => !!p[2] === female)).slice(0, photos.length)
+      .map(([name, town], i) => ({ name, town, face: sampleFace(female), photo: "faces/" + photos[i] + ".jpg" }));
+    return shuffle(pick(true, shuffle(SAMPLE_FACES.women.slice())).concat(pick(false, shuffle(SAMPLE_FACES.men.slice()))));
   }
   /* The newest REAL member (first name + last initial, town, photo) comes from the database function latest_member()
      (see latest-member.sql). If that function is not set up, or nobody has joined with a photo yet, all 12 are samples. */

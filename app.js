@@ -505,7 +505,7 @@
       return el("a", { class: "member-card sample" + (newest ? " newest" : ""), href: "#register", role: "button", onclick: goJoin },
         av, el("b", { text: nm }), el("span", { class: "city", text: m.hometown || "" }), newest ? el("span", { class: "newest-tag", text: L().newest_member }) : null);
     };
-    const sampleCard = s => el("a", { class: "member-card sample", href: "#sample-" + s.id },
+    const sampleCard = s => el("a", { class: "member-card sample", href: me ? "#sample-" + s.id : "#register", onclick: me ? null : goJoin },
       samplePic(s), el("b", { text: s.name }), el("span", { class: "city", text: s.town }));
     /* real members (with photos) and samples are all scattered in a new order on every visit; the newest real member keeps its tag */
     const real = realMembers.slice(0, 21);
@@ -3053,6 +3053,7 @@
     const wasMode = document.body.classList.contains("register-mode") || document.body.classList.contains("member-mode");
     document.body.classList.toggle("register-mode", reg);
     document.body.classList.toggle("member-mode", !!(m || sm));
+    if (sm && !me) { setTimeout(() => go("#register"), 0); return; }   // not signed in: no profiles, go to sign-up
     if (sm) { window.scrollTo(0, 0); currentMember = null; renderSamplePage(sm[1]); }
     if (m) { if (currentMember !== m[1]) window.scrollTo(0, 0); currentMember = m[1]; renderMemberPage(currentMember); }
     else currentMember = null;

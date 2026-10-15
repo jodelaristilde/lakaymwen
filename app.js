@@ -431,7 +431,7 @@
   let blockedIds = new Set(), isAdmin = false;
   const notBlocked = p => !blockedIds.has(p.id);
   const foundingStar = p => p.founding ? el("span", { class: "founding-dot", title: L().founding_badge, text: "★" }) : null;
-  /* ---------- Sample members for visitors who are not signed in: 21 photos from faces/, shuffled on every visit ---------- */
+  /* ---------- Sample members for visitors who are not signed in: 21 photos (01.jpg to 21.jpg), shuffled on every visit ---------- */
   const SAMPLE_POOL = [
     ["Marie Joseph", "Pétion-Ville", 1], ["Nadège Pierre", "Cap-Haïtien", 1], ["Fabiola Jean-Baptiste", "Les Cayes", 1],
     ["Rose-Marie Louis", "Jacmel", 1], ["Widline Charles", "Gonaïves", 1], ["Esther Désir", "Jérémie", 1],
@@ -465,25 +465,27 @@
     return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
   let sampleData = null;   // made once per page load, so a language switch does not reshuffle the faces
-  /* The 21 photos of Black Haitian men and women in the faces/ folder (10 women, 11 men).
+  /* The 21 photos of Black Haitian men and women (01.jpg to 21.jpg, 10 women, 11 men).
      Only these pictures are used: no outside photo service. Each visit shuffles them and gives each a name of the same gender. */
   const SAMPLE_FACES = { women: ["02", "04", "06", "08", "10", "12", "14", "16", "18", "20"],
                          men: ["01", "03", "05", "07", "09", "11", "13", "15", "17", "19", "21"] };
   function makeSamples() {
     const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
     const pick = (female, photos) => shuffle(SAMPLE_POOL.filter(p => !!p[2] === female)).slice(0, photos.length)
-      .map(([name, town], i) => ({ name, town, face: sampleFace(female), photo: "faces/" + photos[i] + ".jpg" }));
+      .map(([name, town], i) => ({ name, town, face: sampleFace(female), photo: photos[i] + ".jpg" }));
     return shuffle(pick(true, shuffle(SAMPLE_FACES.women.slice())).concat(pick(false, shuffle(SAMPLE_FACES.men.slice()))));
   }
-  /* The newest REAL member (first name + last initial, town, photo) comes from the database function latest_member()
-     (see latest-member.sql). If that function is not set up, or nobody has joined with a photo yet, all 12 are samples. */
-  let latestMember = null;
+  /* The newest REAL members (first name + last initial, town, photo) come from the database function latest_members()
+     (see latest-members.sql). Each real member takes the place of one sample, until all 21 places are real people.
+     If that function is not set up yet, the older latest_member() (one member) is used instead. */
+  let realMembers = [];
   async function loadLatestMember() {
     if (!sb) return;
     try {
-      const { data, error } = await sb.rpc("latest_member");
-      const row = Array.isArray(data) ? data[0] : data;
-      if (!error && row && row.first_name) { latestMember = row; if (!me) renderFeatured(); }
+      let { data, error } = await sb.rpc("latest_members", { p_limit: 21 });
+      if (error) ({ data, error } = await sb.rpc("latest_member"));
+      const rows = (Array.isArray(data) ? data : data ? [data] : []).filter(r => r && r.first_name);
+      if (!error && rows.length) { realMembers = rows.slice(0, 21); if (!me) renderFeatured(); }
     } catch (e) { /* not set up yet: just show the samples */ }
   }
   setTimeout(loadLatestMember, 0);
@@ -495,19 +497,49 @@
   function renderSamples(box) {
     if (!sampleData) sampleData = makeSamples();
     const goJoin = ev => { ev.preventDefault(); openAuth(null, "register"); };
-    const cards = [];
-    if (latestMember) {
-      const m = latestMember, nm = m.first_name + (m.last_initial ? " " + String(m.last_initial).charAt(0).toUpperCase() + "." : "");
+    const realCard = (m, newest) => {
+      const nm = m.first_name + (m.last_initial ? " " + String(m.last_initial).charAt(0).toUpperCase() + "." : "");
       const initial = el("div", { class: "avatar", "aria-hidden": "true", text: initialsOf(nm) });
       let av = initial;
       if (m.photo_url) { av = el("img", { class: "avatar photo", src: m.photo_url, alt: "", width: 72, height: 72, referrerpolicy: "no-referrer" }); av.addEventListener("error", () => av.replaceWith(initial), { once: true }); }
-      cards.push(el("a", { class: "member-card sample newest", href: "#register", role: "button", onclick: goJoin },
-        av, el("b", { text: nm }), el("span", { class: "city", text: m.hometown || "" }), el("span", { class: "newest-tag", text: L().newest_member })));
-    }
-    sampleData.slice(0, latestMember ? 20 : 21).forEach(s => cards.push(el("a", { class: "member-card sample", href: "#register", role: "button", onclick: goJoin },
-      samplePic(s), el("b", { text: s.name }), el("span", { class: "city", text: s.town }))));
-    box.replaceChildren(el("p", { class: "empty sample-note", text: L().sample_note }), ...cards);
+      return el("a", { class: "member-card sample" + (newest ? " newest" : ""), href: "#register", role: "button", onclick: goJoin },
+        av, el("b", { text: nm }), el("span", { class: "city", text: m.hometown || "" }), newest ? el("span", { class: "newest-tag", text: L().newest_member }) : null);
+    };
+    const sampleCard = s => el("a", { class: "member-card sample", href: "#", role: "button", onclick: ev => { ev.preventDefault(); showPrivateSample(s); } },
+      samplePic(s), el("b", { text: s.name }), el("span", { class: "city", text: s.town }));
+    /* the newest real member is always first; everyone else (real members and samples) is mixed in a new order on every visit */
+    const real = realMembers.slice(0, 21);
+    const rest = real.slice(1).map(m => realCard(m, false)).concat(sampleData.slice(0, 21 - real.length).map(sampleCard));
+    if (!mixedOrder || mixedOrder.length !== rest.length) { mixedOrder = rest.map((_, i) => i); for (let i = mixedOrder.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [mixedOrder[i], mixedOrder[j]] = [mixedOrder[j], mixedOrder[i]]; } }
+    const cards = (real.length ? [realCard(real[0], true)] : []).concat(mixedOrder.map(i => rest[i]));
+    const allReal = real.length >= 21;
+    box.replaceChildren(...(allReal ? [] : [el("p", { class: "empty sample-note", text: real.length ? (L().sample_note_mixed || L().sample_note) : L().sample_note })]), ...cards);
   }
+  /* Tapping a sample profile: show it as a private member (no friend requests, no messages) instead of forcing a sign-in */
+  function showPrivateSample(s) {
+    let d = $("dlg-private");
+    if (!d) {
+      d = el("dialog", { id: "dlg-private", class: "dlg-private" });
+      d.addEventListener("click", e => { if (e.target === d) d.close(); });   // tap outside to close
+      document.body.appendChild(d);
+    }
+    const t = L();
+    const close = el("button", { class: "dlg-close", type: "button", "aria-label": "Close", text: "×", onclick: () => d.close() });
+    const join = el("button", { class: "btn red", type: "button", text: t.private_join || "Join free", onclick: () => { d.close(); openAuth(null, "register"); } });
+    d.replaceChildren(
+      el("div", { class: "dlg-head" }, el("h2", { text: t.private_title || "Private profile" }), close),
+      el("div", { class: "dlg-body private-body" },
+        el("img", { class: "avatar photo private-av", src: s.photo || s.face, alt: "", width: 112, height: 112 }),
+        el("b", { class: "private-name", text: s.name }),
+        el("span", { class: "city", text: s.town }),
+        el("p", { class: "private-lock", text: "🔒 " + (t.private_msg || "This member's profile is private. They are not accepting friend requests or messages.") }),
+        el("div", { class: "private-btns" },
+          el("button", { class: "btn ghost", type: "button", text: t.private_disabled_friend || "Add friend", disabled: true }),
+          el("button", { class: "btn ghost", type: "button", text: t.private_disabled_msg || "Message", disabled: true })),
+        join));
+    if (!d.open) d.showModal();
+  }
+  let mixedOrder = null;   // made once per page load, so a language switch does not reshuffle the cards
   function renderFeatured() {
     const box = $("featured");
     if (!sb || !me) { const lf = $("land-featured"); if (lf) renderSamples(lf); box.replaceChildren(); return; }

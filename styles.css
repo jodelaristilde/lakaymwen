@@ -1901,3 +1901,53 @@ img.avatar.photo.xl,img.avatar.photo.lg{cursor:zoom-in}
 
 /* ---------- Featured Members for signed-in members: same big photos ---------- */
 #featured .member-card img.avatar,#featured .member-card .avatar,#featured .member-card.sample img.avatar{width:100%;max-width:110px;height:auto;aspect-ratio:1/1;border-radius:50%;font-size:2rem}
+
+/* ---------- Sign-up page (#register): "Already a member? Log in" at the top right of the map box ---------- */
+.map-login{display:none}
+body.register-mode:not(.join-mode):not(.logged-in) #haiti .box-head{flex-wrap:wrap}
+body.register-mode:not(.join-mode):not(.logged-in) #haiti .map-login{display:flex;align-items:center;gap:8px;margin-left:auto;flex:none}
+.map-login-q{display:none}
+.map-login .btn{padding:9px 18px;font-size:.95rem;white-space:nowrap}
+body.register-mode:not(.join-mode):not(.logged-in) #haiti .box-head{flex-wrap:nowrap}
+body.register-mode:not(.join-mode):not(.logged-in) #haiti .box-head h2{min-width:0}
+
+/* =====================================================================
+   Polish (Oct 15): Haitian flag colors, lighter menu, "family wall" of faces.
+   Everything below is visual only. Delete this block to undo it.
+   ===================================================================== */
+:root{--ht-blue:#00209f;--ht-red:#d21034;--wall-ink:#0b1d4a}
+
+/* Left menu: light rows instead of heavy teal blocks */
+.side-menu a,.side-menu button{background:#fff;color:var(--wall-ink);border:1px solid #e3e8f3;box-shadow:none;border-radius:12px;font-weight:700;position:relative;padding-left:18px}
+.side-menu a::before,.side-menu button::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:0 3px 3px 0;background:linear-gradient(var(--ht-blue) 50%,var(--ht-red) 50%);opacity:0;transition:opacity .15s}
+.side-menu a:hover,.side-menu button:hover{background:#f1f4fc;filter:none;transform:none}
+.side-menu a:hover::before,.side-menu button:hover::before,.side-menu a:focus-visible::before,.side-menu button:focus-visible::before{opacity:1}
+.side-menu a:focus-visible,.side-menu button:focus-visible{outline:3px solid color-mix(in srgb,var(--ht-blue) 45%,transparent);outline-offset:2px}
+
+/* "Did you know?" stays its natural size instead of stretching into an empty column */
+body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .side-extra{align-self:start}
+body:not(.logged-in):not(.register-mode):not(.join-mode):not(.member-mode):not(.search-mode):not(.privacy-mode):not(.admin-mode):not(.page-mode) .side-extra .fact-card{flex:none}
+
+/* Main home panel: clean white with a Haitian flag stripe on top */
+.landing{position:relative;overflow:hidden;background:#fff;border:1px solid #e3e8f3}
+.landing::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(90deg,var(--ht-blue) 50%,var(--ht-red) 50%)}
+.land-h{color:var(--wall-ink)}
+
+/* Featured Members: a family wall of faces */
+.land-members .old-h{color:var(--wall-ink);font-size:clamp(1.25rem,2vw,1.5rem);letter-spacing:-.01em;margin:8px 0 2px}
+#land-featured.featured,#featured.featured{gap:18px 10px}
+#land-featured .member-card,#featured .member-card{background:transparent;border:0;box-shadow:none;padding:4px 2px 6px;border-radius:16px;transform:none}
+#land-featured .member-card:hover,#featured .member-card:hover{transform:none;box-shadow:none;background:transparent}
+#land-featured .member-card img.avatar,#land-featured .member-card .avatar,
+#featured .member-card img.avatar,#featured .member-card .avatar,#featured .member-card.sample img.avatar{
+  box-sizing:border-box;border:3px solid transparent;padding:3px;
+  background:linear-gradient(#fff,#fff) padding-box,linear-gradient(var(--ht-blue) 50%,var(--ht-red) 50%) border-box;
+  background-clip:padding-box,border-box;object-fit:cover;object-position:center 30%;
+  box-shadow:0 8px 22px rgba(11,29,74,.14);transition:transform .18s ease,box-shadow .18s ease}
+#land-featured .member-card:hover img.avatar,#land-featured .member-card:focus-visible img.avatar,
+#featured .member-card:hover img.avatar,#featured .member-card:focus-visible img.avatar{transform:scale(1.05);box-shadow:0 12px 28px rgba(11,29,74,.22)}
+#land-featured .member-card:focus-visible,#featured .member-card:focus-visible{outline:3px solid color-mix(in srgb,var(--ht-blue) 45%,transparent);outline-offset:2px}
+#land-featured .member-card b,#featured .member-card b{color:var(--wall-ink);margin-top:4px}
+#land-featured .member-card .city,#featured .member-card .city{color:var(--ht-red)}
+#land-featured .member-card.newest{background:#fff7f0;border:0}
+@media (prefers-reduced-motion:reduce){#land-featured .member-card img.avatar,#featured .member-card img.avatar{transition:none}#land-featured .member-card:hover img.avatar,#featured .member-card:hover img.avatar{transform:none}}
